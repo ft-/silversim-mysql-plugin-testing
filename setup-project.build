@@ -1,11 +1,19 @@
 <?xml version="1.0"?>
 <project name="project setup" default="setup">
+	<target name="help">
+		<echo message="Available targets:"/>
+		<echo message="setup-workspace - Generates sym linked binaries storage"/>
+		<echo message="nuget-updates - Retrieves packages from nuget"/>
+		<echo message="exe.config - installs exe.config files"/>
+		<echo message="prebuild - runs prebuild"/>
+		<echo message="sonar-project - creates sonar-project"/>
+	</target>
+	
 	<target name="setup">
 		<call target="setup-workspace" unless="${directory::exists('bin')}"/>
 		<call target="nuget-updates" unless="${file::exists('bin/.nuget-done')}"/>
 		<call target="exe.config"/>
 		<call target="prebuild"/>
-		<call target="sonar-project"/>
 	</target>
 	
 	<target name="setup-workspace">
