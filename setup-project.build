@@ -129,8 +129,8 @@ ${sonar.moduledeclarations}
 	<target name="nls" description="Process language files">
 		<mkdir dir="bin/languages"/>
 		<foreach item="Folder" property="longfoldername">
-			<in basedir="nls">
-				<items>
+			<in>
+				<items basedir="nls">
 					<include name="*.src"/>
 				</items>
 			</in>
