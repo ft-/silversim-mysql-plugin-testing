@@ -138,10 +138,10 @@ ${sonar.moduledeclarations}
 				<property name="foldername" value="${path::get-file-name-without-extension(longfoldername)}"/>
 				<echo message="Processing language data for ${foldername}"/>
 				<mkdir dir="bin/languages/${foldername}" failonerror="false"/>
-				<foreach item="File" property="longfilename" in="${foldername}.src">
+				<foreach item="File" property="longfilename" in="nls/${foldername}.src">
 					<property name="filename" value="${path::get-file-name-without-extension(longfilename)}"/>
 					<exec program="resgen">
-						<arg path="${foldername}.src/${filename}.txt"/>
+						<arg path="nls/${foldername}.src/${filename}.txt"/>
 						<arg path="bin/languages/${foldername}/${filename}.resources"/>
 					</exec>
 				</foreach>
