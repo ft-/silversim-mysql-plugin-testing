@@ -18,6 +18,7 @@
 *.dump.txt
 *.example
 *.log
+*.userprefs
 
 obj
 bin
