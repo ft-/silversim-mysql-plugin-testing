@@ -19,10 +19,8 @@
 *.example
 *.log
 *.userprefs
-
 obj
 bin
-
 /.sonar
 singletests
 /testresults
@@ -33,3 +31,4 @@ libraries
 data/dumps/**
 sonar-project.properties
 feed/**
+.vs
