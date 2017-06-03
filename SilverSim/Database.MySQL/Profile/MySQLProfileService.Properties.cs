@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.Profile
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", user.ID);
+                        cmd.Parameters.AddParameter("@uuid", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())

@@ -35,9 +35,9 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID LIKE ?itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID LIKE @itemid", connection))
                 {
-                    cmd.Parameters.AddParameter("?itemid", key);
+                    cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -56,9 +56,9 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID LIKE ?itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID LIKE @itemid", connection))
                 {
-                    cmd.Parameters.AddParameter("?itemid", key);
+                    cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -105,9 +105,9 @@ namespace SilverSim.Database.MySQL.Inventory
                         matchStrings.Add(string.Format("\"{0}\"", itemid.ToString()));
                     }
                     string qStr = string.Join(",", matchStrings);
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID IN (" + qStr + ")", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid AND ID IN (" + qStr + ")", connection))
                     {
-                        cmd.Parameters.AddParameter("?ownerid", principalID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while (dbReader.Read())
@@ -127,10 +127,10 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid AND ID LIKE @itemid", connection))
                 {
-                    cmd.Parameters.AddParameter("?ownerid", principalID);
-                    cmd.Parameters.AddParameter("?itemid", key);
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -149,10 +149,10 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid AND ID LIKE @itemid", connection))
                 {
-                    cmd.Parameters.AddParameter("?ownerid", principalID);
-                    cmd.Parameters.AddParameter("?itemid", key);
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -220,10 +220,10 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid AND ID LIKE @itemid", connection))
                 {
-                    cmd.Parameters.AddParameter("?ownerid", principalID);
-                    cmd.Parameters.AddParameter("?itemid", id);
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    cmd.Parameters.AddParameter("@itemid", id);
                     if (1 > cmd.ExecuteNonQuery())
                     {
                         throw new InventoryItemNotFoundException(id);
@@ -278,10 +278,10 @@ namespace SilverSim.Database.MySQL.Inventory
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID LIKE @ownerid AND ID LIKE @folderid", connection))
                     {
-                        cmd.Parameters.AddParameter("?ownerid", principalID);
-                        cmd.Parameters.AddParameter("?folderid", folderID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@folderid", folderID);
                         if (cmd.ExecuteNonQuery() < 1)
                         {
                             throw new InventoryFolderNotStoredException(folderID);

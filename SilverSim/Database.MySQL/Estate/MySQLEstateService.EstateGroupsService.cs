@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = @estateid", conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -63,10 +63,10 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = @estateid AND GroupID LIKE @groupid", conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             return reader.Read();
@@ -77,16 +77,16 @@ namespace SilverSim.Database.MySQL.Estate
             set
             {
                 string query = value ?
-                    "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)" :
-                    "DELETE FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid";
+                    "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (@estateid, @groupid)" :
+                    "DELETE FROM estate_groups WHERE EstateID = @estateid AND GroupID LIKE @groupid";
 
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     using (var cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         if (cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

@@ -90,9 +90,9 @@ namespace SilverSim.Database.MySQL.Friends
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?id", connection))
+                    using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE @id", connection))
                     {
-                        cmd.Parameters.AddParameter("?id", user.ID);
+                        cmd.Parameters.AddParameter("@id", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -128,10 +128,10 @@ namespace SilverSim.Database.MySQL.Friends
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE (UserID LIKE ?userid AND FriendID LIKE ?friendid) OR (UserID LIKE ?friendid AND FriendID LIKE ?userid)", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE (UserID LIKE @userid AND FriendID LIKE @friendid) OR (UserID LIKE @friendid AND FriendID LIKE @userid)", connection))
                 {
-                    cmd.Parameters.AddParameter("?userid", fi.User.ID);
-                    cmd.Parameters.AddParameter("?friendid", fi.Friend.ID);
+                    cmd.Parameters.AddParameter("@userid", fi.User.ID);
+                    cmd.Parameters.AddParameter("@friendid", fi.Friend.ID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -151,9 +151,9 @@ namespace SilverSim.Database.MySQL.Friends
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE UserID LIKE ?id OR FriendID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM friends WHERE UserID LIKE @id OR FriendID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", accountID);
+                    cmd.Parameters.AddParameter("@id", accountID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -214,11 +214,11 @@ namespace SilverSim.Database.MySQL.Friends
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("UPDATE friends SET RightsToFriend = ?rights WHERE UserID LIKE ?userid AND FriendID LIKE ?friendid", connection))
+                using (var cmd = new MySqlCommand("UPDATE friends SET RightsToFriend = @rights WHERE UserID LIKE @userid AND FriendID LIKE @friendid", connection))
                 {
-                    cmd.Parameters.AddParameter("?rights", fi.FriendGivenFlags);
-                    cmd.Parameters.AddParameter("?userid", fi.User.ID);
-                    cmd.Parameters.AddParameter("?friendid", fi.Friend.ID);
+                    cmd.Parameters.AddParameter("@rights", fi.FriendGivenFlags);
+                    cmd.Parameters.AddParameter("@userid", fi.User.ID);
+                    cmd.Parameters.AddParameter("@friendid", fi.Friend.ID);
                     if(cmd.ExecuteNonQuery() < 1)
                     {
                         throw new FriendUpdateFailedException();
@@ -232,10 +232,10 @@ namespace SilverSim.Database.MySQL.Friends
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE ?userid AND A.FriendID LIKE ?friendid", connection))
+                using (var cmd = new MySqlCommand(m_InnerJoinSelectFull + "WHERE A.UserID LIKE @userid AND A.FriendID LIKE @friendid", connection))
                 {
-                    cmd.Parameters.AddParameter("?userid", user.ID);
-                    cmd.Parameters.AddParameter("?friendid", friend.ID);
+                    cmd.Parameters.AddParameter("@userid", user.ID);
+                    cmd.Parameters.AddParameter("@friendid", friend.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())

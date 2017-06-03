@@ -309,7 +309,7 @@ namespace SilverSim.Database.MySQL
             {
                 if (kvp.Value != null)
                 {
-                    AddParameter(mysqlparam, "?v_" + kvp.Key, kvp.Value);
+                    AddParameter(mysqlparam, "@v_" + kvp.Key, kvp.Value);
                 }
             }
         }
@@ -393,7 +393,7 @@ namespace SilverSim.Database.MySQL
                 q1.Append("`");
                 q1.Append(p);
                 q1.Append("`");
-                q2.Append("?v_");
+                q2.Append("@v_");
                 q2.Append(p);
             }
             q1.Append(q2);
@@ -613,41 +613,41 @@ namespace SilverSim.Database.MySQL
 
                 if (t == typeof(Vector3))
                 {
-                    updates.Add("`" + key + "X` = ?v_" + key + "X");
-                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
-                    updates.Add("`" + key + "Z` = ?v_" + key + "Z");
+                    updates.Add("`" + key + "X` = @v_" + key + "X");
+                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
+                    updates.Add("`" + key + "Z` = @v_" + key + "Z");
                 }
                 else if (t == typeof(GridVector) || t == typeof(EnvironmentController.WLVector2))
                 {
-                    updates.Add("`" + key + "X` = ?v_" + key + "X");
-                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
+                    updates.Add("`" + key + "X` = @v_" + key + "X");
+                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
                 }
                 else if (t == typeof(Quaternion))
                 {
-                    updates.Add("`" + key + "X` = ?v_" + key + "X");
-                    updates.Add("`" + key + "Y` = ?v_" + key + "Y");
-                    updates.Add("`" + key + "Z` = ?v_" + key + "Z");
-                    updates.Add("`" + key + "W` = ?v_" + key + "W");
+                    updates.Add("`" + key + "X` = @v_" + key + "X");
+                    updates.Add("`" + key + "Y` = @v_" + key + "Y");
+                    updates.Add("`" + key + "Z` = @v_" + key + "Z");
+                    updates.Add("`" + key + "W` = @v_" + key + "W");
                 }
                 else if (t == typeof(Color))
                 {
-                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
+                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
                 }
                 else if (t == typeof(EnvironmentController.WLVector4))
                 {
-                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
-                    updates.Add("`" + key + "Value` = ?v_" + key + "Value");
+                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
+                    updates.Add("`" + key + "Value` = @v_" + key + "Value");
                 }
                 else if (t == typeof(ColorAlpha))
                 {
-                    updates.Add("`" + key + "Red` = ?v_" + key + "Red");
-                    updates.Add("`" + key + "Green` = ?v_" + key + "Green");
-                    updates.Add("`" + key + "Blue` = ?v_" + key + "Blue");
-                    updates.Add("`" + key + "Alpha` = ?v_" + key + "Alpha");
+                    updates.Add("`" + key + "Red` = @v_" + key + "Red");
+                    updates.Add("`" + key + "Green` = @v_" + key + "Green");
+                    updates.Add("`" + key + "Blue` = @v_" + key + "Blue");
+                    updates.Add("`" + key + "Alpha` = @v_" + key + "Alpha");
                 }
                 else if (value == null)
                 {
@@ -655,7 +655,7 @@ namespace SilverSim.Database.MySQL
                 }
                 else
                 {
-                    updates.Add("`" + key + "` = ?v_" + key);
+                    updates.Add("`" + key + "` = @v_" + key);
                 }
             }
             return updates;
@@ -690,7 +690,7 @@ namespace SilverSim.Database.MySQL
                 {
                     wherestr.Append(" AND ");
                 }
-                wherestr.AppendFormat("{0} LIKE ?w_{0}", w.Key);
+                wherestr.AppendFormat("{0} LIKE @w_{0}", w.Key);
             }
 
             using (var command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
@@ -698,7 +698,7 @@ namespace SilverSim.Database.MySQL
                 AddParameters(command.Parameters, vals);
                 foreach(KeyValuePair<string, object> w in where)
                 {
-                    command.Parameters.AddWithValue("?w_" + w.Key, w.Value);
+                    command.Parameters.AddWithValue("@w_" + w.Key, w.Value);
                 }
                 if (command.ExecuteNonQuery() < 1)
                 {
@@ -875,9 +875,9 @@ namespace SilverSim.Database.MySQL
         #region Migrations helper
         public static uint GetTableRevision(this MySqlConnection connection, string name)
         {
-            using(var cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=?name", connection))
+            using(var cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=@name", connection))
             {
-                cmd.Parameters.AddWithValue("?name", name);
+                cmd.Parameters.AddWithValue("@name", name);
                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
                     if (dbReader.Read())

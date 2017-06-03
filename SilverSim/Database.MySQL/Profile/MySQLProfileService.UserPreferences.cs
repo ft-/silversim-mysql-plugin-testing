@@ -34,9 +34,9 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT useruuid FROM usersettings where useruuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT useruuid FROM usersettings where useruuid LIKE @uuid", conn))
                 {
-                    cmd.Parameters.AddParameter("?uuid", user.ID);
+                    cmd.Parameters.AddParameter("@uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -50,9 +50,9 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE @uuid", conn))
                 {
-                    cmd.Parameters.AddParameter("?uuid", user.ID);
+                    cmd.Parameters.AddParameter("@uuid", user.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -87,9 +87,9 @@ namespace SilverSim.Database.MySQL.Profile
                 using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using(var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                    using(var cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", user.ID);
+                        cmd.Parameters.AddParameter("@uuid", user.ID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())

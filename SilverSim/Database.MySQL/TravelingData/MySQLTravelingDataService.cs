@@ -69,10 +69,10 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND GridExternalName NOT LIKE ?homeuri LIMIT 1", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id AND GridExternalName NOT LIKE @homeuri LIMIT 1", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", agentID);
-                    cmd.Parameters.AddParameter("?homeuri", homeURI);
+                    cmd.Parameters.AddParameter("@id", agentID);
+                    cmd.Parameters.AddParameter("@homeuri", homeURI);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -90,9 +90,9 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", sessionID);
+                    cmd.Parameters.AddParameter("@id", sessionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
@@ -110,10 +110,10 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id AND ClientIPAddress LIKE ?ip", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id AND ClientIPAddress LIKE @ip", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", agentID);
-                    cmd.Parameters.AddParameter("?ip", ipAddress);
+                    cmd.Parameters.AddParameter("@id", agentID);
+                    cmd.Parameters.AddParameter("@ip", ipAddress);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -132,9 +132,9 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", agentID);
+                    cmd.Parameters.AddParameter("@id", agentID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -152,9 +152,9 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", sessionID);
+                    cmd.Parameters.AddParameter("@id", sessionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -165,9 +165,9 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", accountID);
+                    cmd.Parameters.AddParameter("@id", accountID);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -178,9 +178,9 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", agentID);
+                    cmd.Parameters.AddParameter("@id", agentID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

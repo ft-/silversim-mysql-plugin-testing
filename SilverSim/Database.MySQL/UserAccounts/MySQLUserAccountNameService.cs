@@ -91,9 +91,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name AND LastName LIKE ?name", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE @name AND LastName LIKE @name", connection))
                     {
-                        cmd.Parameters.AddParameter("?name", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("@name", "%" + names[0] + "%");
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -109,10 +109,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?name0 AND LastName LIKE ?name1", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE @name0 AND LastName LIKE @name1", connection))
                     {
-                        cmd.Parameters.AddParameter("?name0", "%" + names[0] + "%");
-                        cmd.Parameters.AddParameter("?name1", "%" + names[1] + "%");
+                        cmd.Parameters.AddParameter("@name0", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("@name1", "%" + names[1] + "%");
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -145,9 +145,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", key);
+                    cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -167,10 +167,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName LIKE ?first AND LastName LIKE ?last", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName LIKE @first AND LastName LIKE @last", connection))
                 {
-                    cmd.Parameters.AddParameter("?first", firstName);
-                    cmd.Parameters.AddParameter("?last", lastName);
+                    cmd.Parameters.AddParameter("@first", firstName);
+                    cmd.Parameters.AddParameter("@last", lastName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())

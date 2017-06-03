@@ -86,11 +86,11 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM maptiles WHERE LocX LIKE ?locx AND LocY LIKE ?locy AND ZoomLevel = ?zoomlevel", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM maptiles WHERE LocX LIKE @locx AND LocY LIKE @locy AND ZoomLevel = @zoomlevel", connection))
                 {
-                    cmd.Parameters.AddParameter("?locx", location.X);
-                    cmd.Parameters.AddParameter("?locy", location.Y);
-                    cmd.Parameters.AddParameter("?zoomlevel", zoomlevel);
+                    cmd.Parameters.AddParameter("@locx", location.X);
+                    cmd.Parameters.AddParameter("@locy", location.Y);
+                    cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
@@ -135,11 +135,11 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELEETE FROM maptiles WHERE LocX LIKE ?locx AND LocY LIKE ?locy AND ZoomLevel = ?zoomlevel", connection))
+                using (var cmd = new MySqlCommand("DELEETE FROM maptiles WHERE LocX LIKE @locx AND LocY LIKE @locy AND ZoomLevel = @zoomlevel", connection))
                 {
-                    cmd.Parameters.AddParameter("?locx", location.X);
-                    cmd.Parameters.AddParameter("?locy", location.Y);
-                    cmd.Parameters.AddParameter("?zoomlevel", zoomlevel);
+                    cmd.Parameters.AddParameter("@locx", location.X);
+                    cmd.Parameters.AddParameter("@locy", location.Y);
+                    cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -152,14 +152,14 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate FROM maptiles WHERE ScopeID LIKE ?scopeid AND ZoomLevel = ?zoomlevel AND locX >= ?locxlow AND locY >= ?locylow AND locX <= ?locxhigh AND locY <= ?locyhigh", connection))
+                using (var cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate FROM maptiles WHERE ScopeID LIKE @scopeid AND ZoomLevel = @zoomlevel AND locX >= @locxlow AND locY >= @locylow AND locX <= @locxhigh AND locY <= @locyhigh", connection))
                 {
-                    cmd.Parameters.AddParameter("?scopeid", scopeid);
-                    cmd.Parameters.AddParameter("?zoomlevel", zoomlevel);
-                    cmd.Parameters.AddParameter("?locxlow", minloc.X);
-                    cmd.Parameters.AddParameter("?locylow", minloc.Y);
-                    cmd.Parameters.AddParameter("?locxhigh", maxloc.X);
-                    cmd.Parameters.AddParameter("?locyhigh", maxloc.Y);
+                    cmd.Parameters.AddParameter("@scopeid", scopeid);
+                    cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
+                    cmd.Parameters.AddParameter("@locxlow", minloc.X);
+                    cmd.Parameters.AddParameter("@locylow", minloc.Y);
+                    cmd.Parameters.AddParameter("@locxhigh", maxloc.X);
+                    cmd.Parameters.AddParameter("@locyhigh", maxloc.Y);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while(reader.Read())

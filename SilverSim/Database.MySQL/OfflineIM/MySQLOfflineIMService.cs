@@ -51,9 +51,9 @@ namespace SilverSim.Database.MySQL.OfflineIM
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ID LIKE ?id", connection))
+                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ID LIKE @id", connection))
                 {
-                    command.Parameters.AddParameter("?id", offlineImID);
+                    command.Parameters.AddParameter("@id", offlineImID);
                     command.ExecuteNonQuery();
                 }
             }
@@ -65,9 +65,9 @@ namespace SilverSim.Database.MySQL.OfflineIM
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM offlineim WHERE ToAgentID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM offlineim WHERE ToAgentID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", principalID);
+                    cmd.Parameters.AddParameter("@id", principalID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while(reader.Read())
@@ -129,9 +129,9 @@ namespace SilverSim.Database.MySQL.OfflineIM
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ToAgentID LIKE ?id", connection))
+                using (var command = new MySqlCommand("DELETE FROM offlineim WHERE ToAgentID LIKE @id", connection))
                 {
-                    command.Parameters.AddParameter("?id", accountID);
+                    command.Parameters.AddParameter("@id", accountID);
                     command.ExecuteNonQuery();
                 }
             }

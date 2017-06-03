@@ -70,9 +70,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE ?inviteid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE InviteID LIKE @inviteid", conn))
                 {
-                    cmd.Parameters.AddParameter("?inviteid", groupNoticeID);
+                    cmd.Parameters.AddParameter("@inviteid", groupNoticeID);
                     if(cmd.ExecuteNonQuery() < 1)
                     {
                         throw new KeyNotFoundException();
@@ -87,9 +87,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE GroupID LIKE @groupid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -111,9 +111,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID LIKE @noticeid", conn))
                 {
-                    cmd.Parameters.AddParameter("?noticeid", groupNoticeID);
+                    cmd.Parameters.AddParameter("@noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(!reader.Read())
@@ -136,9 +136,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID LIKE ?noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID LIKE @noticeid", conn))
                 {
-                    cmd.Parameters.AddParameter("?noticeid", groupNoticeID);
+                    cmd.Parameters.AddParameter("@noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();

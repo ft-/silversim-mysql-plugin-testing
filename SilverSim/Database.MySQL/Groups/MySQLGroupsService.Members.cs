@@ -37,9 +37,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -64,9 +64,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT m.* FROM groupmemberships AS m WHERE m.GroupID LIKE @groupid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -127,10 +127,10 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groupmemberships WHERE GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
-                    cmd.Parameters.AddParameter("?principalid", principal.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
+                    cmd.Parameters.AddParameter("@principalid", principal.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -144,10 +144,10 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?principalid", principal.ID);
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("@principalid", principal.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
                     if(cmd.ExecuteNonQuery() < 1)
                     {
                         throw new KeyNotFoundException();
@@ -161,11 +161,11 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET Contribution=?contribution WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET Contribution=@contribution WHERE GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?contribution", contribution);
-                    cmd.Parameters.AddParameter("?principalid", principal.ID);
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("@contribution", contribution);
+                    cmd.Parameters.AddParameter("@principalid", principal.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
                     if(cmd.ExecuteNonQuery() <1)
                     {
                         throw new KeyNotFoundException();
@@ -180,10 +180,10 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
-                    cmd.Parameters.AddParameter("?principalid", principal.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
+                    cmd.Parameters.AddParameter("@principalid", principal.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
@@ -204,12 +204,12 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET AcceptNotices=?acceptnotices, ListInProfile=?listinprofile WHERE GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                using (var cmd = new MySqlCommand("UPDATE groupmemberships SET AcceptNotices=@acceptnotices, ListInProfile=@listinprofile WHERE GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                 {
-                    cmd.Parameters.AddParameter("?acceptnotices", acceptNotices);
-                    cmd.Parameters.AddParameter("?listinprofile", listInProfile);
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
-                    cmd.Parameters.AddParameter("?principalid", principal.ID);
+                    cmd.Parameters.AddParameter("@acceptnotices", acceptNotices);
+                    cmd.Parameters.AddParameter("@listinprofile", listInProfile);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
+                    cmd.Parameters.AddParameter("@principalid", principal.ID);
                     if(cmd.ExecuteNonQuery() < 1)
                     {
                         throw new KeyNotFoundException();

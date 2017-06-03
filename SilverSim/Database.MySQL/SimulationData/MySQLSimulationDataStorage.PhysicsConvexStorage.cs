@@ -106,9 +106,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT ConvexData FROM meshphysics WHERE MeshID=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", meshid);
+                    cmd.Parameters.AddParameter("@id", meshid);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -132,9 +132,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT ConvexData FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT ConvexData FROM primphysics WHERE ShapeKey=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", primShape.Serialization);
+                    cmd.Parameters.AddParameter("@id", primShape.Serialization);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -158,9 +158,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NULL FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM meshphysics WHERE MeshID=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", sculptmeshid);
+                    cmd.Parameters.AddParameter("@id", sculptmeshid);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         return dbReader.Read();
@@ -174,9 +174,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NULL FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM primphysics WHERE ShapeKey=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", primShape.Serialization);
+                    cmd.Parameters.AddParameter("@id", primShape.Serialization);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         return dbReader.Read();
@@ -190,9 +190,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=?id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", sculptmeshid);
+                    cmd.Parameters.AddParameter("@id", sculptmeshid);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -203,9 +203,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM primphysics WHERE ShapeKey=?id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM primphysics WHERE ShapeKey=@id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", primShape.Serialization);
+                    cmd.Parameters.AddParameter("@id", primShape.Serialization);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

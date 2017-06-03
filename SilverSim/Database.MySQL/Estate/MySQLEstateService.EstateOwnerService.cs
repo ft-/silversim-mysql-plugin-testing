@@ -33,9 +33,9 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = ?id", conn))
+                using (var cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = @id", conn))
                 {
-                    cmd.Parameters.AddParameter("?id", estateID);
+                    cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -60,7 +60,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (var cmd = new MySqlCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
                     {
-                        cmd.Parameters.AddParameter("?id", owner.ID);
+                        cmd.Parameters.AddParameter("@id", owner.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -94,10 +94,10 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("UPDATE estates SET Owner = ?ownerid WHERE ID = ?id", conn))
+                    using (var cmd = new MySqlCommand("UPDATE estates SET Owner = @ownerid WHERE ID = @id", conn))
                     {
-                        cmd.Parameters.AddParameter("?id", estateID);
-                        cmd.Parameters.AddParameter("?ownerid", value);
+                        cmd.Parameters.AddParameter("@id", estateID);
+                        cmd.Parameters.AddParameter("@ownerid", value);
                         if(cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

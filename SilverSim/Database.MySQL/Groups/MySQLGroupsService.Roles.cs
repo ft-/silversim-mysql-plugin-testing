@@ -37,9 +37,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE @groupid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -63,10 +63,10 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE ?groupid AND rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE @groupid AND rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -118,10 +118,10 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID LIKE @groupid AND r.RoleID LIKE @roleid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
-                    cmd.Parameters.AddParameter("?roleid", roleID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
+                    cmd.Parameters.AddParameter("@roleid", roleID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -139,19 +139,19 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID LIKE @roleid", conn))
                     {
-                        cmd.Parameters.AddParameter("?zeroid", UUID.Zero);
-                        cmd.Parameters.AddParameter("?roleid", roleID);
+                        cmd.Parameters.AddParameter("@zeroid", UUID.Zero);
+                        cmd.Parameters.AddParameter("@roleid", roleID);
                         cmd.ExecuteNonQuery();
                     }
 
                     foreach (string table in tablenames)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE @groupid AND RoleID LIKE @roleid", conn))
                         {
-                            cmd.Parameters.AddParameter("?groupid", group.ID);
-                            cmd.Parameters.AddParameter("?roleid", roleID);
+                            cmd.Parameters.AddParameter("@groupid", group.ID);
+                            cmd.Parameters.AddParameter("@roleid", roleID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -165,10 +165,10 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE ?groupid AND r.RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE @groupid AND r.RoleID LIKE @roleid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
-                    cmd.Parameters.AddParameter("?roleid", roleID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
+                    cmd.Parameters.AddParameter("@roleid", roleID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
@@ -187,14 +187,14 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE grouproles SET Name=?name, Description=?description, Title=?title,Powers=?powers WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid", conn))
+                using (var cmd = new MySqlCommand("UPDATE grouproles SET Name=@name, Description=@description, Title=@title,Powers=@powers WHERE GroupID LIKE @groupid AND RoleID LIKE @roleid", conn))
                 {
-                    cmd.Parameters.AddParameter("?name", role.Name);
-                    cmd.Parameters.AddParameter("?description", role.Description);
-                    cmd.Parameters.AddParameter("?title", role.Title);
-                    cmd.Parameters.AddParameter("?powers", role.Powers);
-                    cmd.Parameters.AddParameter("?groupid", role.Group.ID);
-                    cmd.Parameters.AddParameter("?roleid", role.ID);
+                    cmd.Parameters.AddParameter("@name", role.Name);
+                    cmd.Parameters.AddParameter("@description", role.Description);
+                    cmd.Parameters.AddParameter("@title", role.Title);
+                    cmd.Parameters.AddParameter("@powers", role.Powers);
+                    cmd.Parameters.AddParameter("@groupid", role.Group.ID);
+                    cmd.Parameters.AddParameter("@roleid", role.ID);
                     cmd.ExecuteNonQuery();
                 }
             }

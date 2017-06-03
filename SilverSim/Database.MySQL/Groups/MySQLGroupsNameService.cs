@@ -97,10 +97,10 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE ?groupName LIMIT ?limit", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE @groupName LIMIT @limit", connection))
                 {
-                    cmd.Parameters.AddParameter("?groupName", groupName);
-                    cmd.Parameters.AddParameter("?limit", limit);
+                    cmd.Parameters.AddParameter("@groupName", groupName);
+                    cmd.Parameters.AddParameter("@limit", limit);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while(dbReader.Read())
@@ -119,11 +119,11 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (?groupID, ?homeURI, ?groupName)", connection))
+                using (var cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (@groupID, @homeURI, @groupName)", connection))
                 {
-                    cmd.Parameters.AddParameter("?groupID", group.ID);
-                    cmd.Parameters.AddParameter("?homeURI", group.HomeURI);
-                    cmd.Parameters.AddParameter("?groupName", group.GroupName);
+                    cmd.Parameters.AddParameter("@groupID", group.ID);
+                    cmd.Parameters.AddParameter("@homeURI", group.HomeURI);
+                    cmd.Parameters.AddParameter("@groupName", group.GroupName);
                     cmd.ExecuteNonQuery();
                 }
             }

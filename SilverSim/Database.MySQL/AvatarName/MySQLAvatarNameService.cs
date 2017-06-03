@@ -59,10 +59,10 @@ namespace SilverSim.Database.MySQL.AvatarName
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE @firstName AND LastName LIKE @lastName", connection))
                 {
-                    cmd.Parameters.AddParameter("?firstName", firstName);
-                    cmd.Parameters.AddParameter("?lastName", lastName);
+                    cmd.Parameters.AddParameter("@firstName", firstName);
+                    cmd.Parameters.AddParameter("@lastName", lastName);
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
                         if (!dbreader.Read())
@@ -96,9 +96,9 @@ namespace SilverSim.Database.MySQL.AvatarName
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE @avatarid", connection))
                 {
-                    cmd.Parameters.AddParameter("?avatarid", key);
+                    cmd.Parameters.AddParameter("@avatarid", key);
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
                         if (!dbreader.Read())
@@ -153,9 +153,9 @@ namespace SilverSim.Database.MySQL.AvatarName
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE @id", connection))
                 {
-                    cmd.Parameters.AddParameter("?id", key);
+                    cmd.Parameters.AddParameter("@id", key);
                     return cmd.ExecuteNonQuery() == 1;
                 }
             }
@@ -174,9 +174,9 @@ namespace SilverSim.Database.MySQL.AvatarName
                 {
                     connection.Open();
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?name OR LastName LIKE ?name", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE @name OR LastName LIKE @name", connection))
                     {
-                        cmd.Parameters.AddParameter("?name", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("@name", "%" + names[0] + "%");
 
                         return GetSearchResults(cmd);
                     }
@@ -188,10 +188,10 @@ namespace SilverSim.Database.MySQL.AvatarName
                 {
                     connection.Open();
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE @firstname AND LastName LIKE @lastname", connection))
                     {
-                        cmd.Parameters.AddParameter("?firstname", "%" + names[0] + "%");
-                        cmd.Parameters.AddParameter("?lastname", "%" + names[1] + "%");
+                        cmd.Parameters.AddParameter("@firstname", "%" + names[0] + "%");
+                        cmd.Parameters.AddParameter("@lastname", "%" + names[1] + "%");
 
                         return GetSearchResults(cmd);
                     }

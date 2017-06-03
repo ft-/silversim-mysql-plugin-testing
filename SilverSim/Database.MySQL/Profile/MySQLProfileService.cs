@@ -57,34 +57,34 @@ namespace SilverSim.Database.MySQL.Profile
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM classifieds where creatoruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM classifieds where creatoruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM userpicks where creatoruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM userpicks where creatoruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM usernotes where useruuid LIKE ?uuid OR targetuuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM usernotes where useruuid LIKE @uuid OR targetuuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM usersettings where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM usersettings where useruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM userprofile where useruuid LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM userprofile where useruuid LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("UPDATE userprofile set profilePartner = '00000000-0000-0000-0000-000000000000' where profilePartner LIKE ?uuid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE userprofile set profilePartner = '00000000-0000-0000-0000-000000000000' where profilePartner LIKE @uuid", conn))
                     {
-                        cmd.Parameters.AddParameter("?uuid", userAccount);
+                        cmd.Parameters.AddParameter("@uuid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
                 });

@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID LIKE @regionid", conn))
                 {
-                    cmd.Parameters.AddParameter("?regionid", regionID);
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -78,9 +78,9 @@ namespace SilverSim.Database.MySQL.SimulationData
 #if DEBUG
                         m_Log.DebugFormat("Removing environment settings for {0}", regionID.ToString());
 #endif
-                        using (var cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE @regionid", conn))
                         {
-                            cmd.Parameters.AddParameter("?regionid", regionID);
+                            cmd.Parameters.AddParameter("@regionid", regionID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -109,9 +109,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE @regionid", conn))
                 {
-                    cmd.Parameters.AddParameter("?regionid", regionID);
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

@@ -39,9 +39,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE @groupid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -54,9 +54,9 @@ namespace SilverSim.Database.MySQL.Groups
                         }
                     }
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -86,9 +86,9 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers, r.Title FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers, r.Title FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -101,9 +101,9 @@ namespace SilverSim.Database.MySQL.Groups
                         }
                     }
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -144,9 +144,9 @@ namespace SilverSim.Database.MySQL.Groups
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.GroupID LIKE ?groupid", conn))
+                        using (var cmd = new MySqlCommand("SELECT * FROM groupmemberships WHERE rm.GroupID LIKE @groupid", conn))
                         {
-                            cmd.Parameters.AddParameter("?groupid", group.ID);
+                            cmd.Parameters.AddParameter("@groupid", group.ID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -165,10 +165,10 @@ namespace SilverSim.Database.MySQL.Groups
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid", conn))
+                        using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE @groupid AND rm.RoleID LIKE @roleid", conn))
                         {
-                            cmd.Parameters.AddParameter("?groupid", group.ID);
-                            cmd.Parameters.AddParameter("?roleid", roleID);
+                            cmd.Parameters.AddParameter("@groupid", group.ID);
+                            cmd.Parameters.AddParameter("@roleid", roleID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 while (reader.Read())
@@ -229,11 +229,11 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT rm.GroupID FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid and rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT rm.GroupID FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE @groupid AND rm.RoleID LIKE @roleid and rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
-                        cmd.Parameters.AddParameter("?roleid", roleID);
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
+                        cmd.Parameters.AddParameter("@roleid", roleID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             return reader.Read();
@@ -258,22 +258,22 @@ namespace SilverSim.Database.MySQL.Groups
                     conn.Open();
                     conn.InsideTransaction(() =>
                     {
-                        using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=?zeroid WHERE SelectedRoleID LIKE ?roleid AND GroupID LIKE ?groupid AND PrincipalID LIKE ?principalid", conn))
+                        using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID LIKE @roleid AND GroupID LIKE @groupid AND PrincipalID LIKE @principalid", conn))
                         {
-                            cmd.Parameters.AddParameter("?zeroid", UUID.Zero);
-                            cmd.Parameters.AddParameter("?principalid", principal.ID);
-                            cmd.Parameters.AddParameter("?groupid", group.ID);
-                            cmd.Parameters.AddParameter("?roleid", roleID);
+                            cmd.Parameters.AddParameter("@zeroid", UUID.Zero);
+                            cmd.Parameters.AddParameter("@principalid", principal.ID);
+                            cmd.Parameters.AddParameter("@groupid", group.ID);
+                            cmd.Parameters.AddParameter("@roleid", roleID);
                             cmd.ExecuteNonQuery();
                         }
 
                         foreach (string table in tablenames)
                         {
-                            using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid AND RoleID LIKE ?roleid AND PrincipalID LIKE ?principalid", conn))
+                            using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE @groupid AND RoleID LIKE @roleid AND PrincipalID LIKE @principalid", conn))
                             {
-                                cmd.Parameters.AddParameter("?principalid", principal.ID);
-                                cmd.Parameters.AddParameter("?groupid", group.ID);
-                                cmd.Parameters.AddParameter("?roleid", roleID);
+                                cmd.Parameters.AddParameter("@principalid", principal.ID);
+                                cmd.Parameters.AddParameter("@groupid", group.ID);
+                                cmd.Parameters.AddParameter("@roleid", roleID);
                                 cmd.ExecuteNonQuery();
                             }
                         }
@@ -307,11 +307,11 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE ?groupid AND rm.RoleID LIKE ?roleid and rm.PrincipalID LIKE ?principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT rm.*, r.Powers FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID LIKE r.GroupID AND rm.RoleID LIKE r.RoleID WHERE rm.GroupID LIKE @groupid AND rm.RoleID LIKE @roleid and rm.PrincipalID LIKE @principalid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
-                        cmd.Parameters.AddParameter("?roleid", roleID);
-                        cmd.Parameters.AddParameter("?principalid", principal.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
+                        cmd.Parameters.AddParameter("@roleid", roleID);
+                        cmd.Parameters.AddParameter("@principalid", principal.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())

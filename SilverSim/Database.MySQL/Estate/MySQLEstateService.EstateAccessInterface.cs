@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = @estateid", conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -59,9 +59,9 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
+                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = @estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -80,18 +80,18 @@ namespace SilverSim.Database.MySQL.Estate
             set
             {
                 string query = value ?
-                    "REPLACE INTO estate_users (EstateID, UserID) VALUES (?estateid, ?userid)" :
-                    "DELETE FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
+                    "REPLACE INTO estate_users (EstateID, UserID) VALUES (@estateid, @userid)" :
+                    "DELETE FROM estate_users WHERE EstateID = @estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
 
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
                     using (var cmd = new MySqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddParameter("?estateid", estateID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
                         if (value)
                         {
-                            cmd.Parameters.AddParameter("?userid", agent.ID);
+                            cmd.Parameters.AddParameter("@userid", agent.ID);
                         }
                         if (cmd.ExecuteNonQuery() < 1 && value)
                         {

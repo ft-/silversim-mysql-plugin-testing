@@ -74,9 +74,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` LIKE ?groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` LIKE @groupname", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupname", groupName);
+                    cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -92,9 +92,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID LIKE @groupid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", groupID);
+                    cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -136,16 +136,16 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID LIKE ?groupid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID LIKE @groupid", conn))
                     {
-                        cmd.Parameters.AddParameter("?groupid", group.ID);
+                        cmd.Parameters.AddParameter("@groupid", group.ID);
                         cmd.ExecuteNonQuery();
                     }
                     foreach (string table in tablenames)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE ?groupid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE @groupid", conn))
                         {
-                            cmd.Parameters.AddParameter("?groupid", group.ID);
+                            cmd.Parameters.AddParameter("@groupid", group.ID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -159,9 +159,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.GroupID, g.`Name`, g.Location, " + GCountQuery + " FROM groups AS g WHERE g.Name LIKE ?value", conn))
+                using (var cmd = new MySqlCommand("SELECT g.GroupID, g.`Name`, g.Location, " + GCountQuery + " FROM groups AS g WHERE g.Name LIKE @value", conn))
                 {
-                    cmd.Parameters.AddParameter("?value", "%" + query + "%");
+                    cmd.Parameters.AddParameter("@value", "%" + query + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while(reader.Read())
@@ -189,9 +189,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` LIKE ?groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` LIKE @groupname", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupname", groupName);
+                    cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -212,9 +212,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID LIKE @groupid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", group.ID);
+                    cmd.Parameters.AddParameter("@groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -235,9 +235,9 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID LIKE ?groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID LIKE @groupid", conn))
                 {
-                    cmd.Parameters.AddParameter("?groupid", groupID);
+                    cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
