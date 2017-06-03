@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Tests.Preconditions.MySQL</name>
+	<skip-delivery>true</skip-delivery>
+	<files>
+		<file name="bin/plugins/SilverSim.Tests.Preconditions.MySQL.dll"/>
+	</files>
+</package>
