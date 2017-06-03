@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+	<name>SilverSim.Database.MySQL</name>
+	<default-configuration>
+		<source>SilverSim.Database.MySQL:PackageConfig.ini</source>
+	</default-configuration>
+	<files>
+		<file name="bin/plugins/SilverSim.Database.MySQL.dll"/>
+	</files>
+</package>
