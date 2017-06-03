@@ -243,13 +243,13 @@ namespace SilverSim.Database.MySQL._Migration
                     }
 
                     var v = (GridVector)colInfo.Default;
-                    result.Add(colInfo.Name + "X", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.X));
-                    result.Add(colInfo.Name + "Y", string.Format("DOUBLE {0} DEFAULT '{1}'", notNull, v.Y));
+                    result.Add(colInfo.Name + "X", string.Format("int {0} DEFAULT '{1}'", notNull, v.X));
+                    result.Add(colInfo.Name + "Y", string.Format("int {0} DEFAULT '{1}'", notNull, v.Y));
                 }
                 else
                 {
-                    result.Add(colInfo.Name + "X", "DOUBLE " + notNull);
-                    result.Add(colInfo.Name + "Y", "DOUBLE " + notNull);
+                    result.Add(colInfo.Name + "X", "int " + notNull);
+                    result.Add(colInfo.Name + "Y", "int " + notNull);
                 }
                 return result;
             }
