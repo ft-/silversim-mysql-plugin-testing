@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Profile
                                     Language = reader.GetString("profileLanguages"),
                                     ImageID = reader.GetUUID("profileImage"),
                                     AboutText = reader.GetString("profileAboutText"),
-                                    FirstLifeImageID = reader.GetString("profileFirstImage"),
+                                    FirstLifeImageID = reader.GetUUID("profileFirstImage"),
                                     FirstLifeText = reader.GetString("profileFirstText")
                                 };
                             }
