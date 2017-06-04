@@ -690,7 +690,7 @@ namespace SilverSim.Database.MySQL
                 {
                     wherestr.Append(" AND ");
                 }
-                wherestr.AppendFormat("{0} LIKE @w_{0}", w.Key);
+                wherestr.AppendFormat("{0} = @w_{0}", w.Key);
             }
 
             using (var command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))

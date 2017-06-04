@@ -99,7 +99,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID LIKE @scopeid AND ID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID = @scopeid AND ID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@scopeid", scopeID);
                         cmd.Parameters.AddParameter("@id", accountID);
@@ -114,7 +114,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -138,7 +138,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE @scopeid AND ID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID = @scopeid AND ID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@scopeid", scopeID);
                         cmd.Parameters.AddParameter("@id", accountID);
@@ -154,7 +154,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -191,7 +191,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE @scopeid AND Email LIKE @email", connection))
+                using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID = @scopeid AND Email = @email", connection))
                 {
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
                     cmd.Parameters.AddParameter("@email", email);
@@ -213,7 +213,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE @scopeid AND Email LIKE @email", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID = @scopeid AND Email = @email", connection))
                 {
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
                     cmd.Parameters.AddParameter("@email", email);
@@ -252,7 +252,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE @scopeid AND FirstName LIKE @firstname AND LastName LIKE @lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID = @scopeid AND FirstName = @firstname AND LastName = @lastname", connection))
                     {
                         cmd.Parameters.AddParameter("@scopeid", scopeID);
                         cmd.Parameters.AddParameter("@firstname", firstName);
@@ -268,7 +268,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName LIKE @firstname AND LastName LIKE @lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName = @firstname AND LastName = @lastname", connection))
                     {
                         cmd.Parameters.AddParameter("@firstname", firstName);
                         cmd.Parameters.AddParameter("@lastname", lastName);
@@ -293,7 +293,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 if (scopeID != UUID.Zero)
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE @scopeid AND FirstName LIKE @firstname AND LastName LIKE @lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID = @scopeid AND FirstName = @firstname AND LastName = @lastname", connection))
                     {
                         cmd.Parameters.AddParameter("@scopeid", scopeID);
                         cmd.Parameters.AddParameter("@firstname", firstName);
@@ -310,7 +310,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE @firstname AND LastName LIKE @lastname", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName = @firstname AND LastName = @lastname", connection))
                     {
                         cmd.Parameters.AddParameter("@firstname", firstName);
                         cmd.Parameters.AddParameter("@lastname", lastName);
@@ -352,7 +352,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts (ScopeID LIKE @ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000')", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts (ScopeID = @ScopeID or ScopeID = '00000000-0000-0000-0000-000000000000')", connection))
                     {
                         cmd.Parameters.AddParameter("@ScopeID", scopeID);
                         using (MySqlDataReader dbreader = cmd.ExecuteReader())
@@ -370,10 +370,10 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                string cmdstr = "select * from useraccounts where (ScopeID LIKE @ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE @word0 or LastName LIKE @word0)";
+                string cmdstr = "select * from useraccounts where (ScopeID = @ScopeID or ScopeID = '00000000-0000-0000-0000-000000000000') and (FirstName LIKE @word0 or LastName LIKE @word0)";
                 if (words.Length == 2)
                 {
-                    cmdstr = "select * from useraccounts where (ScopeID LIKE @ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE @word0 or LastName LIKE @word1)";
+                    cmdstr = "select * from useraccounts where (ScopeID = @ScopeID or ScopeID = '00000000-0000-0000-0000-000000000000') and (FirstName LIKE @word0 or LastName LIKE @word1)";
                 }
                 using (var cmd = new MySqlCommand(cmdstr, connection))
                 {
@@ -446,7 +446,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE @id AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID = @id AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@id", accountID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -463,7 +463,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("UPDATE useraccounts SET IsEverLoggedIn=1 WHERE ID LIKE @id AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("UPDATE useraccounts SET IsEverLoggedIn=1 WHERE ID = @id AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@id", accountID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);

@@ -33,7 +33,7 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid LIKE @user AND targetuuid LIKE @target", conn))
+                using (var cmd = new MySqlCommand("SELECT useruuid FROM usernotes WHERE useruuid = @user AND targetuuid = @target", conn))
                 {
                     cmd.Parameters.AddParameter("@user", user.ID);
                     cmd.Parameters.AddParameter("@target", target.ID);
@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE @user AND targetuuid LIKE @target", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid = @user AND targetuuid = @target", conn))
                 {
                     cmd.Parameters.AddParameter("@user", user.ID);
                     cmd.Parameters.AddParameter("@target", target.ID);

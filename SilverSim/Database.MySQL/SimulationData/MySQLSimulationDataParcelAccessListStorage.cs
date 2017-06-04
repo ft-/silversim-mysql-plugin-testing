@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
 
                     /* we use a specific implementation to reduce the result set here */
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "\"%", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -93,7 +93,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         cmd.ExecuteNonQuery();
                     }
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -145,7 +145,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = '" + regionID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -169,7 +169,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "' AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }

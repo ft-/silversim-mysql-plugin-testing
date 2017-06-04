@@ -59,7 +59,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT `Name`,`Value` FROM avatars WHERE PrincipalID LIKE @principalid", connection))
+                    using (var cmd = new MySqlCommand("SELECT `Name`,`Value` FROM avatars WHERE PrincipalID = @principalid", connection))
                     {
                         cmd.Parameters.AddParameter("@principalid", avatarID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     connection.Open();
                     if (value == null)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE @principalid", connection))
+                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection))
                         {
                             cmd.Parameters.AddParameter("@principalid", avatarID);
                             cmd.ExecuteNonQuery();
@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         connection.InsideTransaction(() =>
                         {
-                            using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE @principalid", connection))
+                            using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection))
                             {
                                 cmd.Parameters.AddParameter("@principalid", avatarID);
                                 cmd.ExecuteNonQuery();
@@ -126,7 +126,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         foreach (string key in itemKeys)
                         {
-                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE @principalid AND `Name` LIKE @name", connection))
+                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
                             {
                                 cmd.Parameters.AddWithValue("@principalid", avatarID.ToString());
                                 cmd.Parameters.AddWithValue("@name", key);
@@ -182,7 +182,7 @@ namespace SilverSim.Database.MySQL.Avatar
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE @principalid AND `Name` LIKE @name", connection))
+                using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
                 {
                     cmd.Parameters.AddWithValue("@principalid", avatarID.ToString());
                     cmd.Parameters.AddWithValue("@name", itemKey);
@@ -237,7 +237,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 {
                     foreach (string name in nameList)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE @principalid AND `Name` LIKE @name", connection))
+                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
                         {
                             cmd.Parameters.AddWithValue("@principalid", avatarID);
                             cmd.Parameters.AddWithValue("@name", name);
@@ -253,7 +253,7 @@ namespace SilverSim.Database.MySQL.Avatar
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE @principalid AND `Name` LIKE @name", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
                 {
                     cmd.Parameters.AddWithValue("@principalid", avatarID.ToString());
                     cmd.Parameters.AddWithValue("@name", name);

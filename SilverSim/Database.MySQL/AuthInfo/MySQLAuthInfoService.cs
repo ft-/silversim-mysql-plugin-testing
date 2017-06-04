@@ -94,12 +94,12 @@ namespace SilverSim.Database.MySQL.AuthInfo
                 connection.Open();
                 connection.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                         cmd.ExecuteNonQuery();
@@ -115,7 +115,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID LIKE @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID = @id", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountid);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -166,7 +166,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.UpdateSet("auth", vals, "UserID LIKE \"" + principalId.ToString() + "\"");
+                connection.UpdateSet("auth", vals, "UserID = \"" + principalId.ToString() + "\"");
             }
         }
 
@@ -195,7 +195,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("UPDATE tokens SET Validity=@validity WHERE UserID LIKE @id AND Token LIKE @token AND Validity >= @current", connection))
+                using (var cmd = new MySqlCommand("UPDATE tokens SET Validity=@validity WHERE UserID = @id AND Token = @token AND Validity >= @current", connection))
                 {
                     cmd.Parameters.AddParameter("@id", principalId);
                     cmd.Parameters.AddParameter("@validity", Date.UnixTimeToDateTime(Date.Now.AsULong + (ulong)lifetime_extension_in_minutes * 30));
@@ -224,7 +224,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE @id AND Token LIKE @token", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID = @id AND Token = @token", connection))
                 {
                     cmd.Parameters.AddParameter("@id", accountId);
                     cmd.Parameters.AddParameter("@token", secureSessionId);
@@ -241,7 +241,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID LIKE @id AND SessionID LIKE @sessionid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID = @id AND SessionID = @sessionid", connection))
                 {
                     cmd.Parameters.AddParameter("@id", accountId);
                     cmd.Parameters.AddParameter("@sessionid", sessionId);

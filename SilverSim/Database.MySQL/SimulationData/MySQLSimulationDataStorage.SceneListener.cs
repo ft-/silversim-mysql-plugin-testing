@@ -100,12 +100,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                             /* has to be processed */
                             string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
                             string partID = req.Part.ID.ToString();
-                            primDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
-                            primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", sceneID, partID));
+                            primDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
+                            primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}')", sceneID, partID));
                             knownSerialNumbers.Remove(req.LocalID);
                             if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
                             {
-                                objectDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
+                                objectDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
                             }
                         }
                         else if (knownSerialNumbers.Contains(req.LocalID))
@@ -115,11 +115,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
                                 string partID = req.Part.ID.ToString();
-                                primDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
-                                primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}')", sceneID, partID));
+                                primDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
+                                primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}')", sceneID, partID));
                                 if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
                                 {
-                                    objectDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND ID LIKE '{1}')", sceneID, partID));
+                                    objectDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
                                 }
                             }
                             else
@@ -194,7 +194,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
                                     if (!items.ContainsKey(itemID))
                                     {
-                                        primItemDeletionRequests.Add(string.Format("(RegionID LIKE '{0}' AND PrimID LIKE '{1}' AND InventoryID LIKE '{2}')",
+                                        primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}' AND InventoryID = '{2}')",
                                             sceneID, partID, itemID.ToString()));
                                     }
                                 }

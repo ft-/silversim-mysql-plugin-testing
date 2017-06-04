@@ -155,7 +155,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -177,7 +177,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE Name LIKE @name", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE Name = @name", conn))
                 {
                     cmd.Parameters.AddParameter("@name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE ID = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -220,7 +220,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE Name LIKE @name", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE Name = @name", conn))
                 {
                     cmd.Parameters.AddParameter("@name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -266,7 +266,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE @id", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -309,7 +309,7 @@ namespace SilverSim.Database.MySQL.Estate
                     using(var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using(var cmd = new MySqlCommand("DELETE FROM estates WHERE ID LIKE @id", conn))
+                        using(var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id", conn))
                         {
                             cmd.Parameters.AddParameter("@id", estateID);
                             if(cmd.ExecuteNonQuery() < 1)

@@ -74,7 +74,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` LIKE @groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` = @groupname", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -92,7 +92,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID LIKE @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID = @groupid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -136,14 +136,14 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID LIKE @groupid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID = @groupid", conn))
                     {
                         cmd.Parameters.AddParameter("@groupid", group.ID);
                         cmd.ExecuteNonQuery();
                     }
                     foreach (string table in tablenames)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE @groupid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID = @groupid", conn))
                         {
                             cmd.Parameters.AddParameter("@groupid", group.ID);
                             cmd.ExecuteNonQuery();
@@ -189,7 +189,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` LIKE @groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` = @groupname", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -212,7 +212,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID LIKE @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID = @groupid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -235,7 +235,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID LIKE @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID = @groupid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -277,7 +277,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.UpdateSet("groups", vals, "GroupID LIKE \"" + group.ID.ID.ToString() + "\"");
+                conn.UpdateSet("groups", vals, "GroupID = \"" + group.ID.ID.ToString() + "\"");
             }
             return group;
         }

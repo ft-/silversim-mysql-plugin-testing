@@ -59,9 +59,10 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = @estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
+                    using (var cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = @estateid AND UserID LIKE @agentid", conn))
                     {
                         cmd.Parameters.AddParameter("@estateid", estateID);
+                        cmd.Parameters.AddParameter("@agentid", agent.ID.ToString() + "%");
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())

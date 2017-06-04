@@ -36,8 +36,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                    using (var cmd = new MySqlCommand("SELECT DistanceX, DistanceY, DistanceZ FROM spawnpoints WHERE RegionID = @regionid", conn))
                     {
+                        cmd.Parameters.AddParameter("@regionid", regionID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -56,8 +57,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     conn.Open();
                     conn.InsideTransaction(() =>
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn))
                         {
+                            cmd.Parameters.AddParameter("@regionid", regionID);
                             cmd.ExecuteNonQuery();
                         }
 
@@ -80,8 +82,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn))
                 {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

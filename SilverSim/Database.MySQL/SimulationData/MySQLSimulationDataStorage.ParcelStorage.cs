@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
                     {
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -119,7 +119,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE '" + regionID.ToString() + "' AND ParcelID LIKE '" + parcelID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
                 {
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -132,7 +132,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(var cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using(var cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID = '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {

@@ -34,7 +34,6 @@ using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Grid
 {
-    #region Service Implementation
     [Description("MySQL Grid Backend")]
     [PluginName("Grid")]
     [ServerParam("DeleteOnUnregister", Type = ServerParamType.GlobalOnly, ParameterType = typeof(bool), DefaultValue = false)]
@@ -122,7 +121,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid LIKE @id AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid = @id AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -146,7 +145,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid LIKE @id AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid = @id AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -176,7 +175,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@x", gridX);
                     cmd.Parameters.AddParameter("@y", gridY);
@@ -201,7 +200,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE locX <= @x AND locY <= @y AND locX + sizeX > @x AND locY + sizeY > @y AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@x", gridX);
                     cmd.Parameters.AddParameter("@y", gridY);
@@ -232,7 +231,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE regionName LIKE @name AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE regionName = @name AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@name", regionName);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -256,7 +255,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE regionName LIKE @name AND ScopeID LIKE @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE regionName = @name AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@name", regionName);
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
@@ -286,7 +285,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid LIKE @id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -309,7 +308,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid LIKE @id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE uuid = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -335,7 +334,7 @@ namespace SilverSim.Database.MySQL.Grid
             ServerHttpPort = dbReader.GetUInt32("serverHttpPort"),
             Owner = dbReader.GetUUI("owner"),
             Access = dbReader.GetEnum<RegionAccess>("access"),
-            ScopeID = dbReader.GetString("ScopeID"),
+            ScopeID = dbReader.GetUUID("ScopeID"),
             Size = dbReader.GetGridVector("size"),
             Flags = dbReader.GetEnum<RegionFlags>("flags"),
             AuthenticatingToken = dbReader.GetString("AuthenticatingToken"),
@@ -351,7 +350,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags | @flags WHERE uuid LIKE @regionid", conn))
+                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags | @flags WHERE uuid = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@flags", setflags);
@@ -365,7 +364,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags & ~@flags WHERE uuid LIKE @regionid", conn))
+                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags & ~@flags WHERE uuid = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@flags", removeflags);
@@ -387,7 +386,7 @@ namespace SilverSim.Database.MySQL.Grid
 
                 if(!m_AllowDuplicateRegionNames)
                 {
-                    using(var cmd = new MySqlCommand("SELECT uuid FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID LIKE @scopeid AND regionName LIKE @name LIMIT 1", conn))
+                    using(var cmd = new MySqlCommand("SELECT uuid FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID = @scopeid AND regionName = @name LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@scopeid", regionInfo.ScopeID);
                         cmd.Parameters.AddParameter("@name", regionInfo.Name);
@@ -406,8 +405,8 @@ namespace SilverSim.Database.MySQL.Grid
                 using(var cmd = new MySqlCommand("SELECT uuid FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE (" +
                             "(locX >= @minx AND locY >= @miny AND locX < @maxx AND locY < @maxy) OR " +
                             "(locX + sizeX > @minx AND locY+sizeY > @miny AND locX + sizeX < @maxx AND locY + sizeY < @maxy)" +
-                            ") AND uuid NOT LIKE @regionid AND " +
-                            "ScopeID LIKE @scopeid LIMIT 1", conn))
+                            ") AND (NOT uuid = @regionid) AND " +
+                            "ScopeID = @scopeid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@min", regionInfo.Location);
                     cmd.Parameters.AddParameter("@max", regionInfo.Location + regionInfo.Size);
@@ -459,7 +458,7 @@ namespace SilverSim.Database.MySQL.Grid
                 {
                     /* we handoff most stuff to mysql here */
                     /* first line deletes only when region is not persistent */
-                    using(var cmd = new MySqlCommand("DELETE FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID LIKE @scopeid AND uuid LIKE @regionid AND (flags & @persistent) != 0", conn))
+                    using(var cmd = new MySqlCommand("DELETE FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID = @scopeid AND uuid = @regionid AND (flags & @persistent) != 0", conn))
                     {
                         cmd.Parameters.AddParameter("@scopeid", scopeID);
                         cmd.Parameters.AddParameter("@regionid", regionID);
@@ -470,7 +469,7 @@ namespace SilverSim.Database.MySQL.Grid
                     /* second step is to set it offline when it is persistent */
                 }
 
-                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags - @online, last_seen=@unixtime WHERE ScopeID LIKE @scopeid AND uuid LIKE @regionid AND (flags & @online) != 0", conn))
+                using (var cmd = new MySqlCommand("UPDATE `" + MySqlHelper.EscapeString(m_TableName) + "` SET flags = flags - @online, last_seen=@unixtime WHERE ScopeID = @scopeid AND uuid = @regionid AND (flags & @online) != 0", conn))
                 {
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
                     cmd.Parameters.AddParameter("@regionid", regionID);
@@ -486,7 +485,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID LIKE @scopeid AND uuid LIKE @regionid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID = @scopeid AND uuid = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@scopeid", scopeID);
                     cmd.Parameters.AddParameter("@regionid", regionID);
@@ -507,7 +506,7 @@ namespace SilverSim.Database.MySQL.Grid
                 connection.Open();
                 using (var cmd = new MySqlCommand(scopeID == UUID.Zero ?
                     "SELECT * FROM regions WHERE flags & @flag != 0" :
-                    "SELECT * FROM regions WHERE flags & @flag != 0 AND ScopeID LIKE @scopeid", connection))
+                    "SELECT * FROM regions WHERE flags & @flag != 0 AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@flag", flags);
                     if (scopeID != UUID.Zero)
@@ -557,7 +556,7 @@ namespace SilverSim.Database.MySQL.Grid
                         "(locX + sizeX >= @xmin AND locY+sizeY >= @ymin AND locX + sizeX <= @xmax AND locY + sizeY <= @ymax) OR " +
                         "(locX >= @xmin AND locY >= @ymin AND locX + sizeX > @xmin AND locY + sizeY > @ymin) OR " +
                         "(locX >= @xmax AND locY >= @ymax AND locX + sizeX > @xmax AND locY + sizeY > @ymax)" +
-                        ") AND ScopeID LIKE @scopeid", connection))
+                        ") AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("@scopeid", scopeID.ToString());
                     cmd.Parameters.AddWithValue("@xmin", min.X);
@@ -592,7 +591,7 @@ namespace SilverSim.Database.MySQL.Grid
                                                             "((locY = @maxY OR locY + sizeY = @locY) AND " +
                                                             "(locX <= @maxX AND locX + sizeX >= @locX))" +
                                                             ") AND " +
-                                                            "ScopeID LIKE @scopeid", connection))
+                                                            "ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("@scopeid", scopeID.ToString());
                     cmd.Parameters.AddWithValue("@locX", ri.Location.X);
@@ -642,7 +641,7 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID LIKE @scopeid AND regionName LIKE '" + MySqlHelper.EscapeString(searchString)+"%'", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID = @scopeid AND regionName LIKE '" + MySqlHelper.EscapeString(searchString)+"%'", connection))
                 {
                     cmd.Parameters.AddWithValue("@scopeid", scopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -695,5 +694,4 @@ namespace SilverSim.Database.MySQL.Grid
             new ChangeColumn<UUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
         };
     }
-    #endregion
 }

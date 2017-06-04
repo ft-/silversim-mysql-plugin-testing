@@ -38,8 +38,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM terrains WHERE RegionID = @regionid", connection))
                     {
+                        cmd.Parameters.AddParameter("@regionid", regionID);
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {

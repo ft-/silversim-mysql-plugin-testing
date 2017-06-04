@@ -71,7 +71,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -84,7 +84,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 using(var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", key);
@@ -133,7 +133,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", id);
@@ -169,7 +169,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -194,7 +194,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (var ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", key);
@@ -287,7 +287,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash LIKE assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id", conn))
+                using (var cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())

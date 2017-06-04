@@ -71,8 +71,9 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID LIKE '" + groupID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID = @groupid", connection))
                 {
+                    cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -97,7 +98,7 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName LIKE @groupName LIMIT @limit", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName = @groupName LIMIT @limit", connection))
                 {
                     cmd.Parameters.AddParameter("@groupName", groupName);
                     cmd.Parameters.AddParameter("@limit", limit);

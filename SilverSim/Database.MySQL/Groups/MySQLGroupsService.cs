@@ -39,13 +39,13 @@ namespace SilverSim.Database.MySQL.Groups
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUPS SERVICE");
         private AggregatingAvatarNameService m_AvatarNameService;
 
-        private const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID LIKE g.GroupID) AS MemberCount," +
-                                    "(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID LIKE g.GroupID) AS RoleCount";
+        private const string GCountQuery = "(SELECT COUNT(m.PrincipalID) FROM groupmemberships AS m WHERE m.GroupID = g.GroupID) AS MemberCount," +
+                                    "(SELECT COUNT(r.RoleID) FROM grouproles AS r WHERE r.GroupID = g.GroupID) AS RoleCount";
 
-        private const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID LIKE g.GroupID) AS RoleCount";
+        private const string MCountQuery = "(SELECT COUNT(xr.RoleID) FROM grouproles AS xr WHERE xr.GroupID = g.GroupID) AS RoleCount";
 
-        private const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID LIKE r.RoleID AND xrm.GroupID LIKE r.GroupID) AS RoleMembers," +
-                                    "(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID LIKE r.GroupID) AS GroupMembers";
+        private const string RCountQuery = "(SELECT COUNT(xrm.PrincipalID) FROM grouprolememberships AS xrm WHERE xrm.RoleID = r.RoleID AND xrm.GroupID = r.GroupID) AS RoleMembers," +
+                                    "(SELECT COUNT(xm.PrincipalID) FROM groupmemberships AS xm WHERE xm.GroupID = r.GroupID) AS GroupMembers";
 
         private UUI ResolveName(UUI uui)
         {
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID LIKE @groupid AND r.RoleID LIKE @grouproleid", conn))
+                using (var cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID = @groupid AND r.RoleID = @grouproleid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@grouproleid", roleID);
@@ -122,8 +122,8 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 using (var cmd = new MySqlCommand(
                     "SELECT Powers FROM roles AS r INNER JOIN " +
-                    "((grouprolemembers AS rm INNER JOIN groupmembers AS m ON rm.GroupID LIKE m.GroupID AND rm.PrincipalID LIKE m.PrincipalID) ON " +
-                    "r.RoleID LIKE rm.RoleID WHERE rm.GroupID LIKE @groupid AND rm.PrincipalID LIKE @principalid", conn))
+                    "((grouprolemembers AS rm INNER JOIN groupmembers AS m ON rm.GroupID = m.GroupID AND rm.PrincipalID = m.PrincipalID) ON " +
+                    "r.RoleID = rm.RoleID WHERE rm.GroupID = @groupid AND rm.PrincipalID = @principalid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", agent.ID);
@@ -156,19 +156,19 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE PrincipalID LIKE @id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM groupinvites WHERE PrincipalID = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE PrincipalID LIKE @id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM groupmemberships WHERE PrincipalID = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE PrincipalID LIKE @id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE PrincipalID = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM grouprolememberships WHERE PrincipalID LIKE @id", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM grouprolememberships WHERE PrincipalID = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", accountID);
                     }

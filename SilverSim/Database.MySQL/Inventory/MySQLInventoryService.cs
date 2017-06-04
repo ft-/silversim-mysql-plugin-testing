@@ -114,7 +114,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid AND AssetType = @assettype AND (flags & 1) <>0", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND AssetType = @assettype AND (flags & 1) <>0", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@assettype", AssetType.Gesture);
@@ -137,7 +137,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE @ownerid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -185,12 +185,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 connection.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID LIKE @ownerid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", userAccount);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID LIKE @ownerid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", userAccount);
                         cmd.ExecuteNonQuery();

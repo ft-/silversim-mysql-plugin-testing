@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID LIKE @principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
                     {
                         cmd.Parameters.AddParameter("@principalid", principalID.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -85,7 +85,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@roleid WHERE PrincipalID LIKE @principalid AND GroupID LIKE @groupid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@roleid WHERE PrincipalID = @principalid AND GroupID = @groupid", conn))
                     {
                         cmd.Parameters.AddParameter("@roleid", value);
                         cmd.Parameters.AddParameter("@groupid", group.ID);
@@ -101,7 +101,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID LIKE @principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
                 {
                     cmd.Parameters.AddParameter("@principalid", principalID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -125,7 +125,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID LIKE @principalid AND GroupID LIKE @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID = @principalid AND GroupID = @groupid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", principal.ID);

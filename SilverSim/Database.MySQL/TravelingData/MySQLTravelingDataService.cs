@@ -69,7 +69,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id AND GridExternalName NOT LIKE @homeuri LIMIT 1", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id AND (NOT GridExternalName = @homeuri) LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     cmd.Parameters.AddParameter("@homeuri", homeURI);
@@ -90,7 +90,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID LIKE @id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", sessionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id AND ClientIPAddress LIKE @ip", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id AND ClientIPAddress = @ip", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     cmd.Parameters.AddParameter("@ip", ipAddress);
@@ -132,7 +132,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID LIKE @id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -152,7 +152,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID LIKE @id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", sessionID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -165,7 +165,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE @id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", accountID);
                     cmd.ExecuteNonQuery();
@@ -178,7 +178,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID LIKE @id", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID = @id", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     return cmd.ExecuteNonQuery() > 0;

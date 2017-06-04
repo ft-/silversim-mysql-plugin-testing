@@ -66,7 +66,7 @@ namespace SilverSim.Database.MySQL.Asset
             using(var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assets WHERE id LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assets WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddWithValue("@id", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -79,7 +79,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 using(var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", key);
@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", id);
@@ -158,7 +158,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assets WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddWithValue("@id", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -183,7 +183,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id LIKE @id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", key);

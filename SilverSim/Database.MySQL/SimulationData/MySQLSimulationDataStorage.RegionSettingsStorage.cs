@@ -135,8 +135,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM regionsettings WHERE RegionID = @regionid", conn))
                 {
+                    cmd.Parameters.AddWithValue("@regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
@@ -156,8 +157,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT RegionID FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("SELECT RegionID FROM regionsettings WHERE RegionID = @regionid", conn))
                 {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -171,8 +173,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM regionsettings WHERE RegionID LIKE '" + regionID.ToString() + "'", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM regionsettings WHERE RegionID = @regionid", conn))
                 {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

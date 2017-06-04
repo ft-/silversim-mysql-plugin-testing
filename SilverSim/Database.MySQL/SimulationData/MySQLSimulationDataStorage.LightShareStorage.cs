@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM lightshare WHERE RegionID LIKE @regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM lightshare WHERE RegionID = @regionid", conn))
                 {
                     cmd.Parameters.AddWithValue("@regionid", regionID.ToString());
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -149,7 +149,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM lightshare WHERE RegionID LIKE @regionid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM lightshare WHERE RegionID = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;

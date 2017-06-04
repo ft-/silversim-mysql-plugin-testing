@@ -108,7 +108,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID LIKE '" + regionIdStr + "'", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID = '" + regionIdStr + "'", connection))
                     {
                         cmd.ExecuteNonQuery();
                     }

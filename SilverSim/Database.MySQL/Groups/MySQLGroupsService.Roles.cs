@@ -37,7 +37,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE @groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouproles AS r WHERE r.GroupID = @groupid", conn))
                     {
                         cmd.Parameters.AddParameter("@groupid", group.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID LIKE r.RoleID WHERE r.GroupID LIKE @groupid AND rm.PrincipalID LIKE @principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT r.*," + RCountQuery + " FROM grouprolememberships AS rm INNER JOIN grouproles AS r ON rm.GroupID AND r.GroupID AND rm.RoleID = r.RoleID WHERE r.GroupID = @groupid AND rm.PrincipalID = @principalid", conn))
                     {
                         cmd.Parameters.AddParameter("@groupid", group.ID);
                         cmd.Parameters.AddParameter("@principalid", principal.ID);
@@ -118,7 +118,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID LIKE @groupid AND r.RoleID LIKE @roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.GroupID FROM grouproles AS r WHERE r.GroupID = @groupid AND r.RoleID = @roleid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@roleid", roleID);
@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.Groups
                 conn.Open();
                 conn.InsideTransaction(() =>
                 {
-                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID LIKE @roleid", conn))
+                    using (var cmd = new MySqlCommand("UPDATE groupmemberships SET SelectedRoleID=@zeroid WHERE SelectedRoleID = @roleid", conn))
                     {
                         cmd.Parameters.AddParameter("@zeroid", UUID.Zero);
                         cmd.Parameters.AddParameter("@roleid", roleID);
@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.Groups
 
                     foreach (string table in tablenames)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID LIKE @groupid AND RoleID LIKE @roleid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID = @groupid AND RoleID = @roleid", conn))
                         {
                             cmd.Parameters.AddParameter("@groupid", group.ID);
                             cmd.Parameters.AddParameter("@roleid", roleID);
@@ -165,7 +165,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID LIKE @groupid AND r.RoleID LIKE @roleid", conn))
+                using (var cmd = new MySqlCommand("SELECT r.*, " + RCountQuery + " FROM grouproles AS r WHERE r.GroupID = @groupid AND r.RoleID = @roleid", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@roleid", roleID);
@@ -187,7 +187,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("UPDATE grouproles SET Name=@name, Description=@description, Title=@title,Powers=@powers WHERE GroupID LIKE @groupid AND RoleID LIKE @roleid", conn))
+                using (var cmd = new MySqlCommand("UPDATE grouproles SET Name=@name, Description=@description, Title=@title,Powers=@powers WHERE GroupID = @groupid AND RoleID = @roleid", conn))
                 {
                     cmd.Parameters.AddParameter("@name", role.Name);
                     cmd.Parameters.AddParameter("@description", role.Description);

@@ -34,8 +34,11 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid", connection))
                 {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@primid", primID);
+                    cmd.Parameters.AddParameter("@itemid", itemID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -86,8 +89,11 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE '" + regionID.ToString() + "' AND PrimID LIKE '" + primID.ToString() + "' AND ItemID LIKE '" + itemID.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid", connection))
                 {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@primid", primID);
+                    cmd.Parameters.AddParameter("@itemid", itemID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }

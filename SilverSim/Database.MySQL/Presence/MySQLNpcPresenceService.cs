@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE @npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -161,7 +161,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE @regionID AND FirstName LIKE @first AND LastName LIKE @last", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID AND FirstName = @first AND LastName = @last", conn))
                 {
                     cmd.Parameters.AddParameter("@regionID", regionID);
                     cmd.Parameters.AddParameter("@first", firstname);
@@ -185,7 +185,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID LIKE @npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -209,7 +209,7 @@ namespace SilverSim.Database.MySQL.Presence
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID LIKE @regionID", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID", conn))
                     {
                         cmd.Parameters.AddParameter("@regionID", regionID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())

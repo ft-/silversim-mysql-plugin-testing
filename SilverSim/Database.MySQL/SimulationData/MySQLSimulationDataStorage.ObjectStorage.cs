@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using(var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(var cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using(var cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID = '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -67,7 +67,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID LIKE '" + key.ToString() + "'", connection))
+                using (var cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID = '" + key.ToString() + "'", connection))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -263,7 +263,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     UUID objgroupID = UUID.Zero;
                     m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
 
-                    using(var cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using(var cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID = '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -288,7 +288,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
                     int primcount = 0;
-                    using (var cmd = new MySqlCommand("SELECT * FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM prims WHERE RegionID = '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -325,7 +325,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     int primitemcount = 0;
                     m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
-                    using (var cmd = new MySqlCommand("SELECT * FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM primitems WHERE RegionID = '" + regionID.ToString() + "'", connection))
                     {
                         cmd.CommandTimeout = 3600;
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -391,7 +391,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 for(int idx = 0; idx < removeObjGroups.Count; idx += 256)
                 {
                     int elemcnt = Math.Min(removeObjGroups.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM objects WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
+                    string sqlcmd = "DELETE FROM objects WHERE RegionID = '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in removeObjGroups.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
                     using (var conn = new MySqlConnection(m_ConnectionString))
@@ -407,7 +407,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 for(int idx = 0; idx < orphanedPrims.Count; idx += 256)
                 {
                     int elemcnt = Math.Min(orphanedPrims.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM prims WHERE RegionID LIKE '" + regionID.ToString() + "' AND ID IN (" +
+                    string sqlcmd = "DELETE FROM prims WHERE RegionID = '" + regionID.ToString() + "' AND ID IN (" +
                         string.Join(",", from id in orphanedPrims.GetRange(idx, elemcnt) select "'" + id.ToString() + "'") +
                         ")";
                     using (var conn = new MySqlConnection(m_ConnectionString))
@@ -422,9 +422,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 for(int idx = 0; idx < orphanedPrimInventories.Count; idx += 256)
                 {
                     int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
-                    string sqlcmd = "DELETE FROM primitems WHERE RegionID LIKE '" + regionID.ToString() + "' AND (" +
+                    string sqlcmd = "DELETE FROM primitems WHERE RegionID = '" + regionID.ToString() + "' AND (" +
                         string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select
-                                            string.Format("PrimID LIKE '{0}' AND ID LIKE '{1}'", id.Key.ToString(), id.Value.ToString()));
+                                            string.Format("PrimID = '{0}' AND ID = '{1}'", id.Key.ToString(), id.Value.ToString()));
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
