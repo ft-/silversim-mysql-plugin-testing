@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELEETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel", connection))
                 {
                     cmd.Parameters.AddParameter("@locx", location.X);
                     cmd.Parameters.AddParameter("@locy", location.Y);
