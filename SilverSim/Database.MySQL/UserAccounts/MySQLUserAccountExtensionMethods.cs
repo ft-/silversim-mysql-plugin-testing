@@ -19,13 +19,7 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using MySql.Data.MySqlClient;
-using SilverSim.Types.GridUser;
-using SilverSim.Types;
 using SilverSim.Types.Account;
 
 namespace SilverSim.Database.MySQL.UserAccounts
