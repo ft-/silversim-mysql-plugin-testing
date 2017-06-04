@@ -263,19 +263,16 @@ namespace SilverSim.Database.MySQL.ServerParam
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    connection.InsideTransaction(() =>
+                    using (var cmd = new MySqlCommand("SELECT regionid, parametername FROM serverparams", connection))
                     {
-                        using (var cmd = new MySqlCommand("SELECT regionid, parametername FROM serverparams", connection))
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                            while (dbReader.Read())
                             {
-                                while (dbReader.Read())
-                                {
-                                    result.Add(new KeyValuePair<UUID, string>(dbReader.GetUUID("regionid"), dbReader.GetString("parametername")));
-                                }
+                                result.Add(new KeyValuePair<UUID, string>(dbReader.GetUUID("regionid"), dbReader.GetString("parametername")));
                             }
                         }
-                    });
+                    }
                 }
                 return result;
             }
@@ -287,19 +284,16 @@ namespace SilverSim.Database.MySQL.ServerParam
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                using (var cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE @regionid AND parametername LIKE @parametername", connection))
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE @regionid AND parametername LIKE @parametername", connection))
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@parametername", parameter);
+                    if (cmd.ExecuteNonQuery() >= 1)
                     {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.Parameters.AddParameter("@parametername", parameter);
-                        if (cmd.ExecuteNonQuery() >= 1)
-                        {
-                            result = true;
-                        }
+                        result = true;
                     }
-                    m_Cache[regionID].Remove(parameter);
-                });
+                }
+                m_Cache[regionID].Remove(parameter);
             }
 
             return result;
