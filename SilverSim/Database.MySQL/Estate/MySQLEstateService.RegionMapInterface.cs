@@ -83,16 +83,9 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var cmd = new MySqlCommand("DELETE FROM estate_regionmap WHERE RegionID = @regionid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return true;
-                        }
-                    }
+                    return cmd.ExecuteNonQuery() > 0;
                 }
             }
-            return false;
         }
 
         uint IEstateRegionMapServiceInterface.this[UUID regionID]

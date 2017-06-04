@@ -240,17 +240,14 @@ namespace SilverSim.Database.MySQL.ServerParam
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    connection.InsideTransaction(() =>
+                    var param = new Dictionary<string, object>
                     {
-                        var param = new Dictionary<string, object>
-                        {
-                            ["regionid"] = regionID,
-                            ["parametername"] = parameter,
-                            ["parametervalue"] = value
-                        };
-                        connection.ReplaceInto("serverparams", param);
-                        m_Cache[regionID][parameter] = value;
-                    });
+                        ["regionid"] = regionID,
+                        ["parametername"] = parameter,
+                        ["parametervalue"] = value
+                    };
+                    connection.ReplaceInto("serverparams", param);
+                    m_Cache[regionID][parameter] = value;
                 }
             }
         }
