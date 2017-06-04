@@ -30,9 +30,11 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Groups
 {
+    [Description("MySQL Groups Backend")]
     [PluginName("Groups")]
     public sealed partial class MySQLGroupsService : GroupsServiceInterface, IPlugin, IDBServiceInterface, IUserAccountDeleteServiceInterface
     {
