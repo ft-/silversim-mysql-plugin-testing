@@ -352,7 +352,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts (ScopeID = @ScopeID or ScopeID = '00000000-0000-0000-0000-000000000000')", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE (ScopeID = @ScopeID or ScopeID = '00000000-0000-0000-0000-000000000000')", connection))
                     {
                         cmd.Parameters.AddParameter("@ScopeID", scopeID);
                         using (MySqlDataReader dbreader = cmd.ExecuteReader())
