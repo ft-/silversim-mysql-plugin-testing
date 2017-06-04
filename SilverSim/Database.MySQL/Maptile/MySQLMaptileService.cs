@@ -55,7 +55,9 @@ namespace SilverSim.Database.MySQL.Maptile
             new AddColumn<string>("ContentType") { Cardinality = 255 },
             new AddColumn<int>("ZoomLevel") { IsNullAllowed = false, Default = 1 },
             new AddColumn<byte[]>("Data") { IsLong = true },
-            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel")
+            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel"),
+            new TableRevision(2),
+            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel", "ScopeID")
         };
 
         public void ProcessMigrations()
@@ -135,11 +137,12 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel AN ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@locx", location.X);
                     cmd.Parameters.AddParameter("@locy", location.Y);
                     cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
+                    cmd.Parameters.AddParameter("@scopeid", scopeid);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
