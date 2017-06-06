@@ -40,6 +40,7 @@ namespace SilverSim.Database.MySQL
         #region Connection String Creator
         public static string BuildConnectionString(IConfig config, ILog log)
         {
+            var sb = new MySqlConnectionStringBuilder();
             if (!(config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
             {
                 string configName = config.Name;
@@ -57,53 +58,52 @@ namespace SilverSim.Database.MySQL
                 }
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            var connectionString = new StringBuilder();
+
             if (config.Contains("Protocol"))
             {
-                connectionString.AppendFormat("Protocol={0};", config.GetString("Protocol"));
+                sb.ConnectionProtocol = (MySqlConnectionProtocol)Enum.Parse(typeof(MySqlConnectionProtocol), config.GetString("Protocol"));
             }
 
             if (config.Contains("SslMode"))
             {
-                connectionString.AppendFormat("SslMode={0};", config.GetString("SslMode"));
+                sb.SslMode = (MySqlSslMode)Enum.Parse(typeof(MySqlSslMode), config.GetString("SslMode"));
             }
 
             if (config.Contains("UseCompression"))
             {
-                connectionString.AppendFormat("UseCompression={0};", config.GetString("UseCompression"));
+                sb.UseCompression = config.GetBoolean("UseCompression");
             }
 
             if(config.Contains("PipeName"))
             {
-                connectionString.AppendFormat("PipeName={0};", config.GetString("PipeName"));
+                sb.PipeName = config.GetString("PipeName");
             }
 
             if (config.Contains("SharedMemoryName"))
             {
-                connectionString.AppendFormat("SharedMemoryName={0};", config.GetString("SharedMemoryName"));
+                sb.SharedMemoryName = config.GetString("SharedMemoryName");
             }
 
             if(config.Contains("Server"))
             {
-                connectionString.AppendFormat("Server={0};", config.GetString("Server"));
+                sb.Server = config.GetString("Server");
             }
 
-            connectionString.AppendFormat("Uid={0};Pwd={1};Database={2};",
-                config.GetString("Username"),
-                config.GetString("Password"),
-                config.GetString("Database"));
+            sb.UserID = config.GetString("Username");
+            sb.Password = config.GetString("Password");
+            sb.Database = config.GetString("Database");
 
             if(config.Contains("Port"))
             {
-                connectionString.AppendFormat("Port={0};", config.GetString("Port"));
+                sb.Port = (uint)config.GetInt("Port");
             }
 
             if(config.Contains("MaximumPoolsize"))
             {
-                connectionString.AppendFormat("MaximumPoolsize={0};", config.GetString("MaximumPoolsize"));
+                sb.MaximumPoolSize = (uint)config.GetInt("MaximumPoolsize");
             }
 
-            return connectionString.ToString();
+            return sb.ToString();
         }
         #endregion
 

@@ -36,6 +36,8 @@ namespace SilverSim.Tests.Preconditions.MySQL
 
         public ResetMySQLDatabase(IConfig config)
         {
+            var sb = new MySqlConnectionStringBuilder();
+
             if (!(config.Contains("Server") && config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
             {
                 if (!config.Contains("Server"))
@@ -56,11 +58,12 @@ namespace SilverSim.Tests.Preconditions.MySQL
                 }
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
-            m_ConnectionString = string.Format("Server={0};Uid={1};Pwd={2};Database={3};",
-                config.GetString("Server"),
-                config.GetString("Username"),
-                config.GetString("Password"),
-                config.GetString("Database"));
+
+            sb.Server = config.GetString("Server");
+            sb.UserID = config.GetString("Username");
+            sb.Password = config.GetString("Password");
+            sb.Database = config.GetString("Database");
+            m_ConnectionString = sb.ToString();
         }
 
         public void Startup(ConfigurationLoader loader)
