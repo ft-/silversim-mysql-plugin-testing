@@ -169,8 +169,8 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
-                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
@@ -212,8 +212,8 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
-                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
