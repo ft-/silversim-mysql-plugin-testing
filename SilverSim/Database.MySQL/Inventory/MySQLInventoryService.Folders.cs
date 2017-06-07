@@ -169,10 +169,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type", connection))
+                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
+                        cmd.Parameters.AddParameter("@rootparent", UUID.Zero);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -210,10 +212,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                            "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.FolderID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@type", type);
+                        cmd.Parameters.AddParameter("@rootparent", UUID.Zero);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -234,42 +238,12 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             get
             {
-                using (var connection = new MySqlConnection(m_ConnectionString))
+                InventoryFolder folder;
+                if(!Folder.TryGetValue(principalID, type, out folder))
                 {
-                    connection.Open();
-                    if (type == AssetType.RootFolder)
-                    {
-                        using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", connection))
-                        {
-                            cmd.Parameters.AddParameter("@ownerid", principalID);
-                            cmd.Parameters.AddParameter("@parentfolderid", UUID.Zero);
-                            using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                            {
-                                if (dbReader.Read())
-                                {
-                                    return dbReader.ToFolder();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND InventoryType = @type", connection))
-                        {
-                            cmd.Parameters.AddParameter("@ownerid", principalID);
-                            cmd.Parameters.AddParameter("@type", type);
-                            using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                            {
-                                if (dbReader.Read())
-                                {
-                                    return dbReader.ToFolder();
-                                }
-                            }
-                        }
-                    }
+                    throw new InventoryFolderTypeNotFoundException(type);
                 }
-
-                throw new InventoryFolderTypeNotFoundException(type);
+                return folder;
             }
         }
 
