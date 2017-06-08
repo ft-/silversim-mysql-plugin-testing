@@ -143,7 +143,27 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
-            get { throw new NotSupportedException(); }
+            get
+            {
+                using (var conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand("SELECT * FROM presence WHERE SessionID = @sessionID", conn))
+                    {
+                        cmd.Parameters.AddParameter("@sessionID", sessionID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            var pi = new PresenceInfo();
+                            pi.UserID.ID = reader.GetUUID("UserID");
+                            pi.RegionID = reader.GetUUID("RegionID");
+                            pi.SessionID = reader.GetUUID("SessionID");
+                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                            return pi;
+                        }
+                    }
+                }
+                throw new PresenceNotFoundException();
+            }
         }
 
         public override void Logout(UUID sessionID, UUID userID)
