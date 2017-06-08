@@ -30,6 +30,7 @@ using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System;
 
 namespace SilverSim.Database.MySQL.Estate
 {
@@ -256,6 +257,19 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 conn.Open();
                 conn.InsertInto("estates", dict);
+            }
+        }
+
+        public override bool Remove(uint estateID)
+        {
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", estateID);
+                    return cmd.ExecuteNonQuery() == 1;
+                }
             }
         }
 
