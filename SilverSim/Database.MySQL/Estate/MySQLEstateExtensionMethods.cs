@@ -38,7 +38,8 @@ namespace SilverSim.Database.MySQL.Estate
             AbuseEmail = reader.GetString("AbuseEmail"),
             CovenantID = reader.GetUUID("CovenantID"),
             CovenantTimestamp = reader.GetDate("CovenantTimestamp"),
-            UseGlobalTime = reader.GetBool("UseGlobalTime")
+            UseGlobalTime = reader.GetBool("UseGlobalTime"),
+            ParentEstateID = reader.GetUInt32("ParentEstateID")
         };
     }
 }

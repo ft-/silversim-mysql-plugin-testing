@@ -146,8 +146,10 @@ namespace SilverSim.Database.MySQL.Estate
             new TableRevision(3),
             new AddColumn<bool>("UseGlobalTime") { IsNullAllowed = false, Default = true },
             new TableRevision(4),
-            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" }
+            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" },
             /* ^^ this is for compatibility our list generator actually skips this field when not finding the revision 3 table */
+            new TableRevision(5),
+            new AddColumn<uint>("ParentEstateID") {IsNullAllowed = false, Default = (uint)1 }
             #endregion
         };
 
@@ -251,7 +253,8 @@ namespace SilverSim.Database.MySQL.Estate
                 ["AbuseEmail"] = estateInfo.AbuseEmail,
                 ["CovenantID"] = estateInfo.CovenantID,
                 ["CovenantTimestamp"] = estateInfo.CovenantTimestamp,
-                ["UseGlobalTime"] = estateInfo.UseGlobalTime
+                ["UseGlobalTime"] = estateInfo.UseGlobalTime,
+                ["ParentEstateID"] = estateInfo.ParentEstateID
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -310,7 +313,8 @@ namespace SilverSim.Database.MySQL.Estate
                         ["AbuseEmail"] = value.AbuseEmail,
                         ["CovenantID"] = value.CovenantID,
                         ["CovenantTimestamp"] = value.CovenantTimestamp,
-                        ["UseGlobalTime"] = value.UseGlobalTime
+                        ["UseGlobalTime"] = value.UseGlobalTime,
+                        ["ParentEstateID"] = value.ParentEstateID
                     };
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
