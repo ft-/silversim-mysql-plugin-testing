@@ -263,6 +263,30 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
+        public override void Update(EstateInfo value)
+        {
+            var dict = new Dictionary<string, object>
+            {
+                ["ID"] = value.ID,
+                ["Name"] = value.Name,
+                ["Owner"] = value.Owner,
+                ["Flags"] = (uint)value.Flags,
+                ["PricePerMeter"] = value.PricePerMeter,
+                ["BillableFactor"] = value.BillableFactor,
+                ["SunPosition"] = value.SunPosition,
+                ["AbuseEmail"] = value.AbuseEmail,
+                ["CovenantID"] = value.CovenantID,
+                ["CovenantTimestamp"] = value.CovenantTimestamp,
+                ["UseGlobalTime"] = value.UseGlobalTime,
+                ["ParentEstateID"] = value.ParentEstateID
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.ReplaceInto("estates", dict);
+            }
+        }
+
         public override bool Remove(uint estateID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -296,47 +320,6 @@ namespace SilverSim.Database.MySQL.Estate
                     }
                 }
                 throw new KeyNotFoundException();
-            }
-            set
-            {
-                if (value != null)
-                {
-                    var dict = new Dictionary<string, object>
-                    {
-                        ["ID"] = value.ID,
-                        ["Name"] = value.Name,
-                        ["Owner"] = value.Owner,
-                        ["Flags"] = (uint)value.Flags,
-                        ["PricePerMeter"] = value.PricePerMeter,
-                        ["BillableFactor"] = value.BillableFactor,
-                        ["SunPosition"] = value.SunPosition,
-                        ["AbuseEmail"] = value.AbuseEmail,
-                        ["CovenantID"] = value.CovenantID,
-                        ["CovenantTimestamp"] = value.CovenantTimestamp,
-                        ["UseGlobalTime"] = value.UseGlobalTime,
-                        ["ParentEstateID"] = value.ParentEstateID
-                    };
-                    using (var conn = new MySqlConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        conn.ReplaceInto("estates", dict);
-                    }
-                }
-                else
-                {
-                    using(var conn = new MySqlConnection(m_ConnectionString))
-                    {
-                        conn.Open();
-                        using(var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id", conn))
-                        {
-                            cmd.Parameters.AddParameter("@id", estateID);
-                            if(cmd.ExecuteNonQuery() < 1)
-                            {
-                                throw new EstateUpdateFailedException();
-                            }
-                        }
-                    }
-                }
             }
         }
 
