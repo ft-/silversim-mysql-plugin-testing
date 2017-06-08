@@ -82,7 +82,7 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 string query = value ?
                     "REPLACE INTO estate_managers (EstateID, UserID) VALUES (@estateid, @userid)" :
-                    "DELETE FROM estate_managers WHERE EstateID = @estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
+                    "DELETE FROM estate_managers WHERE EstateID = @estateid AND UserID LIKE @userid";
 
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
@@ -92,7 +92,11 @@ namespace SilverSim.Database.MySQL.Estate
                         cmd.Parameters.AddParameter("@estateid", estateID);
                         if (value)
                         {
-                            cmd.Parameters.AddParameter("@userid", agent.ID);
+                            cmd.Parameters.AddParameter("@userid", agent);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddParameter("@userid", agent.ID.ToString() + "%");
                         }
                         if (cmd.ExecuteNonQuery() < 1 && value)
                         {
