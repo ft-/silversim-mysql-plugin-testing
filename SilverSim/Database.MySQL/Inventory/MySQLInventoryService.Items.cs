@@ -127,7 +127,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@itemid", key);
@@ -198,7 +198,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 var newVals = new Dictionary<string, object>
                 {
-                    ["AssetID"] = item.AssetID.ToString(),
+                    ["AssetID"] = item.AssetID,
                     ["Name"] = item.Name,
                     ["Description"] = item.Description,
                     ["BasePermissionsMask"] = item.Permissions.Base,
@@ -257,15 +257,31 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = '{0}' AND OwnerID = '{2}')" +
-                    "UPDATE " + m_InventoryItemTable + " SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, id, principalID),
-                    connection))
+                connection.InsideTransaction(() =>
                 {
-                    if (cmd.ExecuteNonQuery() < 1)
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
                     {
-                        throw new InventoryFolderNotStoredException(id);
+                        cmd.Parameters.AddParameter("@folderid", toFolderID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if(!reader.Read())
+                            {
+                                throw new InventoryItemNotStoredException(id);
+                            }
+                        }
                     }
-                }
+                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryItemTable + " SET ParentFolderID = @folderid WHERE ID = @itemid AND OwnerID = @ownerid", connection))
+                    {
+                        cmd.Parameters.AddParameter("@folderid", toFolderID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@itemid", id);
+                        if (cmd.ExecuteNonQuery() < 1)
+                        {
+                            throw new InventoryItemNotFoundException(id);
+                        }
+                    }
+                });
             }
             IncrementVersion(principalID, item.ParentFolderID);
             IncrementVersion(principalID, toFolderID);
