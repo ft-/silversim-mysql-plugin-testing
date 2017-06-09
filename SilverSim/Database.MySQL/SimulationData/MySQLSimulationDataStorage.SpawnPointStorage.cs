@@ -65,7 +65,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                         var data = new Dictionary<string, object>
                         {
-                            ["RegionID"] = regionID.ToString()
+                            ["RegionID"] = regionID
                         };
                         foreach (Vector3 v in value)
                         {
