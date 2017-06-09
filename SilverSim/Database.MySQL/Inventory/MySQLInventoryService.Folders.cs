@@ -59,7 +59,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE ID = @folderid", connection))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid", connection))
                 {
                     cmd.Parameters.AddParameter("@folderid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -117,7 +117,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@folderid", key);
@@ -154,7 +154,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 if (type == AssetType.RootFolder)
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", connection))
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@parentfolderid", UUID.Zero);
@@ -355,15 +355,31 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = '{0}')" +
-                    "UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, folderID),
-                    connection))
+                connection.InsideTransaction(() =>
                 {
-                    if (cmd.ExecuteNonQuery() < 1)
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
                     {
-                        throw new InventoryFolderNotStoredException(folderID);
+                        cmd.Parameters.AddParameter("@folderid", toFolderID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (!reader.Read())
+                            {
+                                throw new InventoryFolderNotStoredException(folderID);
+                            }
+                        }
                     }
-                }
+                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = @folderid WHERE ID = @id AND OwnerID = @ownerid", connection))
+                    {
+                        cmd.Parameters.AddParameter("@folderid", toFolderID);
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@id", folderID);
+                        if (cmd.ExecuteNonQuery() < 1)
+                        {
+                            throw new InventoryFolderNotStoredException(folderID);
+                        }
+                    }
+                });
             }
             IncrementVersionNoExcept(principalID, toFolderID);
             IncrementVersionNoExcept(principalID, thisfolder.ParentFolderID);
