@@ -132,7 +132,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["BlurMultiplier"] = waterData.BlurMultiplier,
                     ["FresnelScale"] = waterData.FresnelScale,
                     ["FresnelOffset"] = waterData.FresnelOffset,
-                    ["NormalMapTexture"] = waterData.NormalMapTexture.ToString(),
+                    ["NormalMapTexture"] = waterData.NormalMapTexture,
                     ["ReflectionWaveletScale"] = waterData.ReflectionWaveletScale,
                     ["RefractScaleAbove"] = waterData.RefractScaleAbove,
                     ["RefractScaleBelow"] = waterData.RefractScaleBelow,
