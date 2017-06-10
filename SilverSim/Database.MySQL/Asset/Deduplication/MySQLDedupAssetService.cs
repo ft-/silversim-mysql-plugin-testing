@@ -340,7 +340,8 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         using (var cmd =
                             new MySqlCommand(
                                 "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
-                                "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @CreatorID, @hash)",
+                                "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @CreatorID, @hash) ON " +
+                                "DUPLICATE KEY UPDATE access_time=@access_time",
                                 conn))
                         {
                             string assetName = asset.Name;
@@ -351,28 +352,18 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                     asset.Name, asset.ID, asset.Name.Length, assetName.Length);
                             }
 
-                            try
-                            {
-                                using (cmd)
-                                {
-                                    // create unix epoch time
-                                    ulong now = Date.GetUnixTime();
-                                    cmd.Parameters.AddParameter("@id", asset.ID);
-                                    cmd.Parameters.AddParameter("@name", assetName);
-                                    cmd.Parameters.AddParameter("@assetType", asset.Type);
-                                    cmd.Parameters.AddParameter("@temporary", asset.Temporary);
-                                    cmd.Parameters.AddParameter("@create_time", now);
-                                    cmd.Parameters.AddParameter("@access_time", now);
-                                    cmd.Parameters.AddParameter("@CreatorID", asset.Creator.ID);
-                                    cmd.Parameters.AddParameter("@asset_flags", asset.Flags);
-                                    cmd.Parameters.AddParameter("@hash", sha1data);
-                                    if (1 > cmd.ExecuteNonQuery())
-                                    {
-                                        throw new AssetStoreFailedException(asset.ID);
-                                    }
-                                }
-                            }
-                            catch
+                            // create unix epoch time
+                            ulong now = Date.GetUnixTime();
+                            cmd.Parameters.AddParameter("@id", asset.ID);
+                            cmd.Parameters.AddParameter("@name", assetName);
+                            cmd.Parameters.AddParameter("@assetType", asset.Type);
+                            cmd.Parameters.AddParameter("@temporary", asset.Temporary);
+                            cmd.Parameters.AddParameter("@create_time", now);
+                            cmd.Parameters.AddParameter("@access_time", now);
+                            cmd.Parameters.AddParameter("@CreatorID", asset.Creator.ID);
+                            cmd.Parameters.AddParameter("@asset_flags", asset.Flags);
+                            cmd.Parameters.AddParameter("@hash", sha1data);
+                            if (1 > cmd.ExecuteNonQuery())
                             {
                                 throw new AssetStoreFailedException(asset.ID);
                             }
