@@ -90,7 +90,7 @@ namespace SilverSim.Database.MySQL.Profile
                             pick.Enabled = reader.GetBoolean("enabled");
                             pick.Name = reader.GetString("name");
                             pick.OriginalName = reader.GetString("originalname");
-                            pick.ParcelID = reader.GetUUID("parceluuid");
+                            pick.ParcelID = reader.GetParcelID("parceluuid");
                             pick.PickID = reader.GetUUID("pickuuid");
                             pick.SimName = reader.GetString("simname");
                             pick.SnapshotID = reader.GetUUID("snapshotuuid");

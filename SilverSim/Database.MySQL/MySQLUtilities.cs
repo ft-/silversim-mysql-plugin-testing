@@ -281,6 +281,11 @@ namespace SilverSim.Database.MySQL
             {
                 mysqlparam.AddWithValue(key, value.ToString());
             }
+            else if(t == typeof(ParcelID))
+            {
+                UUID i = new UUID(((ParcelID)value).GetBytes(), 0);
+                mysqlparam.AddWithValue(key, i.ToString());
+            }
             else if (t == typeof(AnArray))
             {
                 using (var stream = new MemoryStream())
@@ -721,6 +726,12 @@ namespace SilverSim.Database.MySQL
             var enumType = typeof(T).GetEnumUnderlyingType();
             object v = dbreader[prefix];
             return (T)Convert.ChangeType(v, enumType);
+        }
+
+        public static ParcelID GetParcelID(this MySqlDataReader dbReader, string prefix)
+        {
+            UUID id = GetUUID(dbReader, prefix);
+            return new ParcelID(id.GetBytes(), 0);
         }
 
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)

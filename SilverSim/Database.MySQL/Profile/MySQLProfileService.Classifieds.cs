@@ -74,7 +74,7 @@ namespace SilverSim.Database.MySQL.Profile
                                 Flags = reader.GetByte("classifiedflags"),
                                 GlobalPos = reader.GetVector3("posglobal"),
                                 Name = reader.GetString("name"),
-                                ParcelID = reader.GetUUID("parceluuid"),
+                                ParcelID = reader.GetParcelID("parceluuid"),
                                 ParcelName = reader.GetString("parcelname"),
                                 ParentEstate = reader.GetInt32("parentestate"),
                                 Price = reader.GetInt32("priceforlisting"),
