@@ -163,7 +163,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 typeSql = "VARCHAR(255)";
             }
-            else if (f == typeof(UUID))
+            else if (f == typeof(UUID) || f == typeof(ParcelID))
             {
                 typeSql = "CHAR(36)";
             }
