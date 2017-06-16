@@ -428,6 +428,10 @@ namespace SilverSim.Database.MySQL._Migration
                 {
                     def = ((Date)def).AsULong;
                 }
+                else if(typeof(ParcelID) == f)
+                {
+                    def = new UUID(((ParcelID)def).GetBytes(), 0);
+                }
                 else if(f.IsEnum)
                 {
                     def = Convert.ChangeType(def, f.GetEnumUnderlyingType());
