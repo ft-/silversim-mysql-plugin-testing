@@ -169,6 +169,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<bool>("IsRotateZEnabled") { IsNullAllowed = false, Default = true },
             new TableRevision(12),
             new AddColumn<PathfindingType>("PathfindingType") {IsNullAllowed = false, Default = PathfindingType.LegacyLinkset },
+            new TableRevision(13),
+            new AddColumn<byte[]>("ProjectionData"),
             #endregion
 
             #region Table primitems

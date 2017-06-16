@@ -132,27 +132,31 @@ namespace SilverSim.Database.MySQL.SimulationData
                 MediaURL = dbReader.GetString("MediaURL"),
 
                 AngularVelocity = dbReader.GetVector3("AngularVelocity"),
-                PointLight = new ObjectPart.PointLightParam()
+                PointLight = new ObjectPart.PointLightParam
                 {
-                    Serialization = dbReader.GetBytes("LightData")
+                    DbSerialization = dbReader.GetBytes("LightData")
                 },
-                Text = new ObjectPart.TextParam()
+                Projection = new ObjectPart.ProjectionParam
+                {
+                    DbSerialization = dbReader.GetBytes("ProjectionData")
+                },
+                Text = new ObjectPart.TextParam
                 {
                     Serialization = dbReader.GetBytes("HoverTextData")
                 },
-                Flexible = new ObjectPart.FlexibleParam()
+                Flexible = new ObjectPart.FlexibleParam
                 {
-                    Serialization = dbReader.GetBytes("FlexibleData")
+                    DbSerialization = dbReader.GetBytes("FlexibleData")
                 },
-                Sound = new ObjectPart.SoundParam()
+                Sound = new ObjectPart.SoundParam
                 {
                     Serialization = dbReader.GetBytes("LoopedSoundData")
                 },
-                CollisionSound = new ObjectPart.CollisionSoundParam()
+                CollisionSound = new ObjectPart.CollisionSoundParam
                 {
                     Serialization = dbReader.GetBytes("ImpactSoundData")
                 },
-                Shape = new ObjectPart.PrimitiveShape()
+                Shape = new ObjectPart.PrimitiveShape
                 {
                     Serialization = dbReader.GetBytes("PrimitiveShapeData")
                 },
