@@ -20,8 +20,10 @@
 // exception statement from your version.
 
 using MySql.Data.MySqlClient;
+using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
@@ -40,6 +42,45 @@ namespace SilverSim.Database.MySQL.SimulationData
                         while (dbReader.Read())
                         {
                             action(dbReader.GetUUID("AssetId"));
+                        }
+                    }
+                }
+                using (MySqlCommand cmd = new MySqlCommand("SELECT PrimitiveShapeData, ParticleSystem, TextureEntryBytes, ProjectionData, LoopedSoundData, ImpactSoundData FROM prims", conn))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            ObjectPart.PrimitiveShape shape = new ObjectPart.PrimitiveShape { Serialization = dbReader.GetBytes("PrimitiveShapeData") };
+                            ParticleSystem particleSystem = new ParticleSystem(dbReader.GetBytes("ParticleSystem"), 0);
+                            TextureEntry te = new TextureEntry(dbReader.GetBytes("TextureEntryBytes"));
+                            ObjectPart.ProjectionParam proj = new ObjectPart.ProjectionParam { DbSerialization = dbReader.GetBytes("ProjectionData") };
+                            ObjectPart.SoundParam sound = new ObjectPart.SoundParam { Serialization = dbReader.GetBytes("LoopedSoundData") };
+                            ObjectPart.CollisionSoundParam colsound = new ObjectPart.CollisionSoundParam { Serialization = dbReader.GetBytes("ImpactSoundData") };
+                            if(shape.SculptMap != UUID.Zero)
+                            {
+                                action(shape.SculptMap);
+                            }
+                            foreach(UUID refid in particleSystem.References)
+                            {
+                                action(refid);
+                            }
+                            foreach (UUID refid in te.References)
+                            {
+                                action(refid);
+                            }
+                            if(proj.ProjectionTextureID != UUID.Zero)
+                            {
+                                action(proj.ProjectionTextureID);
+                            }
+                            if(sound.SoundID != UUID.Zero)
+                            {
+                                action(sound.SoundID);
+                            }
+                            if(colsound.ImpactSound != UUID.Zero)
+                            {
+                                action(colsound.ImpactSound);
+                            }
                         }
                     }
                 }

@@ -65,6 +65,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 {
                     cmd.ExecuteNonQuery();
                 }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType)", conn))
+                {
+                    cmd.ExecuteNonQuery();
+                }
             }
 
             return purged;
