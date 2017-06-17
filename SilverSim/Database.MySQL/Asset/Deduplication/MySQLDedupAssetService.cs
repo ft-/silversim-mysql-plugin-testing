@@ -278,11 +278,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         internal List<UUID> GetAssetRefs(UUID key)
         {
             List<UUID> references = new List<UUID>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 bool processed;
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -294,7 +294,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 AssetData data;
                 if(processed)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
+                    using (var cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())

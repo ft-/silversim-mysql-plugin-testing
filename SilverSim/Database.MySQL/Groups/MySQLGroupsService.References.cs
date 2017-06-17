@@ -30,10 +30,10 @@ namespace SilverSim.Database.MySQL.Groups
     {
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT InsigniaID FROM groups", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT InsigniaID FROM groups", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {

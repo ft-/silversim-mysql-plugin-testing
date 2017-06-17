@@ -30,10 +30,10 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT snapshotuuid FROM classifieds", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT snapshotuuid FROM classifieds", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Profile
                         }
                     }
                 }
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT snapshotuuid FROM userpicks", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT snapshotuuid FROM userpicks", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -61,7 +61,7 @@ namespace SilverSim.Database.MySQL.Profile
                         }
                     }
                 }
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT profileImage FROM userprofile", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT profileImage FROM userprofile", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -75,7 +75,7 @@ namespace SilverSim.Database.MySQL.Profile
                         }
                     }
                 }
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT profileFirstImage FROM userprofile", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT profileFirstImage FROM userprofile", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {

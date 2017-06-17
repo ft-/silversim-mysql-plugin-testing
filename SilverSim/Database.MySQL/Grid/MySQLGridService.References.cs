@@ -30,17 +30,25 @@ namespace SilverSim.Database.MySQL.Grid
     {
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT regionMapTexture, parcelMapTexture FROM `" + MySqlHelper.EscapeString(m_TableName) + "`", conn))
+                using (var cmd = new MySqlCommand("SELECT regionMapTexture, parcelMapTexture FROM `" + MySqlHelper.EscapeString(m_TableName) + "`", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("regionMapTexture"));
-                            action(dbReader.GetUUID("parcelMapTexture"));
+                            UUID id = dbReader.GetUUID("regionMapTexture");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                            id = dbReader.GetUUID("parcelMapTexture");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }

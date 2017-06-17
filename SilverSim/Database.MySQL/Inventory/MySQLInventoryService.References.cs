@@ -30,10 +30,10 @@ namespace SilverSim.Database.MySQL.Inventory
     {
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT AssetID FROM " + m_InventoryItemTable + " WHERE NOT (AssetType = 24 OR AssetType = 25)", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT AssetID FROM " + m_InventoryItemTable + " WHERE NOT (AssetType = 24 OR AssetType = 25)", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {

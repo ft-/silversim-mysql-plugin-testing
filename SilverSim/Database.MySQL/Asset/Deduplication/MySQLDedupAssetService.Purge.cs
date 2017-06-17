@@ -37,10 +37,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             string ids = "'" + string.Join("','", assetIDs) + "'";
             string sql = string.Format("UPDATE assetrefs SET access_time=@access_time WHERE id IN ({0})", ids);
 
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                using (var cmd = new MySqlCommand(sql, conn))
                 {
                     ulong now = Date.GetUnixTime();
                     cmd.Parameters.AddParameter("@access_time", now);
@@ -52,20 +52,20 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         public long PurgeUnusedAssets()
         {
             long purged;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetrefs WHERE access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn))
                 {
                     ulong now = Date.GetUnixTime() - 2 * 24 * 3600;
                     cmd.Parameters.AddParameter("@access_time", now);
                     purged = cmd.ExecuteNonQuery();
                 }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id)", conn))
                 {
                     cmd.ExecuteNonQuery();
                 }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType)", conn))
                 {
                     cmd.ExecuteNonQuery();
                 }
@@ -77,7 +77,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         private void GenerateAssetInUseEntries(AssetData data)
         {
             List<UUID> references = data.References;
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 UUID assetid = data.ID;
@@ -87,14 +87,14 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         continue;
                     }
-                    using (MySqlCommand cmd = new MySqlCommand("REPLACE INTO assetsinuse (`id`, `usesid`) VALUES (@id, @usesid)", conn))
+                    using (var cmd = new MySqlCommand("REPLACE INTO assetsinuse (`id`, `usesid`) VALUES (@id, @usesid)", conn))
                     {
                         cmd.Parameters.AddParameter("@id", assetid);
                         cmd.Parameters.AddParameter("@usesid", refid);
                         cmd.ExecuteNonQuery();
                     }
                 }
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE assetrefs SET usesprocessed = 1 WHERE id = @id", conn))
+                using (var cmd = new MySqlCommand("UPDATE assetrefs SET usesprocessed = 1 WHERE id = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", assetid);
                     cmd.ExecuteNonQuery();
@@ -105,10 +105,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         public List<UUID> GetUnprocessedAssets()
         {
             List<UUID> assets = new List<UUID>();
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -194,6 +194,5 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 return stats;
             }
         }
-
     }
 }

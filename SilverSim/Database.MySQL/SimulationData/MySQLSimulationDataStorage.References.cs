@@ -21,7 +21,6 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.WindLight;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
@@ -35,7 +34,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         public void EnumerateUsedAssets(Action<UUID> action)
         {
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT AssetId FROM primitems", conn))
@@ -49,7 +48,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings", conn))
+                using (var cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -68,7 +67,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT NormalMapTexture FROM lightshare", conn))
+                using (var cmd = new MySqlCommand("SELECT DISTINCT NormalMapTexture FROM lightshare", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -83,8 +82,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT TerrainTexture1, TerrainTexture2, TerrainTexture3, TerrainTexture4 FROM regionsettings", conn))
-                {
+                using (var cmd = new MySqlCommand("SELECT DISTINCT TerrainTexture1, TerrainTexture2, TerrainTexture3, TerrainTexture4 FROM regionsettings", conn))
+                { 
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -115,7 +114,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                 }
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT PrimitiveShapeData, ParticleSystem, TextureEntryBytes, ProjectionData, LoopedSoundData, ImpactSoundData FROM prims", conn))
+                using (var cmd = new MySqlCommand("SELECT PrimitiveShapeData, ParticleSystem, TextureEntryBytes, ProjectionData, LoopedSoundData, ImpactSoundData FROM prims", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
