@@ -39,12 +39,12 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
     [Description("MySQL Deduplication Asset Backend")]
     [PluginName("DedupAssets")]
-    public sealed class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
+    public sealed partial class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 
         private readonly string m_ConnectionString;
-        private readonly DefaultAssetReferencesService m_ReferencesService;
+        private readonly MySQLAssetReferencesService m_ReferencesService;
         private readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
@@ -52,7 +52,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
-            m_ReferencesService = new DefaultAssetReferencesService(this);
+            m_ReferencesService = new MySQLAssetReferencesService(this);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -263,6 +263,60 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region References interface
+        public sealed class MySQLAssetReferencesService : AssetReferencesServiceInterface
+        {
+            private readonly MySQLDedupAssetService m_AssetService;
+
+            internal MySQLAssetReferencesService(MySQLDedupAssetService assetService)
+            {
+                m_AssetService = assetService;
+            }
+
+            public override List<UUID> this[UUID key] => m_AssetService.GetAssetRefs(key);
+        }
+
+        internal List<UUID> GetAssetRefs(UUID key)
+        {
+            List<UUID> references = new List<UUID>();
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                bool processed;
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", key);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        processed = dbReader.Read() && dbReader.GetBool("usesprocessed");
+                    }
+                }
+
+                AssetData data;
+                if(processed)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@id", key);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            while(dbReader.Read())
+                            {
+                                references.Add(dbReader.GetUUID("usesid"));
+                            }
+                        }
+                    }
+                }
+                else if(TryGetValue(key, out data))
+                {
+                    references = data.References;
+                    references.Remove(UUID.Zero);
+                    references.Remove(data.ID);
+                }
+
+                return references;
+            }
+        }
+
         public override AssetReferencesServiceInterface References => m_ReferencesService;
         #endregion
 
@@ -371,6 +425,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     });
                 }
             }
+            EnqueueAsset(asset.ID);
         }
         #endregion
 
@@ -383,6 +438,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=@id AND asset_flags <> 0", conn))
                 {
                     cmd.Parameters.AddParameter("@id", id);
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
@@ -435,6 +491,15 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             new ChangeColumn<bool>("temporary") { IsNullAllowed = false },
             new ChangeColumn<AssetFlags>("asset_flags") { IsNullAllowed = false },
             new ChangeColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
+            new TableRevision(3),
+            new AddColumn<bool>("usesprocessed") { IsNullAllowed = false, Default = false },
+
+            new SqlTable("assetsinuse"),
+            new AddColumn<UUID>("id") { IsNullAllowed = false },
+            new AddColumn<UUID>("usesid") { IsNullAllowed = false },
+            new PrimaryKeyInfo("id", "usesid"),
+            new NamedKeyInfo("id", "id"),
+            new NamedKeyInfo("usesid", "usesid")
         };
         #endregion
 
