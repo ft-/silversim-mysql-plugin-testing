@@ -19,13 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.IO;
+using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {

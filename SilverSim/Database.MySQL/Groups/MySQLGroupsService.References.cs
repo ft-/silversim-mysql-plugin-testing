@@ -39,7 +39,11 @@ namespace SilverSim.Database.MySQL.Groups
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("InsigniaID"));
+                            UUID id = dbReader.GetUUID("InsigniaID");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }

@@ -23,10 +23,6 @@ using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -43,7 +39,11 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("snapshotuuid"));
+                            UUID id = dbReader.GetUUID("snapshotuuid");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }
@@ -53,7 +53,11 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("snapshotuuid"));
+                            UUID id = dbReader.GetUUID("snapshotuuid");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }
@@ -63,7 +67,11 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("profileImage"));
+                            UUID id = dbReader.GetUUID("profileImage");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }
@@ -73,7 +81,11 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         while (dbReader.Read())
                         {
-                            action(dbReader.GetUUID("profileFirstImage"));
+                            UUID id = dbReader.GetUUID("profileFirstImage");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
                         }
                     }
                 }

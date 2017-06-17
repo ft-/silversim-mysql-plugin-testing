@@ -21,10 +21,13 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.WindLight;
 using SilverSim.ServiceInterfaces.Purge;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
+using System.IO;
+using WindLightSettings = SilverSim.Scene.Types.WindLight.EnvironmentSettings;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -45,6 +48,73 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                     }
                 }
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings", conn))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            WindLightSettings settings;
+                            using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("EnvironmentSettings")))
+                            {
+                                settings = WindLightSettings.Deserialize(ms);
+                            }
+                            if(settings.WaterSettings.NormalMap != UUID.Zero)
+                            {
+                                action(settings.WaterSettings.NormalMap);
+                            }
+                        }
+                    }
+                }
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT NormalMapTexture FROM lightshare", conn))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            UUID id = dbReader.GetUUID("NormalMapTexture");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                        }
+                    }
+                }
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT TerrainTexture1, TerrainTexture2, TerrainTexture3, TerrainTexture4 FROM regionsettings", conn))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            UUID id;
+                            
+                            id = dbReader.GetUUID("TerrainTexture1");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                            id = dbReader.GetUUID("TerrainTexture2");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                            id = dbReader.GetUUID("TerrainTexture3");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                            id = dbReader.GetUUID("TerrainTexture4");
+                            if (id != UUID.Zero)
+                            {
+                                action(id);
+                            }
+                        }
+                    }
+                }
+
                 using (MySqlCommand cmd = new MySqlCommand("SELECT PrimitiveShapeData, ParticleSystem, TextureEntryBytes, ProjectionData, LoopedSoundData, ImpactSoundData FROM prims", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -63,11 +133,17 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
                             foreach(UUID refid in particleSystem.References)
                             {
-                                action(refid);
+                                if (refid != UUID.Zero)
+                                {
+                                    action(refid);
+                                }
                             }
                             foreach (UUID refid in te.References)
                             {
-                                action(refid);
+                                if (refid != UUID.Zero)
+                                {
+                                    action(refid);
+                                }
                             }
                             if(proj.ProjectionTextureID != UUID.Zero)
                             {
