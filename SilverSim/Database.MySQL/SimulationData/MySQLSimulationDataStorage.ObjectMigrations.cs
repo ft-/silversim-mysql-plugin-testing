@@ -176,7 +176,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<bool>("IsSandbox") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("IsDieAtEdge") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("IsReturnAtEdge") { IsNullAllowed = false, Default = false },
-            new AddColumn<bool>("IsBlockGrabObject"){IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsBlockGrabObject") { IsNullAllowed = false, Default = false },
+            new TableRevision(15),
+            new AddColumn<Vector3>("SandboxOrigin") { IsNullAllowed = false, Default = Vector3.Zero },
             #endregion
 
             #region Table primitems

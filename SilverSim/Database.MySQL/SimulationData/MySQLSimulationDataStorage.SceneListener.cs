@@ -493,7 +493,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["IsSandbox"] = objpart.IsSandbox,
                     ["IsDieAtEdge"] = objpart.IsDieAtEdge,
                     ["IsReturnAtEdge"] = objpart.IsReturnAtEdge,
-                    ["IsBlockGrabObject"] = objpart.IsBlockGrabObject
+                    ["IsBlockGrabObject"] = objpart.IsBlockGrabObject,
+                    ["SandboxOrigin"] = objpart.SandboxOrigin
                 };
                 using (var ms = new MemoryStream())
                 {
