@@ -66,7 +66,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             BlockDwell = reader.GetBool("BlockDwell"),
             ResetHomeOnTeleport = reader.GetBool("ResetHomeOnTeleport"),
             AllowLandmark = reader.GetBool("AllowLandmark"),
-            AllowDirectTeleport = reader.GetBool("AllowDirectTeleport")
+            AllowDirectTeleport = reader.GetBool("AllowDirectTeleport"),
+            MaxBasePrims = reader.GetInt32("MaxBasePrims")
         };
 
         RegionSettings ISimulationDataRegionSettingsStorageInterface.this[UUID regionID]
@@ -123,7 +124,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                         ["BlockDwell"] = value.BlockDwell,
                         ["ResetHomeOnTeleport"] = value.ResetHomeOnTeleport,
                         ["AllowLandmark"] = value.AllowLandmark,
-                        ["AllowDirectTeleport"] = value.AllowDirectTeleport
+                        ["AllowDirectTeleport"] = value.AllowDirectTeleport,
+                        ["MaxBasePrims"] = value.MaxBasePrims
                     };
                     conn.ReplaceInto("regionsettings", data);
                 }
