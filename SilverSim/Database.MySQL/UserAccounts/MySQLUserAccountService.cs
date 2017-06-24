@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -38,6 +39,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
     public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
+        private Uri m_HomeURI;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
 
         #region Constructor
@@ -48,7 +50,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_HomeURI = new Uri(loader.HomeURI);
         }
         #endregion
 
@@ -146,7 +148,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -161,7 +163,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -221,7 +223,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                     {
                         if (reader.Read())
                         {
-                            account = reader.ToUserAccount();
+                            account = reader.ToUserAccount(m_HomeURI);
                             return true;
                         }
                     }
@@ -302,7 +304,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -318,7 +320,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         {
                             if (reader.Read())
                             {
-                                account = reader.ToUserAccount();
+                                account = reader.ToUserAccount(m_HomeURI);
                                 return true;
                             }
                         }
@@ -359,7 +361,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         {
                             while (dbreader.Read())
                             {
-                                accounts.Add(dbreader.ToUserAccount());
+                                accounts.Add(dbreader.ToUserAccount(m_HomeURI));
                             }
                         }
                     }
@@ -386,7 +388,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                     {
                         while (dbreader.Read())
                         {
-                            accounts.Add(dbreader.ToUserAccount());
+                            accounts.Add(dbreader.ToUserAccount(m_HomeURI));
                         }
                     }
                 }

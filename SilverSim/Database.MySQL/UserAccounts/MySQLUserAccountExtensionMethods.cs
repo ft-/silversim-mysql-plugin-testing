@@ -21,19 +21,20 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Types.Account;
+using System;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
     public static class MySQLUserAccountExtensionMethods
     {
-        public static UserAccount ToUserAccount(this MySqlDataReader reader)
+        public static UserAccount ToUserAccount(this MySqlDataReader reader, Uri homeURI)
         {
             var info = new UserAccount();
 
             info.Principal.ID = reader.GetUUID("ID");
             info.Principal.FirstName = reader.GetString("FirstName");
             info.Principal.LastName = reader.GetString("LastName");
-            info.Principal.HomeURI = null;
+            info.Principal.HomeURI = homeURI;
             info.Principal.IsAuthoritative = true;
             info.ScopeID = reader.GetUUID("ScopeID");
             info.Email = reader.GetString("Email");

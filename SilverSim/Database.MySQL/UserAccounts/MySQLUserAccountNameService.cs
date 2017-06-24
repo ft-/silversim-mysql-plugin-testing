@@ -26,6 +26,7 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -38,6 +39,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNTNAME SERVICE");
 
         private readonly string m_ConnectionString;
+        private Uri m_HomeURI;
 
         public MySQLUserAccountNameService(IConfig ownSection)
         {
@@ -126,17 +128,18 @@ namespace SilverSim.Database.MySQL.UserAccounts
             return list;
         }
 
-        private static UUI GetUUIFromReader(MySqlDataReader reader) => new UUI()
+        private UUI GetUUIFromReader(MySqlDataReader reader) => new UUI()
         {
             FirstName = reader.GetString("FirstName"),
             LastName = reader.GetString("LastName"),
             ID = reader.GetUUID("ID"),
+            HomeURI = m_HomeURI,
             IsAuthoritative = true
         };
 
         public void Startup(ConfigurationLoader loader)
         {
-            /* intentionally left empty */
+            m_HomeURI = new Uri(loader.HomeURI);
         }
 
         public override bool TryGetValue(UUID key, out UUI uui)
