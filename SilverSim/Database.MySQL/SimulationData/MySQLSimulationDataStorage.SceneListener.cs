@@ -488,7 +488,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["IsRotateZEnabled"] = objpart.IsRotateZEnabled,
                     ["IsVolumeDetect"] = objpart.IsVolumeDetect,
                     ["IsPhantom"] = objpart.IsPhantom,
-                    ["IsPhysics"] = objpart.IsPhysics
+                    ["IsPhysics"] = objpart.IsPhysics,
+                    ["IsBlockGrab"] = objpart.IsBlockGrab,
+                    ["IsSandbox"] = objpart.IsSandbox,
+                    ["IsDieAtEdge"] = objpart.IsDieAtEdge,
+                    ["IsReturnAtEdge"] = objpart.IsReturnAtEdge,
+                    ["IsBlockGrabObject"] = objpart.IsBlockGrabObject
                 };
                 using (var ms = new MemoryStream())
                 {

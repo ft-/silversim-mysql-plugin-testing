@@ -188,6 +188,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 IsRotateXEnabled = dbReader.GetBool("IsRotateXEnabled"),
                 IsRotateYEnabled = dbReader.GetBool("IsRotateYEnabled"),
                 IsRotateZEnabled = dbReader.GetBool("IsRotateZEnabled"),
+                IsBlockGrab = dbReader.GetBool("IsBlockGrab"),
+                IsSandbox = dbReader.GetBool("IsSandbox"),
+                IsDieAtEdge = dbReader.GetBool("IsDieAtEdge"),
+                IsReturnAtEdge = dbReader.GetBool("IsReturnAtEdge"),
+                IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject")
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
