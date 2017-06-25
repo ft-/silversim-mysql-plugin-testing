@@ -193,7 +193,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 IsDieAtEdge = dbReader.GetBool("IsDieAtEdge"),
                 IsReturnAtEdge = dbReader.GetBool("IsReturnAtEdge"),
                 IsBlockGrabObject = dbReader.GetBool("IsBlockGrabObject"),
-                SandboxOrigin = dbReader.GetVector3("SandboxOrigin")
+                SandboxOrigin = dbReader.GetVector3("SandboxOrigin"),
+                ExtendedMesh = new ObjectPart.ExtendedMeshParams { DbSerialization = dbReader.GetBytes("ExtendedMeshData") }
             };
 
             using (var ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
