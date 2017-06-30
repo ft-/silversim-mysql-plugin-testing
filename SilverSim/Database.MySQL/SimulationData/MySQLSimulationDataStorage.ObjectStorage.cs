@@ -104,9 +104,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         private ObjectPart ObjectPartFromDbReader(MySqlDataReader dbReader)
         {
-            var objpart = new ObjectPart()
+            var objpart = new ObjectPart(dbReader.GetUUID("ID"))
             {
-                ID = dbReader.GetUUID("ID"),
                 LoadedLinkNumber = dbReader.GetInt32("LinkNumber"),
                 Position = dbReader.GetVector3("Position"),
                 Rotation = dbReader.GetQuaternion("Rotation"),
@@ -210,7 +209,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         private ObjectPartInventoryItem ObjectPartInventoryItemFromDbReader(MySqlDataReader dbReader)
         {
-            var item = new ObjectPartInventoryItem()
+            var item = new ObjectPartInventoryItem(dbReader.GetUUID("InventoryID"))
             {
                 AssetID = dbReader.GetUUID("AssetID"),
                 AssetType = dbReader.GetEnum<AssetType>("AssetType"),
@@ -220,7 +219,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Flags = dbReader.GetEnum<InventoryFlags>("Flags"),
                 Group = dbReader.GetUGI("Group"),
                 IsGroupOwned = dbReader.GetBool("GroupOwned"),
-                ID = dbReader.GetUUID("InventoryID"),
                 InventoryType = dbReader.GetEnum<InventoryType>("InventoryType"),
                 LastOwner = dbReader.GetUUI("LastOwner"),
                 Name = dbReader.GetString("Name"),

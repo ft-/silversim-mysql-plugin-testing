@@ -28,6 +28,7 @@ using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace SilverSim.Database.MySQL.SimulationData
@@ -41,6 +42,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             private readonly RwLockedList<MySQLSceneListener> m_SceneListenerThreads;
 
             public MySQLSceneListener(string connectionString, UUID regionID, RwLockedList<MySQLSceneListener> sceneListenerThreads)
+                : base(regionID)
             {
                 m_ConnectionString = connectionString;
                 RegionID = regionID;
@@ -57,318 +59,462 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             private int m_ProcessedPrims;
 
-            protected override void StorageMainThread()
+            public struct PrimKey : IEquatable<PrimKey>
             {
-                try
+                public UUID PartID;
+                public UUID ItemID;
+
+                public PrimKey(ObjectInventoryUpdateInfo info)
                 {
-                    m_SceneListenerThreads.Add(this);
-                    Thread.CurrentThread.Name = "Storage Main Thread: " + RegionID.ToString();
-                    var primDeletionRequests = new List<string>();
-                    var primItemDeletionRequests = new List<string>();
-                    var objectDeletionRequests = new List<string>();
-                    var updateObjectsRequests = new List<string>();
-                    var updatePrimsRequests = new List<string>();
-                    var updatePrimItemsRequests = new List<string>();
+                    PartID = info.PartID;
+                    ItemID = info.ItemID;
+                }
 
-                    var knownSerialNumbers = new C5.TreeDictionary<uint, int>();
-                    var knownInventorySerialNumbers = new C5.TreeDictionary<uint, int>();
-                    var knownInventories = new C5.TreeDictionary<uint, List<UUID>>();
+                public bool Equals(PrimKey other)
+                {
+                    return PartID.Equals(other.PartID) && ItemID.Equals(other.ItemID);
+                }
 
-                    string replaceIntoObjects = string.Empty;
-                    string replaceIntoPrims = string.Empty;
-                    string replaceIntoPrimItems = string.Empty;
+                public override int GetHashCode()
+                {
+                    return PartID.GetHashCode() ^ ItemID.GetHashCode();
+                }
+            }
 
-                    while (!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0)
+            private readonly C5.TreeDictionary<PrimKey, bool> m_PrimItemDeletions = new C5.TreeDictionary<PrimKey, bool>();
+            private readonly C5.TreeDictionary<PrimKey, Dictionary<string, object>> m_PrimItemUpdates = new C5.TreeDictionary<PrimKey, Dictionary<string, object>>();
+
+            protected override void OnUpdate(ObjectInventoryUpdateInfo info)
+            {
+                if(info.IsRemoved)
+                {
+                    m_PrimItemUpdates.Remove(new PrimKey(info));
+                    m_PrimItemDeletions[new PrimKey(info)] = true;
+                }
+                else
+                {
+                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(info.PartID, info.Item);
+                    data["RegionID"] = m_RegionID;
+                    m_PrimItemUpdates[new PrimKey(info)] = data;
+                }
+            }
+
+            protected override bool HasPendingData =>
+                !m_PrimDeletions.IsEmpty || !m_PrimUpdates.IsEmpty ||
+                !m_PrimItemDeletions.IsEmpty || !m_PrimItemUpdates.IsEmpty ||
+                !m_GroupDeletions.IsEmpty || !m_GroupUpdates.IsEmpty;
+
+            private readonly C5.TreeDictionary<UUID, bool> m_PrimDeletions = new C5.TreeDictionary<UUID, bool>();
+            private readonly C5.TreeDictionary<UUID, Dictionary<string, object>> m_PrimUpdates = new C5.TreeDictionary<UUID, Dictionary<string, object>>();
+            private readonly C5.TreeDictionary<UUID, int> m_PrimSerials = new C5.TreeDictionary<UUID, int>();
+
+            private readonly C5.TreeDictionary<UUID, bool> m_GroupDeletions = new C5.TreeDictionary<UUID, bool>();
+            private readonly C5.TreeDictionary<UUID, Dictionary<string, object>> m_GroupUpdates = new C5.TreeDictionary<UUID, Dictionary<string, object>>();
+
+            protected override void OnUpdate(ObjectUpdateInfo info)
+            {
+                if(info.IsKilled)
+                {
+                    if (info.Part.ObjectGroup.RootPart == info.Part)
                     {
-                        ObjectUpdateInfo req;
-                        try
+                        m_GroupUpdates.Remove(info.ID);
+                        m_GroupDeletions[info.ID] = true;
+                    }
+                    m_PrimUpdates.Remove(info.ID);
+                    m_PrimDeletions[info.ID] = true;
+                }
+                else if(m_PrimSerials.Contains(info.ID) && m_PrimSerials[info.ID] == info.Part.SerialNumber)
+                {
+                    /* ignore update */
+                }
+                else
+                {
+                    if (info.Part.ObjectGroup.RootPart != info.Part)
+                    {
+                        m_GroupDeletions[info.ID] = true;
+                    }
+                    Dictionary<string, object> data = GenerateUpdateObjectPart(info.Part);
+                    data["RegionID"] = m_RegionID;
+                    m_PrimUpdates[info.ID] = data;
+                    ObjectGroup grp = info.Part.ObjectGroup;
+                    m_GroupUpdates[grp.ID] = GenerateUpdateObjectGroup(grp);
+                }
+            }
+
+            private void ProcessPrimItemDeletions(MySqlConnection conn)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                List<PrimKey> removedItems = new List<PrimKey>();
+
+                foreach (PrimKey k in m_PrimItemDeletions.Keys.ToArray())
+                {
+                    if (sb.Length != 0)
+                    {
+                        sb.Append(" AND ");
+                    }
+                    else
+                    {
+                        sb.Append("DELETE FROM primitems WHERE ");
+                    }
+
+                    sb.AppendFormat("(RegionID = '{0}' AND PrimID = '{1}' AND InventoryID = '{2}')",
+                        m_RegionID, k.PartID, k.ItemID);
+                    removedItems.Add(k);
+                    if (removedItems.Count == 255)
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
                         {
-                            req = m_StorageMainRequestQueue.Dequeue(1000);
+                            cmd.ExecuteNonQuery();
                         }
-                        catch
+                        foreach (PrimKey r in removedItems)
                         {
-                            continue;
+                            m_PrimItemDeletions.Remove(r);
                         }
-
-                        int serialNumber = req.SerialNumber;
-                        int knownSerial;
-                        int knownInventorySerial;
-                        bool updatePrim = false;
-                        bool updateInventory = false;
-                        if (req.IsKilled)
-                        {
-                            /* has to be processed */
-                            string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
-                            string partID = req.Part.ID.ToString();
-                            primDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
-                            primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}')", sceneID, partID));
-                            knownSerialNumbers.Remove(req.LocalID);
-                            if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                            {
-                                objectDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
-                            }
-                        }
-                        else if (knownSerialNumbers.Contains(req.LocalID))
-                        {
-                            knownSerial = knownSerialNumbers[req.LocalID];
-                            if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
-                            {
-                                string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
-                                string partID = req.Part.ID.ToString();
-                                primDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
-                                primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}')", sceneID, partID));
-                                if (req.Part.LinkNumber == ObjectGroup.LINK_ROOT)
-                                {
-                                    objectDeletionRequests.Add(string.Format("(RegionID = '{0}' AND ID = '{1}')", sceneID, partID));
-                                }
-                            }
-                            else
-                            {
-                                if (knownSerial != serialNumber && !req.Part.ObjectGroup.IsAttached && !req.Part.ObjectGroup.IsTemporary)
-                                {
-                                    /* prim update */
-                                    updatePrim = true;
-                                    updateInventory = true;
-                                }
-
-                                if (knownInventorySerialNumbers.Contains(req.LocalID))
-                                {
-                                    knownInventorySerial = knownSerialNumbers[req.LocalID];
-                                    /* inventory update */
-                                    updateInventory = knownInventorySerial != req.Part.Inventory.InventorySerial;
-                                }
-                            }
-                        }
-                        else if (req.Part.ObjectGroup.IsAttached || req.Part.ObjectGroup.IsTemporary)
-                        {
-                            /* ignore it */
-                            continue;
-                        }
-                        else
-                        {
-                            updatePrim = true;
-                            updateInventory = true;
-                        }
-
-                        int newPrimInventorySerial = req.Part.Inventory.InventorySerial;
-
-                        int count = Interlocked.Increment(ref m_ProcessedPrims);
-                        if (count % 100 == 0)
-                        {
-                            m_Log.DebugFormat("Processed {0} prims", count);
-                        }
-
-                        if (updatePrim)
-                        {
-                            Dictionary<string, object> primData = GenerateUpdateObjectPart(req.Part);
-                            ObjectGroup grp = req.Part.ObjectGroup;
-                            primData.Add("RegionID", grp.Scene.ID);
-                            if (replaceIntoPrims.Length == 0)
-                            {
-                                replaceIntoPrims = MySQLUtilities.GenerateFieldNames(primData);
-                            }
-                            updatePrimsRequests.Add("(" + MySQLUtilities.GenerateValues(primData) + ")");
-                            knownSerialNumbers[req.LocalID] = req.SerialNumber;
-
-                            Dictionary<string, object> objData = GenerateUpdateObjectGroup(grp);
-                            if (replaceIntoObjects.Length == 0)
-                            {
-                                replaceIntoObjects = MySQLUtilities.GenerateFieldNames(objData);
-                            }
-                            updateObjectsRequests.Add("(" + MySQLUtilities.GenerateValues(objData) + ")");
-                        }
-
-                        if (updateInventory)
-                        {
-                            var items = new Dictionary<UUID, ObjectPartInventoryItem>();
-                            foreach (ObjectPartInventoryItem item in req.Part.Inventory.ValuesByKey1)
-                            {
-                                items.Add(item.ID, item);
-                            }
-
-                            if (knownInventories.Contains(req.Part.LocalID))
-                            {
-                                string sceneID = req.Part.ObjectGroup.Scene.ID.ToString();
-                                string partID = req.Part.ID.ToString();
-                                foreach (UUID itemID in knownInventories[req.Part.LocalID])
-                                {
-                                    if (!items.ContainsKey(itemID))
-                                    {
-                                        primItemDeletionRequests.Add(string.Format("(RegionID = '{0}' AND PrimID = '{1}' AND InventoryID = '{2}')",
-                                            sceneID, partID, itemID.ToString()));
-                                    }
-                                }
-
-                                foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
-                                {
-                                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
-                                    data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
-                                    if (replaceIntoPrimItems.Length == 0)
-                                    {
-                                        replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
-                                    }
-                                    updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
-                                }
-                            }
-                            else
-                            {
-                                foreach (KeyValuePair<UUID, ObjectPartInventoryItem> kvp in items)
-                                {
-                                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(req.Part.ID, kvp.Value);
-                                    data["RegionID"] = req.Part.ObjectGroup.Scene.ID;
-                                    if (replaceIntoPrimItems.Length == 0)
-                                    {
-                                        replaceIntoPrimItems = MySQLUtilities.GenerateFieldNames(data);
-                                    }
-                                    updatePrimItemsRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
-                                }
-                            }
-                            knownInventories[req.Part.LocalID] = new List<UUID>(items.Keys);
-                            knownInventorySerialNumbers[req.Part.LocalID] = newPrimInventorySerial;
-                        }
-
-                        bool emptyQueue = m_StorageMainRequestQueue.Count == 0;
-                        bool processUpdateObjects = updateObjectsRequests.Count != 0;
-                        bool processUpdatePrims = updatePrimsRequests.Count != 0;
-                        bool processUpdatePrimItems = updatePrimItemsRequests.Count != 0;
-
-                        if (((emptyQueue || processUpdateObjects) && objectDeletionRequests.Count > 0) || objectDeletionRequests.Count > 256)
-                        {
-                            string elems = string.Join(" OR ", objectDeletionRequests);
-                            try
-                            {
-                                string command = "DELETE FROM objects WHERE " + elems;
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                                objectDeletionRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Object deletion failed", e);
-                            }
-                        }
-
-                        if (((emptyQueue || processUpdatePrims) && primDeletionRequests.Count > 0) || primDeletionRequests.Count > 256)
-                        {
-                            string elems = string.Join(" OR ", primDeletionRequests);
-                            try
-                            {
-                                string command = "DELETE FROM prims WHERE " + elems;
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                                primDeletionRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Prim deletion failed", e);
-                            }
-                        }
-
-                        if (((emptyQueue || processUpdatePrimItems) && primItemDeletionRequests.Count > 0) || primItemDeletionRequests.Count > 256)
-                        {
-                            string elems = string.Join(" OR ", primItemDeletionRequests);
-                            try
-                            {
-                                string command = "DELETE FROM primitems WHERE " + elems;
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-                                primItemDeletionRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Object deletion failed", e);
-                            }
-                        }
-
-                        if ((emptyQueue && updateObjectsRequests.Count > 0) || updateObjectsRequests.Count > 256)
-                        {
-                            string command = "REPLACE INTO objects (" + replaceIntoObjects + ") VALUES " + string.Join(",", updateObjectsRequests);
-                            try
-                            {
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-
-                                updateObjectsRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Object update failed", e);
-                            }
-                        }
-
-                        if ((emptyQueue && updatePrimsRequests.Count > 0) || updatePrimsRequests.Count > 256)
-                        {
-                            string command = "REPLACE INTO prims (" + replaceIntoPrims + ") VALUES " + string.Join(",", updatePrimsRequests);
-                            try
-                            {
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-
-                                updatePrimsRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Prim update failed", e);
-                            }
-                        }
-
-                        if ((emptyQueue && updatePrimItemsRequests.Count > 0) || updatePrimItemsRequests.Count > 256)
-                        {
-                            string command = "REPLACE INTO primitems (" + replaceIntoPrimItems + ") VALUES " + string.Join(",", updatePrimItemsRequests);
-                            try
-                            {
-                                using (var conn = new MySqlConnection(m_ConnectionString))
-                                {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(command, conn))
-                                    {
-                                        cmd.ExecuteNonQuery();
-                                    }
-                                }
-
-                                updatePrimItemsRequests.Clear();
-                            }
-                            catch (Exception e)
-                            {
-                                m_Log.Error("Prim inventory update failed", e);
-                            }
-                        }
+                        sb.Clear();
                     }
                 }
-                finally
+
+                if (removedItems.Count != 0)
                 {
-                    m_SceneListenerThreads.Remove(this);
+                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (PrimKey r in removedItems)
+                    {
+                        m_PrimItemDeletions.Remove(r);
+                    }
                 }
+            }
+
+            private void ProcessPrimDeletions(MySqlConnection conn)
+            {
+                StringBuilder sb = new StringBuilder();
+                StringBuilder sb2 = new StringBuilder();
+
+                List<UUID> removedItems = new List<UUID>();
+
+                foreach (UUID k in m_PrimDeletions.Keys.ToArray())
+                {
+                    if (sb.Length != 0)
+                    {
+                        sb.Append(" AND ");
+                        sb2.Append(" AND ");
+                    }
+                    else
+                    {
+                        sb.Append("DELETE FROM prims WHERE ");
+                        sb2.Append("DELETE FROM primitems WHERE ");
+                    }
+
+                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
+                        m_RegionID, k);
+                    sb2.AppendFormat("(RegionID = '{0}' AND PrimID = '{1}')",
+                        m_RegionID, k);
+                    removedItems.Add(k);
+                    if (removedItems.Count == 255)
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        using (MySqlCommand cmd = new MySqlCommand(sb2.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        foreach (UUID r in removedItems)
+                        {
+                            m_PrimDeletions.Remove(r);
+                            Interlocked.Increment(ref m_ProcessedPrims);
+                        }
+                        sb.Clear();
+                        sb2.Clear();
+                    }
+                }
+
+                if (removedItems.Count != 0)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand(sb2.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (UUID r in removedItems)
+                    {
+                        m_PrimDeletions.Remove(r);
+                        Interlocked.Increment(ref m_ProcessedPrims);
+                    }
+                }
+            }
+
+            private void ProcessGroupDeletions(MySqlConnection conn)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                List<UUID> removedItems = new List<UUID>();
+
+                foreach (UUID k in m_GroupDeletions.Keys.ToArray())
+                {
+                    if (sb.Length != 0)
+                    {
+                        sb.Append(" AND ");
+                    }
+                    else
+                    {
+                        sb.Append("DELETE FROM objects WHERE ");
+                    }
+
+                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
+                        m_RegionID, k);
+                    removedItems.Add(k);
+                    if (removedItems.Count == 255)
+                    {
+                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        foreach (UUID r in removedItems)
+                        {
+                            m_GroupDeletions.Remove(r);
+                        }
+                        sb.Clear();
+                    }
+                }
+
+                if (removedItems.Count != 0)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (UUID r in removedItems)
+                    {
+                        m_GroupDeletions.Remove(r);
+                    }
+                }
+            }
+
+            private void ProcessPrimItemUpdates(MySqlConnection conn)
+            {
+                StringBuilder replaceInto1 = new StringBuilder();
+                StringBuilder replaceInto2 = new StringBuilder();
+                bool replaceInto1Inited = false;
+                List<PrimKey> processedItems = new List<PrimKey>();
+
+                foreach (PrimKey k in m_PrimItemUpdates.Keys.ToArray())
+                {
+                    Dictionary<string, object> data = m_PrimItemUpdates[k];
+                    if (!replaceInto1Inited)
+                    {
+                        replaceInto1Inited = true;
+                        replaceInto1.Append("REPLACE INTO primitems (");
+                        replaceInto1.Append(MySQLUtilities.GenerateFieldNames(data));
+                    }
+
+                    if(replaceInto2.Length == 0)
+                    { 
+                        replaceInto2.Append(") VALUES (");
+                    }
+                    else
+                    {
+                        replaceInto2.Append("),(");
+                    }
+                    processedItems.Add(k);
+                    replaceInto2.Append(MySQLUtilities.GenerateValues(data));
+
+                    if(processedItems.Count == 255)
+                    {
+                        StringBuilder replaceInto = new StringBuilder();
+                        replaceInto.Append(replaceInto1);
+                        replaceInto.Append(replaceInto2);
+                        replaceInto.Append(")");
+                        using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        foreach (PrimKey r in processedItems)
+                        {
+                            m_PrimItemUpdates.Remove(r);
+                            Interlocked.Increment(ref m_ProcessedPrims);
+                        }
+                        replaceInto2.Clear();
+                    }
+                }
+
+                if (processedItems.Count > 0)
+                {
+                    StringBuilder replaceInto = new StringBuilder();
+                    replaceInto.Append(replaceInto1);
+                    replaceInto.Append(replaceInto2);
+                    replaceInto.Append(")");
+                    using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (PrimKey r in processedItems)
+                    {
+                        m_PrimItemUpdates.Remove(r);
+                        Interlocked.Increment(ref m_ProcessedPrims);
+                    }
+                }
+            }
+
+            private void ProcessPrimUpdates(MySqlConnection conn)
+            {
+                StringBuilder replaceInto1 = new StringBuilder();
+                StringBuilder replaceInto2 = new StringBuilder();
+                bool replaceInto1Inited = false;
+                List<UUID> processedItems = new List<UUID>();
+
+                foreach (UUID k in m_PrimUpdates.Keys.ToArray())
+                {
+                    Dictionary<string, object> data = m_PrimUpdates[k];
+                    if (!replaceInto1Inited)
+                    {
+                        replaceInto1Inited = true;
+                        replaceInto1.Append("REPLACE INTO prims (");
+                        replaceInto1.Append(MySQLUtilities.GenerateFieldNames(data));
+                    }
+
+                    if (replaceInto2.Length == 0)
+                    {
+                        replaceInto2.Append(") VALUES (");
+                    }
+                    else
+                    {
+                        replaceInto2.Append("),(");
+                    }
+                    processedItems.Add(k);
+                    replaceInto2.Append(MySQLUtilities.GenerateValues(data));
+
+                    if (processedItems.Count == 255)
+                    {
+                        StringBuilder replaceInto = new StringBuilder();
+                        replaceInto.Append(replaceInto1);
+                        replaceInto.Append(replaceInto2);
+                        replaceInto.Append(")");
+                        using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        foreach (UUID r in processedItems)
+                        {
+                            m_PrimUpdates.Remove(r);
+                        }
+                        replaceInto2.Clear();
+                    }
+                }
+
+                if (processedItems.Count > 0)
+                {
+                    StringBuilder replaceInto = new StringBuilder();
+                    replaceInto.Append(replaceInto1);
+                    replaceInto.Append(replaceInto2);
+                    replaceInto.Append(")");
+                    using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (UUID r in processedItems)
+                    {
+                        m_PrimUpdates.Remove(r);
+                    }
+                }
+            }
+
+
+            private void ProcessGroupUpdates(MySqlConnection conn)
+            {
+                StringBuilder replaceInto1 = new StringBuilder();
+                StringBuilder replaceInto2 = new StringBuilder();
+                bool replaceInto1Inited = false;
+                List<UUID> processedItems = new List<UUID>();
+
+                foreach (UUID k in m_GroupUpdates.Keys.ToArray())
+                {
+                    Dictionary<string, object> data = m_GroupUpdates[k];
+                    if (!replaceInto1Inited)
+                    {
+                        replaceInto1Inited = true;
+                        replaceInto1.Append("REPLACE INTO objects (");
+                        replaceInto1.Append(MySQLUtilities.GenerateFieldNames(data));
+                    }
+
+                    if (replaceInto2.Length == 0)
+                    {
+                        replaceInto2.Append(") VALUES (");
+                    }
+                    else
+                    {
+                        replaceInto2.Append("),(");
+                    }
+                    processedItems.Add(k);
+                    replaceInto2.Append(MySQLUtilities.GenerateValues(data));
+
+                    if (processedItems.Count == 255)
+                    {
+                        StringBuilder replaceInto = new StringBuilder();
+                        replaceInto.Append(replaceInto1);
+                        replaceInto.Append(replaceInto2);
+                        replaceInto.Append(")");
+                        using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        foreach (UUID r in processedItems)
+                        {
+                            m_GroupUpdates.Remove(r);
+                        }
+                        replaceInto2.Clear();
+                    }
+                }
+
+                if (processedItems.Count > 0)
+                {
+                    StringBuilder replaceInto = new StringBuilder();
+                    replaceInto.Append(replaceInto1);
+                    replaceInto.Append(replaceInto2);
+                    replaceInto.Append(")");
+                    using (MySqlCommand cmd = new MySqlCommand(replaceInto.ToString(), conn))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    foreach (UUID r in processedItems)
+                    {
+                        m_GroupUpdates.Remove(r);
+                    }
+                }
+            }
+
+            protected override void OnIdle()
+            {
+                StringBuilder sb = new StringBuilder();
+
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+
+                    ProcessPrimItemDeletions(conn);
+                    ProcessPrimDeletions(conn);
+                    ProcessGroupDeletions(conn);
+                    ProcessPrimUpdates(conn);
+                    ProcessGroupUpdates(conn);
+                    ProcessPrimItemUpdates(conn);
+                }
+            }
+
+            protected override void OnStart()
+            {
+                m_SceneListenerThreads.Add(this);
+            }
+
+            protected override void OnStop()
+            {
+                m_SceneListenerThreads.Remove(this);
             }
 
             private Dictionary<string, object> GenerateUpdateObjectPartInventoryItem(UUID primID, ObjectPartInventoryItem item)
