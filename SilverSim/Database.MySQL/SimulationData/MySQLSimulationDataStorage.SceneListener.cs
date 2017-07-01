@@ -113,7 +113,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             protected override void OnUpdate(ObjectUpdateInfo info)
             {
-                if(info.IsKilled)
+                if (info.IsKilled)
                 {
                     if (info.Part.ObjectGroup.RootPart == info.Part)
                     {
@@ -123,21 +123,35 @@ namespace SilverSim.Database.MySQL.SimulationData
                     m_PrimUpdates.Remove(info.ID);
                     m_PrimDeletions[info.ID] = true;
                 }
-                else if(m_PrimSerials.Contains(info.ID) && m_PrimSerials[info.ID] == info.Part.SerialNumber)
-                {
-                    /* ignore update */
-                }
                 else
                 {
-                    if (info.Part.ObjectGroup.RootPart != info.Part)
+                    bool havePrimSerial = m_PrimSerials.Contains(info.ID);
+                    if (havePrimSerial && m_PrimSerials[info.ID] == info.Part.SerialNumber)
                     {
-                        m_GroupDeletions[info.ID] = true;
+                        /* ignore update */
                     }
-                    Dictionary<string, object> data = GenerateUpdateObjectPart(info.Part);
-                    data["RegionID"] = m_RegionID;
-                    m_PrimUpdates[info.ID] = data;
-                    ObjectGroup grp = info.Part.ObjectGroup;
-                    m_GroupUpdates[grp.ID] = GenerateUpdateObjectGroup(grp);
+                    else
+                    {
+                        if(!havePrimSerial)
+                        {
+                            foreach(ObjectPartInventoryItem item in info.Part.Inventory.Values)
+                            {
+                                ObjectInventoryUpdateInfo invinfo = item.UpdateInfo;
+                                Dictionary<string, object> itemdata = GenerateUpdateObjectPartInventoryItem(invinfo.PartID, invinfo.Item);
+                                itemdata["RegionID"] = m_RegionID;
+                                m_PrimItemUpdates[new PrimKey(invinfo)] = itemdata;
+                            }
+                        }
+                        if (info.Part.ObjectGroup.RootPart != info.Part)
+                        {
+                            m_GroupDeletions[info.ID] = true;
+                        }
+                        Dictionary<string, object> data = GenerateUpdateObjectPart(info.Part);
+                        data["RegionID"] = m_RegionID;
+                        m_PrimUpdates[info.ID] = data;
+                        ObjectGroup grp = info.Part.ObjectGroup;
+                        m_GroupUpdates[grp.ID] = GenerateUpdateObjectGroup(grp);
+                    }
                 }
             }
 
