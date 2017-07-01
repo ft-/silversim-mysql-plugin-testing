@@ -505,7 +505,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 StringBuilder sb = new StringBuilder();
 
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
 
