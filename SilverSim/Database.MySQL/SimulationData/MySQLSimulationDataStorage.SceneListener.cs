@@ -503,8 +503,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             protected override void OnIdle()
             {
-                StringBuilder sb = new StringBuilder();
-
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
