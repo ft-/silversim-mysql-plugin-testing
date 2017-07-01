@@ -49,8 +49,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 m_SceneListenerThreads = sceneListenerThreads;
             }
 
-            public UUID RegionID { get; }
-
             public QueueStat GetStats()
             {
                 int count = m_StorageMainRequestQueue.Count;
