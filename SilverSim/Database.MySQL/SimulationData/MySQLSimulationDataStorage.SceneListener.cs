@@ -45,7 +45,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                 : base(regionID)
             {
                 m_ConnectionString = connectionString;
-                RegionID = regionID;
                 m_SceneListenerThreads = sceneListenerThreads;
             }
 
@@ -163,7 +162,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (sb.Length != 0)
                     {
-                        sb.Append(" AND ");
+                        sb.Append(" OR ");
                     }
                     else
                     {
@@ -175,7 +174,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
                     {
-                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                        using (var cmd = new MySqlCommand(sb.ToString(), conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -189,7 +188,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if (removedItems.Count != 0)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    using (var cmd = new MySqlCommand(sb.ToString(), conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -211,8 +210,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (sb.Length != 0)
                     {
-                        sb.Append(" AND ");
-                        sb2.Append(" AND ");
+                        sb.Append(" OR ");
+                        sb2.Append(" OR ");
                     }
                     else
                     {
@@ -227,11 +226,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
                     {
-                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                        using (var cmd = new MySqlCommand(sb.ToString(), conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
-                        using (MySqlCommand cmd = new MySqlCommand(sb2.ToString(), conn))
+                        using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -247,11 +246,11 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if (removedItems.Count != 0)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    using (var cmd = new MySqlCommand(sb.ToString(), conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
-                    using (MySqlCommand cmd = new MySqlCommand(sb2.ToString(), conn))
+                    using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -273,7 +272,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     if (sb.Length != 0)
                     {
-                        sb.Append(" AND ");
+                        sb.Append(" OR ");
                     }
                     else
                     {
@@ -285,7 +284,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
                     {
-                        using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                        using (var cmd = new MySqlCommand(sb.ToString(), conn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -299,7 +298,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 if (removedItems.Count != 0)
                 {
-                    using (MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn))
+                    using (var cmd = new MySqlCommand(sb.ToString(), conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
