@@ -563,7 +563,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["SalePermMask"] = item.SaleInfo.PermMask,
                     ["PermsGranter"] = grantinfo.PermsGranter.ToString(),
                     ["PermsMask"] = grantinfo.PermsMask,
-                    ["NextOwnerAssetID"] = item.NextOwnerAssetID
+                    ["NextOwnerAssetID"] = item.NextOwnerAssetID,
+                    ["ExperienceID"] = item.ExperienceID
                 };
             }
 
