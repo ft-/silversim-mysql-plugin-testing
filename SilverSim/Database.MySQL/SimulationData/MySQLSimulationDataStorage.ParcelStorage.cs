@@ -32,6 +32,8 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         private readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
         private readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
+        private readonly MySQLSimulationDataParcelExperienceListStorage m_AllowedParcelExperiences;
+        private readonly MySQLSimulationDataParcelExperienceListStorage m_BlockedParcelExperiences;
 
         ParcelInfo ISimulationDataParcelStorageInterface.this[UUID regionID, UUID parcelID]
         {
@@ -207,7 +209,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
-
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
+        ISimulationDataParcelExperienceListStorageInterface ISimulationDataParcelStorageInterface.AllowedExperiences => m_AllowedParcelExperiences;
+        ISimulationDataParcelExperienceListStorageInterface ISimulationDataParcelStorageInterface.BlockedExperiences => m_BlockedParcelExperiences;
     }
 }

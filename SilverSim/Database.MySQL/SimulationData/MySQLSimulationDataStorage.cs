@@ -29,6 +29,7 @@ using SilverSim.ServiceInterfaces.Statistics;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -46,6 +47,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccesswhitelist");
             m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccessblacklist");
+            m_AllowedParcelExperiences = new MySQLSimulationDataParcelExperienceListStorage(m_ConnectionString, "parcelallowedexperiences");
+            m_BlockedParcelExperiences = new MySQLSimulationDataParcelExperienceListStorage(m_ConnectionString, "parcelblockedexperiences");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -73,6 +76,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         public override ISimulationDataTerrainStorageInterface Terrains => this;
 
         public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
+
+        public override ISimulationDataRegionExperiencesStorageInterface RegionExperiences => this;
         #endregion
 
         #region IDBServiceInterface
@@ -97,7 +102,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             "environmentcontroller",
             "regionsettings",
             "lightshare",
-            "spawnpoints"
+            "spawnpoints",
+            "parcelallowedexperiences",
+            "parcelblockedexperiences",
+            "regionexperiences"
         };
 
         public override void RemoveRegion(UUID regionID)

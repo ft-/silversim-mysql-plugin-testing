@@ -132,6 +132,26 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(4),
             new PrimaryKeyInfo("RegionID", "ParcelID", "Accessor"),
             #endregion
+
+            #region Table parcelallowedexperiences
+            new SqlTable("parcelallowedexperiences"),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ParcelID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo("RegionID", "ParcelID", "ExperienceID"),
+            new NamedKeyInfo("RegionID", "RegionID"),
+            new NamedKeyInfo("RegionIDParcelID", "RegionID", "ParcelID"),
+            #endregion
+
+            #region Table parcelblockedexperiences
+            new SqlTable("parcelblockedexperiences"),
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ParcelID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero },
+            new PrimaryKeyInfo("RegionID", "ParcelID", "ExperienceID"),
+            new NamedKeyInfo("RegionID", "RegionID"),
+            new NamedKeyInfo("RegionIDParcelID", "RegionID", "ParcelID")
+            #endregion
         };
     }
 }

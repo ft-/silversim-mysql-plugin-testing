@@ -60,6 +60,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             var entry = new ParcelAccessEntry()
                             {
+                                RegionID = regionID,
                                 ParcelID = reader.GetUUID("ParcelID"),
                                 Accessor = reader.GetUUI("Accessor")
                             };
