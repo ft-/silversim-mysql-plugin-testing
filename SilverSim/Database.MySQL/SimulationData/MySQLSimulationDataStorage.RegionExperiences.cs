@@ -19,16 +19,12 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
-using MySql.Data.MySqlClient;
-using SilverSim.Scene.Types.Scene;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {

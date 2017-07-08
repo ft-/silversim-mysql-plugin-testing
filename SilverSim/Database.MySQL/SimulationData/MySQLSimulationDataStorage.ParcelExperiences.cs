@@ -25,24 +25,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataParcelExperienceListStorage : ISimulationDataParcelExperienceListStorageInterface
+    public sealed partial class MySQLSimulationDataStorage : ISimulationDataParcelExperienceListStorageInterface
     {
-        private readonly string m_ConnectionString;
-        private readonly string m_TableName;
-
-        public MySQLSimulationDataParcelExperienceListStorage(string connectionString, string tableName)
-        {
-            m_ConnectionString = connectionString;
-            m_TableName = tableName;
-        }
-
-        public List<ParcelExperienceEntry> this[UUID regionID, UUID parcelID]
+        List<ParcelExperienceEntry> IParcelExperienceList.this[UUID regionID, UUID parcelID]
         {
             get
             {
@@ -50,7 +42,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE RegionID = @regionid AND ParcelID = @parcelid", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid", connection))
                     {
                         cmd.Parameters.AddParameter("@regionid", regionID);
                         cmd.Parameters.AddParameter("@parcelid", parcelID);
@@ -62,7 +54,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),
-                                    ExperienceID = reader.GetUUID("ExperienceID")
+                                    ExperienceID = reader.GetUUID("ExperienceID"),
+                                    IsAllowed = reader.GetBool("IsAllowed")
                                 };
                                 result.Add(entry);
                             }
@@ -73,34 +66,25 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public bool this[UUID regionID, UUID parcelID, UUID experienceID]
+        ParcelExperienceEntry IParcelExperienceList.this[UUID regionID, UUID parcelID, UUID experienceID]
         {
             get
             {
-                using (var connection = new MySqlConnection(m_ConnectionString))
+                ParcelExperienceEntry exp;
+                if(!Parcels.Experiences.TryGetValue(regionID, parcelID, experienceID, out exp))
                 {
-                    connection.Open();
-                    /* we use a specific implementation to reduce the result set here */
-                    using (var cmd = new MySqlCommand("SELECT ExperienceID FROM " + m_TableName + " WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid", connection))
-                    {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
-                        cmd.Parameters.AddParameter("@parcelid", parcelID);
-                        cmd.Parameters.AddParameter("@experienceid", experienceID);
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            return reader.Read();
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
+                return exp;
             }
         }
 
-        public bool Remove(UUID regionID, UUID parcelID)
+        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = @regionid AND ParcelID = @parcelid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);
@@ -109,12 +93,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public bool Remove(UUID regionID, UUID parcelID, UUID experienceID)
+        bool IParcelExperienceList.Remove(UUID regionID, UUID parcelID, UUID experienceID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID = @experienceid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID = @experienceid", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);
@@ -124,12 +108,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public bool RemoveAllFromRegion(UUID regionID)
+        bool ISimulationDataParcelExperienceListStorageInterface.RemoveAllFromRegion(UUID regionID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID = @regionid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM parcelexperiences WHERE RegionID = @regionid", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     return cmd.ExecuteNonQuery() > 0;
@@ -137,7 +121,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public void Store(ParcelExperienceEntry entry)
+        void IParcelExperienceList.Store(ParcelExperienceEntry entry)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
@@ -148,8 +132,40 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["ParcelID"] = entry.ParcelID,
                     ["ExperienceID"] = entry.ExperienceID
                 };
-                connection.ReplaceInto(m_TableName, data);
+                connection.ReplaceInto("parcelexperiences", data);
             }
+        }
+
+        bool IParcelExperienceList.TryGetValue(UUID regionID, UUID parcelID, UUID experienceID, out ParcelExperienceEntry entry)
+        {
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                /* we use a specific implementation to reduce the result set here */
+                using (var cmd = new MySqlCommand("SELECT ExperienceID FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid", connection))
+                {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@parcelid", parcelID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if(reader.Read())
+                        {
+                            entry = new ParcelExperienceEntry
+                            {
+                                RegionID = reader.GetUUID("RegionID"),
+                                ParcelID = reader.GetUUID("ParcelID"),
+                                ExperienceID = reader.GetUUID("ExperienceID"),
+                                IsAllowed = reader.GetBool("IsAllowed")
+                            };
+                            return true;
+                        }
+                    }
+                }
+                entry = default(ParcelExperienceEntry);
+                return false;
+            }
+
         }
     }
 }

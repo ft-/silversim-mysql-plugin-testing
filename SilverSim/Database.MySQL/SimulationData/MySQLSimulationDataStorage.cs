@@ -47,8 +47,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccesswhitelist");
             m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccessblacklist");
-            m_AllowedParcelExperiences = new MySQLSimulationDataParcelExperienceListStorage(m_ConnectionString, "parcelallowedexperiences");
-            m_BlockedParcelExperiences = new MySQLSimulationDataParcelExperienceListStorage(m_ConnectionString, "parcelblockedexperiences");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -103,8 +101,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             "regionsettings",
             "lightshare",
             "spawnpoints",
-            "parcelallowedexperiences",
-            "parcelblockedexperiences",
+            "parcelexperiences",
             "regionexperiences"
         };
 
