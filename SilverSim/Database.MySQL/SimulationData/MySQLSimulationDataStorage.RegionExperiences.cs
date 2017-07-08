@@ -28,12 +28,13 @@ using System.Threading.Tasks;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
 using MySql.Data.MySqlClient;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
     public sealed partial class MySQLSimulationDataStorage : ISimulationDataRegionExperiencesStorageInterface
     {
-        List<RegionExperienceInfo> ISimulationDataRegionExperiencesStorageInterface.this[UUID regionID]
+        List<RegionExperienceInfo> IRegionExperienceList.this[UUID regionID]
         {
             get
             {
@@ -63,7 +64,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        RegionExperienceInfo ISimulationDataRegionExperiencesStorageInterface.this[UUID regionID, UUID experienceID]
+        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
         {
             get
             {
@@ -76,7 +77,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        bool ISimulationDataRegionExperiencesStorageInterface.Remove(UUID regionID, UUID experienceID)
+        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -103,7 +104,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        void ISimulationDataRegionExperiencesStorageInterface.Store(RegionExperienceInfo info)
+        void IRegionExperienceList.Store(RegionExperienceInfo info)
         {
             var vals = new Dictionary<string, object>
             {
@@ -119,7 +120,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        bool ISimulationDataRegionExperiencesStorageInterface.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
