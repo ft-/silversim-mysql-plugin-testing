@@ -126,7 +126,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     ["RegionID"] = entry.RegionID,
                     ["ParcelID"] = entry.ParcelID,
-                    ["ExperienceID"] = entry.ExperienceID
+                    ["ExperienceID"] = entry.ExperienceID,
+                    ["IsAllowed"] = entry.IsAllowed
                 };
                 connection.ReplaceInto("parcelexperiences", data);
             }
