@@ -356,8 +356,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 }
                                 else
                                 {
-                                    m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
-                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("ID")));
+                                    m_Log.WarnFormat("deleting orphan prim inventory in region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
+                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(dbReader.GetUUID("PrimID"), dbReader.GetUUID("InventoryID")));
                                 }
                             }
                         }
@@ -434,7 +434,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     int elemcnt = Math.Min(orphanedPrimInventories.Count - idx, 256);
                     string sqlcmd = "DELETE FROM primitems WHERE RegionID = '" + regionID.ToString() + "' AND (" +
                         string.Join(" OR ", from id in orphanedPrimInventories.GetRange(idx, elemcnt) select
-                                            string.Format("PrimID = '{0}' AND ID = '{1}'", id.Key.ToString(), id.Value.ToString()));
+                                            string.Format("(PrimID = '{0}' AND InventoryID = '{1}')", id.Key.ToString(), id.Value.ToString())) + ")";
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
