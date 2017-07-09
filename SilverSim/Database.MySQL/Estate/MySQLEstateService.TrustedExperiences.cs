@@ -65,7 +65,11 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 if (value)
                 {
-                    var vals = new Dictionary<string, object>();
+                    var vals = new Dictionary<string, object>
+                    {
+                        ["EstateID"] = estateID,
+                        ["ExperienceID"] = experienceID
+                    };
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
