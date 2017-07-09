@@ -228,7 +228,35 @@ namespace SilverSim.Database.MySQL.Experience
 
         public override bool Remove(UUI requestingAgent, UUID id)
         {
-            throw new NotImplementedException();
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                return conn.InsideTransaction<bool>(() =>
+                {
+                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ExperienceID = @experienceid", conn))
+                    {
+                        cmd.Parameters.AddParameter("@experienceid", id);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if(!reader.Read())
+                            {
+                                return false;
+                            }
+
+                            if(!reader.GetUUI("Owner").EqualsGrid(requestingAgent))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    using (var cmd = new MySqlCommand("DELETE FROM experiences WHERE ExperienceID = @experienceid", conn))
+                    {
+                        cmd.Parameters.AddParameter("@experienceid", id);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
+            }
         }
 
         public void Remove(UUID scopeID, UUID accountID)
