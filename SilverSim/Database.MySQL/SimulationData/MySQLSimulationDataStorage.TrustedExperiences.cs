@@ -19,15 +19,11 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
+using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -64,7 +60,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegioNID = @regionid AND ExperienceID = @experienceid", conn))
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
                     {
                         cmd.Parameters.AddParameter("@regionid", regionID);
                         cmd.Parameters.AddParameter("@experienceid", experienceID);
