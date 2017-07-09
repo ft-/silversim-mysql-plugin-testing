@@ -128,9 +128,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegionID = @regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM regiontrustedexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         trusted = reader.Read();
