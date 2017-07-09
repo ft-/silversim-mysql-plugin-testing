@@ -41,7 +41,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM estatetrustedexperiences WHERE EstateID = @estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid", conn))
                     {
                         cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())

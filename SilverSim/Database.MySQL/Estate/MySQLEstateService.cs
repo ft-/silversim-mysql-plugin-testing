@@ -158,6 +158,8 @@ namespace SilverSim.Database.MySQL.Estate
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
             new AddColumn<bool>("IsAllowed") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("IsTrusted") { IsNullAllowed = false, Default = false },
+            new TableRevision(2),
+            new DropColumn("IsTrusted"),
             #endregion
 
             #region estatetrustedexperiences
