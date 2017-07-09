@@ -76,6 +76,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         public override ISimulationDataRegionSettingsStorageInterface RegionSettings => this;
 
         public override ISimulationDataRegionExperiencesStorageInterface RegionExperiences => this;
+
+        public override ISimulationDataRegionTrustedExperiencesStorageInterface TrustedExperiences => this;
         #endregion
 
         #region IDBServiceInterface
@@ -102,7 +104,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             "lightshare",
             "spawnpoints",
             "parcelexperiences",
-            "regionexperiences"
+            "regionexperiences",
+            "regiontrustedexperiences"
         };
 
         public override void RemoveRegion(UUID regionID)

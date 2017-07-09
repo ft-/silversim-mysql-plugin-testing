@@ -184,7 +184,7 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Creator, ID FROM experiences WHERE Group LIKE @group", conn))
+                using (var cmd = new MySqlCommand("SELECT Group, ID FROM experiences WHERE Group LIKE @group", conn))
                 {
                     cmd.Parameters.AddParameter("@group", group.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -208,7 +208,7 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Creator, ID FROM experiences WHERE Owner LIKE @owner", conn))
+                using (var cmd = new MySqlCommand("SELECT Owner, ID FROM experiences WHERE Owner LIKE @owner", conn))
                 {
                     cmd.Parameters.AddParameter("@owner", owner.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())

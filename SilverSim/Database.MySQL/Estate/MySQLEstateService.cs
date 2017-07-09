@@ -149,7 +149,21 @@ namespace SilverSim.Database.MySQL.Estate
             new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" },
             /* ^^ this is for compatibility our list generator actually skips this field when not finding the revision 3 table */
             new TableRevision(5),
-            new AddColumn<uint>("ParentEstateID") {IsNullAllowed = false, Default = (uint)1 }
+            new AddColumn<uint>("ParentEstateID") {IsNullAllowed = false, Default = (uint)1 },
+            #endregion
+
+            #region estateexperiences
+            new SqlTable("estateexperiences"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
+            new AddColumn<bool>("IsAllowed") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsTrusted") { IsNullAllowed = false, Default = false },
+            #endregion
+
+            #region estatetrustedexperiences
+            new SqlTable("estatetrustedexperiences"),
+            new AddColumn<uint>("EstateID") { IsNullAllowed = false },
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
             #endregion
         };
 
@@ -287,11 +301,29 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
+        public static readonly string[] EstateRemoveTables =
+        {
+            "estate_regionmap",
+            "estate_managers",
+            "estate_groups",
+            "estate_users",
+            "estate_bans",
+            "estateexperiences",
+            "estatetrustedexperiences",
+        };
         public override bool Remove(uint estateID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
+                foreach (string table in EstateRemoveTables)
+                {
+                    using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE EstateID = @id", conn))
+                    {
+                        cmd.Parameters.AddParameter("@id", estateID);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
                 using (var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
@@ -382,5 +414,9 @@ namespace SilverSim.Database.MySQL.Estate
         public override IEstateGroupsServiceInterface EstateGroup => this;
 
         public override IEstateRegionMapServiceInterface RegionMap => this;
+
+        public override IEstateExperienceServiceInterface Experiences => this;
+
+        public override IEstateTrustedExperienceServiceInterface TrustedExperiences => this;
     }
 }

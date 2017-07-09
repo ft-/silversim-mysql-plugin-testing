@@ -19,37 +19,40 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using MySql.Data.MySqlClient;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Estate;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using SilverSim.Types;
 using SilverSim.Types.Experience;
-using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
-namespace SilverSim.Database.MySQL.SimulationData
+namespace SilverSim.Database.MySQL.Estate
 {
-    public sealed partial class MySQLSimulationDataStorage : ISimulationDataRegionExperiencesStorageInterface
+    public sealed partial class MySQLEstateService : IEstateExperienceServiceInterface
     {
-        List<RegionExperienceInfo> IRegionExperienceList.this[UUID regionID]
+        List<EstateExperienceInfo> IEstateExperienceServiceInterface.this[uint estateID]
         {
             get
             {
-                List<RegionExperienceInfo> result = new List<RegionExperienceInfo>();
+                var result = new List<EstateExperienceInfo>();
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM estatetrustedexperiences WHERE EstateID = @estateid", conn))
                     {
-                        cmd.Parameters.AddParameter("@regionid", regionID);
+                        cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            while (reader.Read())
+                            while(reader.Read())
                             {
-                                result.Add(new RegionExperienceInfo
+                                result.Add(new EstateExperienceInfo
                                 {
+                                    EstateID = reader.GetUInt32("EstateID"),
                                     ExperienceID = reader.GetUUID("ExperienceID"),
-                                    RegionID = reader.GetUUID("RegionID"),
-                                    IsAllowed = reader.GetBool("IsAllowed"),
+                                    IsAllowed = reader.GetBool("IsAllowed")
                                 });
                             }
                         }
@@ -59,12 +62,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        RegionExperienceInfo IRegionExperienceList.this[UUID regionID, UUID experienceID]
+        EstateExperienceInfo IEstateExperienceServiceInterface.this[uint estateID, UUID experienceID]
         {
             get
             {
-                RegionExperienceInfo info;
-                if(!RegionExperiences.TryGetValue(regionID, experienceID, out info))
+                EstateExperienceInfo info;
+                if(!Experiences.TryGetValue(estateID, experienceID, out info))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -72,73 +75,60 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        bool IRegionExperienceList.Remove(UUID regionID, UUID experienceID)
+        bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
-                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@estateid", estateID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        void ISimulationDataRegionExperiencesStorageInterface.RemoveRegion(UUID regionID)
-        {
-            using (var conn = new MySqlConnection(m_ConnectionString))
-            {
-                conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM regionexperiences WHERE RegionID = @regionid", conn))
-                {
-                    cmd.Parameters.AddParameter("@regionid", regionID);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-        }
-
-        void IRegionExperienceList.Store(RegionExperienceInfo info)
+        void IEstateExperienceServiceInterface.Store(EstateExperienceInfo info)
         {
             var vals = new Dictionary<string, object>
             {
-                ["RegionID"] = info.RegionID,
+                ["EstateID"] = info.EstateID,
                 ["ExperienceID"] = info.ExperienceID,
-                ["IsAllowed"] = info.IsAllowed,
+                ["IsAllowed"] = info.IsAllowed
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.ReplaceInto("regionexperiences", vals);
+                conn.ReplaceInto("estateexperiences", vals);
             }
         }
 
-        bool IRegionExperienceList.TryGetValue(UUID regionID, UUID experienceID, out RegionExperienceInfo info)
+        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM regionexperiences WHERE RegionID = @regionid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
-                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.Parameters.AddParameter("@estateid", estateID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        if (reader.Read())
+                        if(reader.Read())
                         {
-                            info = new RegionExperienceInfo
+                            info = new EstateExperienceInfo
                             {
-                                ExperienceID = reader.GetUUID("ExperienceID"),
-                                RegionID = reader.GetUUID("RegionID"),
-                                IsAllowed = reader.GetBool("IsAllowed"),
+                                EstateID = estateID,
+                                ExperienceID = experienceID,
+                                IsAllowed = reader.GetBool("IsAllowed")
                             };
                             return true;
                         }
                     }
                 }
             }
-            info = default(RegionExperienceInfo);
+            info = default(EstateExperienceInfo);
             return false;
         }
     }
