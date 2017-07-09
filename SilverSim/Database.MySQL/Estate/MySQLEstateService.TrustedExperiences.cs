@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT ExperienceID FROM regiontrustedexperiences WHERE EstateID = @estateid", conn))
+                    using (var cmd = new MySqlCommand("SELECT ExperienceID FROM estatetrustedexperiences WHERE EstateID = @estateid", conn))
                     {
                         cmd.Parameters.AddParameter("@estateid", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -84,7 +84,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM regiontrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM estatetrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
@@ -98,7 +98,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NULL FROM regiontrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM estatetrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
