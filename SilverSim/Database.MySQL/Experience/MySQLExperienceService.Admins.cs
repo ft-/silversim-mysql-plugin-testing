@@ -29,7 +29,32 @@ namespace SilverSim.Database.MySQL.Experience
 {
     public sealed partial class MySQLExperienceService : ExperienceServiceInterface.IExperienceAdminInterface
     {
-        List<UUID> IExperienceAdminInterface.this[UUI agent] => throw new NotImplementedException();
+        List<UUID> IExperienceAdminInterface.this[UUI agent]
+        {
+            get
+            {
+                var result = new List<UUID>();
+                using (var conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand("SELECT ExperienceID, Admin FROM experienceadmins WHERE Admin LIKE @admin", conn))
+                    {
+                        cmd.Parameters.AddParameter("@admin", agent.ID.ToString() + "%");
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if (reader.GetUUI("Admin").EqualsGrid(agent))
+                                {
+                                    result.Add(reader.GetUUID("ExperienceID"));
+                                }
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+        }
 
         bool IExperienceAdminInterface.this[UUID experienceID, UUI agent]
         {

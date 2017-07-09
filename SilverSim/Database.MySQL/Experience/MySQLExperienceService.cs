@@ -369,6 +369,8 @@ namespace SilverSim.Database.MySQL.Experience
             new PrimaryKeyInfo("ExperienceID", "User"),
             new NamedKeyInfo("ExperienceID", "ExperienceID"),
             new NamedKeyInfo("User", "User"),
+            new TableRevision(2),
+            new AddColumn<bool>("IsAllowed") { IsNullAllowed = false, Default = false },
 
             new SqlTable("experiencekeyvalues"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
