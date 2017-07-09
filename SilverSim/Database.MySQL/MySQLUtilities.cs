@@ -202,6 +202,32 @@ namespace SilverSim.Database.MySQL
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public static T InsideTransaction<T>(this MySqlConnection connection, Func<T> del)
+        {
+            T res;
+            using (var cmd = new MySqlCommand("BEGIN", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            try
+            {
+                res = del();
+            }
+            catch (Exception e)
+            {
+                using (var cmd = new MySqlCommand("ROLLBACK", connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                throw new MySQLTransactionException("Transaction failed", e);
+            }
+            using (var cmd = new MySqlCommand("COMMIT", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            return res;
+        }
         #endregion
 
         public static int GetMaxAllowedPacketSize(this MySqlConnection conn)
