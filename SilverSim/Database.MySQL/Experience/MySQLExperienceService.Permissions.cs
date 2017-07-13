@@ -70,7 +70,20 @@ namespace SilverSim.Database.MySQL.Experience
                 return ret;
             }
 
-            set => throw new NotImplementedException();
+            set
+            {
+                var vals = new Dictionary<string, object>
+                {
+                    ["ExperienceID"] = experienceID,
+                    ["User"] = agent,
+                    ["IsAllowed"] = value
+                };
+                using (var conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    conn.ReplaceInto("experienceusers", vals);
+                }
+            }
         }
 
         bool IExperiencePermissionsInterface.Remove(UUID experienceID, UUI agent)
