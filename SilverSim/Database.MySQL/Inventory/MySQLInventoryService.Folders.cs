@@ -304,6 +304,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 ["InventoryType"] = folder.InventoryType,
                 ["Version"] = folder.Version
             };
+
+            if(!IsParentFolderIdValid(folder.Owner.ID, folder.ParentFolderID))
+            {
+                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", folder.ParentFolderID, folder.ID));
+            }
+
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -348,10 +354,17 @@ namespace SilverSim.Database.MySQL.Inventory
         void IInventoryFolderServiceInterface.Move(UUID principalID, UUID folderID, UUID toFolderID)
         {
             InventoryFolder thisfolder = Folder[principalID, folderID];
-            if(folderID == toFolderID)
+
+            if (folderID == toFolderID)
             {
                 throw new ArgumentException("folderID != toFolderID");
             }
+
+            if (!IsParentFolderIdValid(principalID, toFolderID, folderID))
+            {
+                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", toFolderID, folderID));
+            }
+
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
