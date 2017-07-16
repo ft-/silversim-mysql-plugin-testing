@@ -183,15 +183,18 @@ namespace SilverSim.Database.MySQL.Inventory
 
         void IInventoryItemServiceInterface.Add(InventoryItem item)
         {
-            if (!IsParentFolderIdValid(item.Owner.ID, item.ParentFolderID))
-            {
-                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", item.ParentFolderID, item.ID));
-            }
-
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsertInto(m_InventoryItemTable, item.ToDictionary());
+                connection.InsideTransaction(() =>
+                {
+                    if (!IsParentFolderIdValid(connection, item.Owner.ID, item.ParentFolderID, UUID.Zero))
+                    {
+                        throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", item.ParentFolderID, item.ID));
+                    }
+
+                    connection.InsertInto(m_InventoryItemTable, item.ToDictionary());
+                });
             }
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
@@ -260,16 +263,16 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             InventoryItem item = Item[principalID, id];
 
-            if (!IsParentFolderIdValid(principalID, toFolderID))
-            {
-                throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", toFolderID, id));
-            }
-
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 connection.InsideTransaction(() =>
                 {
+                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, UUID.Zero))
+                    {
+                        throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", toFolderID, id));
+                    }
+
                     using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
                     {
                         cmd.Parameters.AddParameter("@folderid", toFolderID);

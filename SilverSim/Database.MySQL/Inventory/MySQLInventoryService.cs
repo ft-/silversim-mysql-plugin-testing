@@ -173,37 +173,50 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        public override bool IsParentFolderIdValid(UUID principalID, UUID parentFolderID, UUID expectedFolderID)
+        public bool IsParentFolderIdValid(MySqlConnection conn, UUID principalID, UUID parentFolderID, UUID expectedFolderID)
         {
             if (parentFolderID == UUID.Zero)
             {
-                return !Folder.ContainsKey(principalID, AssetType.RootFolder);
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", conn))
+                {
+                    cmd.Parameters.AddParameter("@ownerid", principalID);
+                    cmd.Parameters.AddParameter("@parentfolderid", UUID.Zero);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        return !dbReader.Read();
+                    }
+                }
             }
             else
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                UUID checkFolderID = parentFolderID;
+                UUID actParentFolderID;
+                /* traverse to root folder and check that we never see the moved folder in that path */
+                while (TryGetParentFolderId(conn, principalID, checkFolderID, out actParentFolderID))
                 {
-                    conn.Open();
-                    UUID checkFolderID = parentFolderID;
-                    UUID actParentFolderID;
-                    /* traverse to root folder and check that we never see the moved folder in that path */
-                    while (TryGetParentFolderId(conn, principalID, checkFolderID, out actParentFolderID))
+                    if (checkFolderID == expectedFolderID)
                     {
-                        if (checkFolderID == expectedFolderID)
-                        {
-                            /* this folder would trigger a circular dependency */
-                            return false;
-                        }
-                        if (actParentFolderID == UUID.Zero)
-                        {
-                            /* this is a good one, it ends at the root folder */
-                            return true;
-                        }
+                        /* this folder would trigger a circular dependency */
+                        return false;
                     }
-
-                    /* folder missing */
-                    return false;
+                    if (actParentFolderID == UUID.Zero)
+                    {
+                        /* this is a good one, it ends at the root folder */
+                        return true;
+                    }
                 }
+
+                /* folder missing */
+                return false;
+            }
+        }
+
+        public override bool IsParentFolderIdValid(UUID principalID, UUID parentFolderID, UUID expectedFolderID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                return IsParentFolderIdValid(conn, principalID, parentFolderID, expectedFolderID);
             }
         }
 
