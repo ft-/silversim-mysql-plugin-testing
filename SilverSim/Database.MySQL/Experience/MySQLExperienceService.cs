@@ -226,6 +226,7 @@ namespace SilverSim.Database.MySQL.Experience
             return result;
         }
 
+        private static readonly string[] m_RemoveFromTables = new string[] { "experiencekeyvalues", "experienceadmins", "experienceusers" };
         public override bool Remove(UUI requestingAgent, UUID id)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -233,7 +234,7 @@ namespace SilverSim.Database.MySQL.Experience
                 conn.Open();
                 return conn.InsideTransaction<bool>(() =>
                 {
-                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ExperienceID = @experienceid", conn))
+                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn))
                     {
                         cmd.Parameters.AddParameter("@experienceid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -250,7 +251,16 @@ namespace SilverSim.Database.MySQL.Experience
                         }
                     }
 
-                    using (var cmd = new MySqlCommand("DELETE FROM experiences WHERE ExperienceID = @experienceid", conn))
+                    foreach(string table in m_RemoveFromTables)
+                    {
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE ExperienceID = @experienceid", conn))
+                        {
+                            cmd.Parameters.AddParameter("@experienceid", id);
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    using (var cmd = new MySqlCommand("DELETE FROM experiences WHERE ID = @experienceid", conn))
                     {
                         cmd.Parameters.AddParameter("@experienceid", id);
                         return cmd.ExecuteNonQuery() > 0;
@@ -301,11 +311,6 @@ namespace SilverSim.Database.MySQL.Experience
 
         public override void Update(UUI requestingAgent, ExperienceInfo info)
         {
-            if(!Admins[info.ID, requestingAgent])
-            {
-                throw new InvalidOperationException();
-            }
-
             var vals = new Dictionary<string, object>();
             vals.Add("Name", info.Name);
             vals.Add("Description", info.Description);
@@ -319,7 +324,44 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"");
+                conn.InsideTransaction(() =>
+                {
+                    bool isallowed = false;
+                    using (var cmd = new MySqlCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
+                    {
+                        cmd.Parameters.AddParameter("@experienceid", info.ID);
+                        cmd.Parameters.AddParameter("@admin", requestingAgent.ID.ToString() + "%");
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                if (reader.GetUUI("Admin").EqualsGrid(requestingAgent))
+                                {
+                                    isallowed = true;
+                                }
+                            }
+                        }
+                    }
+                    if(!isallowed)
+                    {
+                        using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @id", conn))
+                        {
+                            cmd.Parameters.AddParameter("@id", info.ID);
+                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    isallowed = reader.GetUUI("Owner").EqualsGrid(requestingAgent);
+                                }
+                            }
+                        }
+                    }
+                    if(!isallowed)
+                    {
+                        throw new InvalidOperationException("requesting agent is not allowed to edit experience");
+                    }
+                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"");
+                });
             }
         }
 
