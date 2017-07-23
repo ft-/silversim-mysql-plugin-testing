@@ -33,3 +33,4 @@ sonar-project.properties
 feed/**
 .vs
 Thumbs.db
+/*.psess
