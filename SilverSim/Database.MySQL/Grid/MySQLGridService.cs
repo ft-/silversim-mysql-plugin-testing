@@ -551,12 +551,9 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE (" +
-                        "(locX >= @xmin AND locY >= @ymin AND locX <= @xmax AND locY <= @ymax) OR " +
-                        "(locX + sizeX >= @xmin AND locY+sizeY >= @ymin AND locX + sizeX <= @xmax AND locY + sizeY <= @ymax) OR " +
-                        "(locX >= @xmin AND locY >= @ymin AND locX + sizeX > @xmin AND locY + sizeY > @ymin) OR " +
-                        "(locX >= @xmax AND locY >= @ymax AND locX + sizeX > @xmax AND locY + sizeY > @ymax)" +
-                        ") AND ScopeID = @scopeid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE " +
+                        "locX+sizeX > @xmin AND locX <= @xmax AND locY+sizeY > @ymin AND locY <= @ymax " +
+                        " AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("@scopeid", scopeID.ToString());
                     cmd.Parameters.AddWithValue("@xmin", min.X);
