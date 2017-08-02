@@ -124,6 +124,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType"),
                 PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType"),
+                WalkableCoefficientA = dbReader.GetDouble("WalkableCoefficientA"),
+                WalkableCoefficientB = dbReader.GetDouble("WalkableCoefficientB"),
+                WalkableCoefficientC = dbReader.GetDouble("WalkableCoefficientC"),
+                WalkableCoefficientD = dbReader.GetDouble("WalkableCoefficientD"),
                 Material = dbReader.GetEnum<PrimitiveMaterial>("Material"),
                 Size = dbReader.GetVector3("Size"),
                 Slice = dbReader.GetVector3("Slice"),
