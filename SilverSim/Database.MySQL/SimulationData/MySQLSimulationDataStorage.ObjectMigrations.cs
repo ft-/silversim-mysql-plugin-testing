@@ -182,10 +182,12 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(16),
             new AddColumn<byte[]>("ExtendedMeshData"),
             new TableRevision(17),
-            new AddColumn<double>("WalkableCoefficientA") {IsNullAllowed = false, Default = 1.0 },
-            new AddColumn<double>("WalkableCoefficientB") {IsNullAllowed = false, Default = 1.0 },
-            new AddColumn<double>("WalkableCoefficientC") {IsNullAllowed = false, Default = 1.0 },
-            new AddColumn<double>("WalkableCoefficientD") {IsNullAllowed = false, Default = 1.0 },
+            new AddColumn<double>("WalkableCoefficientA") { IsNullAllowed = false, Default = 1.0 },
+            new AddColumn<double>("WalkableCoefficientB") { IsNullAllowed = false, Default = 1.0 },
+            new AddColumn<double>("WalkableCoefficientC") { IsNullAllowed = false, Default = 1.0 },
+            new AddColumn<double>("WalkableCoefficientD") { IsNullAllowed = false, Default = 1.0 },
+            new TableRevision(18),
+            new AddColumn<double>("WalkableCoefficientAvatar") { IsNullAllowed = false, Default = 1.0 },
             #endregion
 
             #region Table primitems
