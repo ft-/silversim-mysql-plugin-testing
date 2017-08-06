@@ -86,7 +86,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
 
             private readonly C5.TreeDictionary<PrimKey, bool> m_PrimItemDeletions = new C5.TreeDictionary<PrimKey, bool>();
-            private readonly C5.TreeDictionary<PrimKey, Dictionary<string, object>> m_PrimItemUpdates = new C5.TreeDictionary<PrimKey, Dictionary<string, object>>();
+            private readonly C5.TreeDictionary<PrimKey, ObjectInventoryUpdateInfo> m_PrimItemUpdates = new C5.TreeDictionary<PrimKey, ObjectInventoryUpdateInfo>();
 
             protected override void OnUpdate(ObjectInventoryUpdateInfo info)
             {
@@ -97,10 +97,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
                 else
                 {
-                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(info.PartID, info.Item);
-                    m_Log.DebugFormat("Add prim item {0} / {1}", info.PartID, info.Item.ID);
-                    data["RegionID"] = m_RegionID;
-                    m_PrimItemUpdates[new PrimKey(info)] = data;
+                    m_PrimItemUpdates[new PrimKey(info)] = info;
                 }
             }
 
@@ -142,9 +139,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             foreach(ObjectPartInventoryItem item in info.Part.Inventory.Values)
                             {
                                 ObjectInventoryUpdateInfo invinfo = item.UpdateInfo;
-                                Dictionary<string, object> itemdata = GenerateUpdateObjectPartInventoryItem(invinfo.PartID, invinfo.Item);
-                                itemdata["RegionID"] = m_RegionID;
-                                m_PrimItemUpdates[new PrimKey(invinfo)] = itemdata;
+                                m_PrimItemUpdates[new PrimKey(invinfo)] = invinfo;
                             }
                         }
                         if (info.Part.ObjectGroup.RootPart != info.Part)
@@ -177,7 +172,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         sb.Append("DELETE FROM primitems WHERE ");
                     }
 
-                    sb.AppendFormat("(RegionID = '{0}' AND PrimID = '{1}' AND InventoryID = '{2}')",
+                    sb.AppendFormat("(RegionID = \"{0}\" AND PrimID = \"{1}\" AND InventoryID = \"{2}\")",
                         m_RegionID, k.PartID, k.ItemID);
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
@@ -191,6 +186,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             m_PrimItemDeletions.Remove(r);
                         }
                         sb.Clear();
+                        removedItems.Clear();
                     }
                 }
 
@@ -216,7 +212,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 foreach (UUID k in m_PrimDeletions.Keys.ToArray())
                 {
-                    m_Log.DebugFormat("Deleted prim {0}", k);
                     if (sb.Length != 0)
                     {
                         sb.Append(" OR ");
@@ -228,9 +223,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                         sb2.Append("DELETE FROM primitems WHERE ");
                     }
 
-                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
+                    sb.AppendFormat("(RegionID = \"{0}\" AND ID = \"{1}\")",
                         m_RegionID, k);
-                    sb2.AppendFormat("(RegionID = '{0}' AND PrimID = '{1}')",
+                    sb2.AppendFormat("(RegionID = \"{0}\" AND PrimID = \"{1}\")",
                         m_RegionID, k);
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
@@ -239,9 +234,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             cmd.ExecuteNonQuery();
                         }
+
                         using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                         {
-                            cmd.ExecuteNonQuery();
+                            int r = cmd.ExecuteNonQuery();
+                            m_Log.DebugFormat("Delete prim items {0} => {1}", sb2.ToString(), r);
                         }
                         foreach (UUID r in removedItems)
                         {
@@ -250,6 +247,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                         sb.Clear();
                         sb2.Clear();
+                        removedItems.Clear();
                     }
                 }
 
@@ -261,7 +259,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                     using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                     {
-                        cmd.ExecuteNonQuery();
+                        int r = cmd.ExecuteNonQuery();
+                        m_Log.DebugFormat("Delete prim items {0} => {1}", sb2.ToString(), r);
                     }
                     foreach (UUID r in removedItems)
                     {
@@ -288,7 +287,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         sb.Append("DELETE FROM objects WHERE ");
                     }
 
-                    sb.AppendFormat("(RegionID = '{0}' AND ID = '{1}')",
+                    sb.AppendFormat("(RegionID = \"{0}\" AND ID = \"{1}\")",
                         m_RegionID, k);
                     removedItems.Add(k);
                     if (removedItems.Count == 255)
@@ -302,6 +301,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             m_GroupDeletions.Remove(r);
                         }
                         sb.Clear();
+                        removedItems.Clear();
                     }
                 }
 
@@ -327,7 +327,16 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 foreach (PrimKey k in m_PrimItemUpdates.Keys.ToArray())
                 {
-                    Dictionary<string, object> data = m_PrimItemUpdates[k];
+                    ObjectInventoryUpdateInfo update = m_PrimItemUpdates[k];
+                    if(update.IsRemoved)
+                    {
+                        /* do not save removed data */
+                        m_PrimItemUpdates.Remove(k);
+                        continue;
+                    }
+                    Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(update.PartID, update.Item);
+                    data["RegionID"] = m_RegionID;
+
                     if (!replaceInto1Inited)
                     {
                         replaceInto1Inited = true;
@@ -362,6 +371,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             Interlocked.Increment(ref m_ProcessedPrims);
                         }
                         replaceInto2.Clear();
+                        processedItems.Clear();
                     }
                 }
 
@@ -426,6 +436,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             m_PrimUpdates.Remove(r);
                         }
                         replaceInto2.Clear();
+                        processedItems.Clear();
                     }
                 }
 
@@ -490,6 +501,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             m_GroupUpdates.Remove(r);
                         }
                         replaceInto2.Clear();
+                        processedItems.Clear();
                     }
                 }
 
