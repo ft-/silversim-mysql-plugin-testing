@@ -98,6 +98,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 else
                 {
                     Dictionary<string, object> data = GenerateUpdateObjectPartInventoryItem(info.PartID, info.Item);
+                    m_Log.DebugFormat("Add prim item {0} / {1}", info.PartID, info.Item.ID);
                     data["RegionID"] = m_RegionID;
                     m_PrimItemUpdates[new PrimKey(info)] = data;
                 }
@@ -215,6 +216,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 foreach (UUID k in m_PrimDeletions.Keys.ToArray())
                 {
+                    m_Log.DebugFormat("Deleted prim {0}", k);
                     if (sb.Length != 0)
                     {
                         sb.Append(" OR ");
@@ -552,7 +554,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["InventoryType"] = item.InventoryType,
                     ["LastOwner"] = item.LastOwner,
                     ["Owner"] = item.Owner,
-                    ["ParentFolderID"] = item.ParentFolderID,
                     ["BasePermissions"] = item.Permissions.Base,
                     ["CurrentPermissions"] = item.Permissions.Current,
                     ["EveryOnePermissions"] = item.Permissions.EveryOne,

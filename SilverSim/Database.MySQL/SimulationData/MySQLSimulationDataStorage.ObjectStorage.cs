@@ -228,7 +228,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 LastOwner = dbReader.GetUUI("LastOwner"),
                 Name = dbReader.GetString("Name"),
                 Owner = dbReader.GetUUI("Owner"),
-                ParentFolderID = dbReader.GetUUID("ParentFolderID"),
+                ParentFolderID = dbReader.GetUUID("PrimID"),
                 NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID"),
                 ExperienceID = dbReader.GetUUID("ExperienceID")
             };
