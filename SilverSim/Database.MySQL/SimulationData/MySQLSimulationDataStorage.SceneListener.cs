@@ -237,8 +237,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                         using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                         {
-                            int r = cmd.ExecuteNonQuery();
-                            m_Log.DebugFormat("Delete prim items {0} => {1}", sb2.ToString(), r);
+                            cmd.ExecuteNonQuery();
                         }
                         foreach (UUID r in removedItems)
                         {
@@ -259,8 +258,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                     using (var cmd = new MySqlCommand(sb2.ToString(), conn))
                     {
-                        int r = cmd.ExecuteNonQuery();
-                        m_Log.DebugFormat("Delete prim items {0} => {1}", sb2.ToString(), r);
+                        cmd.ExecuteNonQuery();
                     }
                     foreach (UUID r in removedItems)
                     {
@@ -528,12 +526,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     conn.Open();
 
+                    ProcessPrimItemUpdates(conn);
                     ProcessPrimItemDeletions(conn);
                     ProcessPrimDeletions(conn);
                     ProcessGroupDeletions(conn);
                     ProcessPrimUpdates(conn);
                     ProcessGroupUpdates(conn);
-                    ProcessPrimItemUpdates(conn);
                 }
             }
 
