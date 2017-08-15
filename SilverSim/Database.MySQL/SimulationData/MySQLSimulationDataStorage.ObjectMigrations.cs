@@ -188,6 +188,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<double>("WalkableCoefficientD") { IsNullAllowed = false, Default = 1.0 },
             new TableRevision(18),
             new AddColumn<double>("WalkableCoefficientAvatar") { IsNullAllowed = false, Default = 1.0 },
+            new TableRevision(19),
+            new AddColumn<Date>("RezDate") { IsNullAllowed = false },
             #endregion
 
             #region Table primitems
