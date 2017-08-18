@@ -487,7 +487,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
 
-                if (!deleteFolder)
+                if (deleteFolder)
                 {
                     using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                     {

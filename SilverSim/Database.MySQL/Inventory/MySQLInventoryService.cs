@@ -153,7 +153,6 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-
         private bool TryGetParentFolderId(MySqlConnection connection, UUID principalID, UUID folderID, out UUID parentFolderID)
         {
             using (var cmd = new MySqlCommand("SELECT ParentFolderID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
