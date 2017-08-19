@@ -27,7 +27,6 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
