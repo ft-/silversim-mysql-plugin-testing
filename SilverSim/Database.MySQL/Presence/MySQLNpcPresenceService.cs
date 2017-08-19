@@ -100,7 +100,15 @@ namespace SilverSim.Database.MySQL.Presence
 
         public override void Remove(UUID scopeID, UUID npcID)
         {
-            throw new NotImplementedException();
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand("DELETE FROM npcpresence WHERE NpcID = @userid", conn))
+                {
+                    cmd.Parameters.AddParameter("@userid", npcID);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
