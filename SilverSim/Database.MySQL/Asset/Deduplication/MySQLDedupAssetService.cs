@@ -440,6 +440,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
                 }
+                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE fsassetrefs.\"id\" = assetsinuse.\"id\")", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
         #endregion
