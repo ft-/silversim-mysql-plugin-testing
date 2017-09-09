@@ -84,7 +84,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 using(var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using(var ucmd = new MySqlCommand("UPDATE assets SET access_time = @access WHERE id = @id", uconn))
+                                    using(var ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", key);
