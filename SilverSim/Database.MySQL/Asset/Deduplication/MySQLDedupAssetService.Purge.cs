@@ -189,7 +189,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             get
             {
-                List<QueueStatAccessor> stats = new List<QueueStatAccessor>();
+                var stats = new List<QueueStatAccessor>();
                 stats.Add(new QueueStatAccessor("AssetReferences", GetProcessorQueueStats));
                 return stats;
             }
