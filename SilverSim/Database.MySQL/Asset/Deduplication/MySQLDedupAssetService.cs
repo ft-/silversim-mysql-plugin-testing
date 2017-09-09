@@ -130,10 +130,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
-                                using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                using (var uconn = new MySqlConnection(m_ConnectionString))
                                 {
                                     uconn.Open();
-                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
+                                    using (var ucmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", uconn))
                                     {
                                         ucmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
                                         ucmd.Parameters.AddWithValue("@id", id);

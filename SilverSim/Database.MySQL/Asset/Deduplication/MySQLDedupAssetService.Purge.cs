@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn))
                 {
                     ulong now = Date.GetUnixTime() - 2 * 24 * 3600;
                     cmd.Parameters.AddParameter("@access_time", now);
