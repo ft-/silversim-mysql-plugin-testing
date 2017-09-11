@@ -503,6 +503,22 @@ namespace SilverSim.Database.MySQL.Inventory
                         }
                     }
                 }
+                else
+                {
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    {
+                        cmd.Parameters.AddParameter("@ownerid", principalID);
+                        cmd.Parameters.AddParameter("@folderid", folderID);
+                        try
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        catch
+                        {
+                            /* nothing to do here */
+                        }
+                    }
+                }
 
                 using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection))
                 {
