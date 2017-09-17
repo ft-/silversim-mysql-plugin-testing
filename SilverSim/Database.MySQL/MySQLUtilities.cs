@@ -153,29 +153,6 @@ namespace SilverSim.Database.MySQL
             {
             }
         }
-
-        [Serializable]
-        public class MySQLTransactionException : Exception
-        {
-            public MySQLTransactionException()
-            {
-            }
-
-            public MySQLTransactionException(string msg)
-                : base(msg)
-            {
-            }
-
-            protected MySQLTransactionException(SerializationInfo info, StreamingContext context)
-                : base(info, context)
-            {
-            }
-
-            public MySQLTransactionException(string msg, Exception inner)
-                : base(msg, inner)
-            {
-            }
-        }
         #endregion
 
         #region Transaction Helper
@@ -189,13 +166,13 @@ namespace SilverSim.Database.MySQL
             {
                 del();
             }
-            catch(Exception e)
+            catch
             {
                 using (var cmd = new MySqlCommand("ROLLBACK", connection))
                 {
                     cmd.ExecuteNonQuery();
                 }
-                throw new MySQLTransactionException("Transaction failed", e);
+                throw;
             }
             using (var cmd = new MySqlCommand("COMMIT", connection))
             {
@@ -214,13 +191,13 @@ namespace SilverSim.Database.MySQL
             {
                 res = del();
             }
-            catch (Exception e)
+            catch
             {
                 using (var cmd = new MySqlCommand("ROLLBACK", connection))
                 {
                     cmd.ExecuteNonQuery();
                 }
-                throw new MySQLTransactionException("Transaction failed", e);
+                throw;
             }
             using (var cmd = new MySqlCommand("COMMIT", connection))
             {
