@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Experience
     {
         void IExperienceKeyValueInterface.Add(UUID experienceID, string key, string value)
         {
-            Dictionary<string, object> vals = new Dictionary<string, object>
+            var vals = new Dictionary<string, object>
             {
                 ["ExperienceID"] = experienceID,
                 ["Key"] = key,

@@ -22,7 +22,6 @@
 using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Experience
@@ -98,7 +97,6 @@ namespace SilverSim.Database.MySQL.Experience
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
-                throw new NotImplementedException();
         }
 
         bool IExperiencePermissionsInterface.TryGetValue(UUID experienceID, UUI agent, out bool allowed)
