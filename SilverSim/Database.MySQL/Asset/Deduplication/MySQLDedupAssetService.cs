@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
     [Description("MySQL Deduplication Asset Backend")]
     [PluginName("DedupAssets")]
-    public sealed partial class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface
+    public sealed partial class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 
@@ -467,6 +467,28 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 conn.Open();
                 conn.MigrateTables(Migrations, m_Log);
             }
+        }
+
+        public List<UUID> GetAssetList(long start, long count)
+        {
+            var result = new List<UUID>();
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand("SELECT id FROM assetrefs ORDER BY id LIMIT @start, @count", conn))
+                {
+                    cmd.Parameters.AddParameter("start", start);
+                    cmd.Parameters.AddParameter("count", count);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(reader.GetUUID("id"));
+                        }
+                    }
+                }
+            }
+            return result;
         }
 
         private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
