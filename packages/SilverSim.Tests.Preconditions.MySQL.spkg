@@ -3,6 +3,6 @@
 	<name>SilverSim.Tests.Preconditions.MySQL</name>
 	<skip-delivery>true</skip-delivery>
 	<files>
-		<file name="bin/plugins/SilverSim.Tests.Preconditions.MySQL.dll"/>
+		<file name="bin/plugins/SilverSim.Tests.Preconditions.MySQL.dll" is-version-src="true"/>
 	</files>
 </package>

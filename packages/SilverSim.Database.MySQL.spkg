@@ -5,6 +5,6 @@
 		<source>SilverSim.Database.MySQL:PackageConfig.ini</source>
 	</default-configuration>
 	<files>
-		<file name="bin/plugins/SilverSim.Database.MySQL.dll"/>
+		<file name="bin/plugins/SilverSim.Database.MySQL.dll" is-version-src="true"/>
 	</files>
 </package>

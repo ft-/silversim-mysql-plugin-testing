@@ -3,6 +3,6 @@
 	<name>MySql.Data</name>
 	<license>GPL</license>
 	<files>
-		<file name="bin/MySql.Data.dll"/>
+		<file name="bin/MySql.Data.dll" is-version-src="true"/>
 	</files>
 </package>

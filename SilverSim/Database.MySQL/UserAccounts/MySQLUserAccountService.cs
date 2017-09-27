@@ -91,7 +91,9 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new TableRevision(2),
             new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = (uint)0 },
             new TableRevision(3),
-            new AddColumn<int>("IsEverLoggedIn") {IsNullAllowed = false, Default = 0 }
+            new AddColumn<int>("IsEverLoggedIn") {IsNullAllowed = false, Default = 0 },
+            new TableRevision(4),
+            new ChangeColumn<bool>("IsEverLoggedIn") {IsNullAllowed = false, Default = false }
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
