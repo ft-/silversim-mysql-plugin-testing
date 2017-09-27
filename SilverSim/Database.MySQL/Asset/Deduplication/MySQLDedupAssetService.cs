@@ -81,7 +81,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         {
                             return false;
                         }
-                        needsUpdateAccessTime = dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1);
+                        needsUpdateAccessTime = DateTime.UtcNow - dbReader.GetDate("access_time") > TimeSpan.FromHours(1);
                     }
                 }
                 if (needsUpdateAccessTime)
@@ -126,7 +126,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         {
                             UUID id = dbReader.GetUUID("id");
                             res[id] = true;
-                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (DateTime.UtcNow - dbReader.GetDate("access_time") > TimeSpan.FromHours(1))
                             {
                                 updaterequired.Add(id);
                             }
@@ -194,7 +194,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         };
                     }
                 }
-                if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
+                if (DateTime.UtcNow - asset.AccessTime > TimeSpan.FromHours(1))
                 {
                     /* update access_time */
                     using (var cmd = new MySqlCommand("UPDATE assetrefs SET access_time = @access WHERE id = @id", conn))
