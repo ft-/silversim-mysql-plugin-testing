@@ -133,8 +133,8 @@
     &lt;StartProgram&gt;${path::combine(binpath, 'SilverSim.Main.exe')}&lt;/StartProgram&gt;
     &lt;StartWorkingDirectory&gt;${binpath}&lt;/StartWorkingDirectory&gt;
   &lt;/PropertyGroup&gt;
-  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'DebugRel|AnyCPU' &quot;/&gt;
-  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot;/&gt;
+  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'DebugRel|AnyCPU' &quot; /&gt;
+  &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot; /&gt;
 &lt;/Project&gt;"/>
 		</foreach>
 	</target>
