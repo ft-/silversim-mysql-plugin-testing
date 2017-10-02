@@ -130,7 +130,7 @@
   &lt;/PropertyGroup&gt;
   &lt;PropertyGroup Condition=&quot; '$$(Configuration)|$$(Platform)' == 'Debug|AnyCPU' &quot;&gt;
     &lt;StartAction&gt;Program&lt;/StartAction&gt;
-    &lt;StartProgram&gt;${${path::combine(binpath, 'SilverSim.Main.exe')}&lt;/StartProgram&gt;
+    &lt;StartProgram&gt;${path::combine(binpath, 'SilverSim.Main.exe')}&lt;/StartProgram&gt;
     &lt;StartWorkingDirectory&gt;${binpath}&lt;/StartWorkingDirectory&gt;
   &lt;/PropertyGroup&gt;
   &lt;PropertyGroup Condition=&quot; '$$(Configuration)|$$(Platform)' == 'DebugRel|AnyCPU' &quot;&gt;
