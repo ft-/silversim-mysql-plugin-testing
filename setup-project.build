@@ -102,22 +102,8 @@
 	<target name="prebuild" description="Runs prebuild.exe">
 		<foreach item="Folder" in="SilverSim" property="modulefolder">
 			<delete dir="${modulefolder}/obj" failonerror="false"/>
-		</foreach>
-		<if test="${platform::is-windows()}">
-			<exec program="Prebuild/Prebuild.exe">
-				<arg value="/target"/>
-				<arg value="vs2015"/>
-			</exec>
-		</if>
-		<if test="${not platform::is-windows()}">
-			<exec program="mono">
-				<arg path="Prebuild/Prebuild.exe"/>
-				<arg value="/target"/>
-				<arg value="vs2015"/>
-			</exec>
-		</if>
-        <property name="binpath" value="${directory::get-parent-directory(directory::get-current-directory())}"/>
-        <echo file="${modulefolder}/SilverSim.${path::get-file-name(modulefolder)}.csproj.user" message="&lt;Project xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
+            <property name="binpath" value="${directory::get-parent-directory(directory::get-current-directory())}"/>
+            <echo file="${modulefolder}/SilverSim.${path::get-file-name(modulefolder)}.csproj.user" message="&lt;Project xmlns=&quot;http://schemas.microsoft.com/developer/msbuild/2003&quot;&gt;
   &lt;PropertyGroup&gt;
   &lt;Configuration Condition=&quot; '$(Configuration)' == '' &quot;&gt;Debug&lt;/Configuration&gt;
     &lt;Platform Condition=&quot; '$(Platform)' == '' &quot;&gt;AnyCPU&lt;/Platform&gt;
@@ -134,6 +120,20 @@
   &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'DebugRel|AnyCPU' &quot;&gt;
   &lt;PropertyGroup Condition=&quot; '$(Configuration)|$(Platform)' == 'Release|AnyCPU' &quot;&gt;
 &lt;/Project&gt;"/>
+		</foreach>
+		<if test="${platform::is-windows()}">
+			<exec program="Prebuild/Prebuild.exe">
+				<arg value="/target"/>
+				<arg value="vs2015"/>
+			</exec>
+		</if>
+		<if test="${not platform::is-windows()}">
+			<exec program="mono">
+				<arg path="Prebuild/Prebuild.exe"/>
+				<arg value="/target"/>
+				<arg value="vs2015"/>
+			</exec>
+		</if>
 	</target>
 	
 	<target name="sonar-project" description="Creates sonar-project">
