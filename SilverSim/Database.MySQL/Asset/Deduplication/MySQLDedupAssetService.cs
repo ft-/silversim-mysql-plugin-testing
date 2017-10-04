@@ -188,7 +188,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             Name = dbReader.GetString("name"),
                             CreateTime = dbReader.GetDate("create_time"),
                             AccessTime = dbReader.GetDate("access_time"),
-                            Creator = dbReader.GetUUI("CreatorID"),
                             Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
                             Temporary = dbReader.GetBool("temporary")
                         };
@@ -243,7 +242,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 ID = dbReader.GetUUID("id"),
                                 Type = dbReader.GetEnum<AssetType>("assetType"),
                                 Name = dbReader.GetString("name"),
-                                Creator = dbReader.GetUUI("CreatorID"),
                                 CreateTime = dbReader.GetDate("create_time"),
                                 AccessTime = dbReader.GetDate("access_time"),
                                 Flags = dbReader.GetEnum<AssetFlags>("asset_flags"),
@@ -411,7 +409,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             cmd.Parameters.AddParameter("@temporary", asset.Temporary);
                             cmd.Parameters.AddParameter("@create_time", now);
                             cmd.Parameters.AddParameter("@access_time", now);
-                            cmd.Parameters.AddParameter("@CreatorID", asset.Creator.ID);
                             cmd.Parameters.AddParameter("@asset_flags", asset.Flags);
                             cmd.Parameters.AddParameter("@hash", sha1data);
                             if (1 > cmd.ExecuteNonQuery())
@@ -517,6 +514,8 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             new ChangeColumn<UUI>("CreatorID") { IsNullAllowed = false, Default = UUID.Zero },
             new TableRevision(3),
             new AddColumn<bool>("usesprocessed") { IsNullAllowed = false, Default = false },
+            new TableRevision(4),
+            new DropColumn("CreatorID"),
 
             new SqlTable("assetsinuse"),
             new AddColumn<UUID>("id") { IsNullAllowed = false },
