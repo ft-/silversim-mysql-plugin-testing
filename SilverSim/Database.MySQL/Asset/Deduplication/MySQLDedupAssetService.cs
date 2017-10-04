@@ -138,7 +138,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 if (updaterequired.Count != 0)
                 {
                     ids = "'" + string.Join("','", updaterequired) + "'";
-                    sql = $"UPATE assetrefs SET access_time = @access WHERE id IN ({ids})";
+                    sql = $"UPDATE assetrefs SET access_time = @access WHERE id IN ({ids})";
                     using (var cmd = new MySqlCommand(sql, dbcon))
                     {
                         cmd.Parameters.AddWithValue("@access", Date.GetUnixTime());
