@@ -388,8 +388,8 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
                         using (var cmd =
                             new MySqlCommand(
-                                "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
-                                "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @CreatorID, @hash) ON " +
+                                "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, hash)" +
+                                "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @hash) ON " +
                                 "DUPLICATE KEY UPDATE access_time=@access_time",
                                 conn))
                         {
