@@ -128,12 +128,15 @@ namespace SilverSim.Database.MySQL.Presence
                         cmd.Parameters.AddParameter("@userID", userID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            var pi = new PresenceInfo();
-                            pi.UserID.ID = reader.GetUUID("UserID");
-                            pi.RegionID = reader.GetUUID("RegionID");
-                            pi.SessionID = reader.GetUUID("SessionID");
-                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
-                            presences.Add(pi);
+                            while (reader.Read())
+                            {
+                                var pi = new PresenceInfo();
+                                pi.UserID.ID = reader.GetUUID("UserID");
+                                pi.RegionID = reader.GetUUID("RegionID");
+                                pi.SessionID = reader.GetUUID("SessionID");
+                                pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                                presences.Add(pi);
+                            }
                         }
                     }
                 }
@@ -153,12 +156,15 @@ namespace SilverSim.Database.MySQL.Presence
                         cmd.Parameters.AddParameter("@sessionID", sessionID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            var pi = new PresenceInfo();
-                            pi.UserID.ID = reader.GetUUID("UserID");
-                            pi.RegionID = reader.GetUUID("RegionID");
-                            pi.SessionID = reader.GetUUID("SessionID");
-                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
-                            return pi;
+                            if (reader.Read())
+                            {
+                                var pi = new PresenceInfo();
+                                pi.UserID.ID = reader.GetUUID("UserID");
+                                pi.RegionID = reader.GetUUID("RegionID");
+                                pi.SessionID = reader.GetUUID("SessionID");
+                                pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                                return pi;
+                            }
                         }
                     }
                 }
