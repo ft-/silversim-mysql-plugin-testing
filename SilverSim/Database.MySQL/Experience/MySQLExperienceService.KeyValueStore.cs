@@ -89,7 +89,6 @@ namespace SilverSim.Database.MySQL.Experience
 
         bool IExperienceKeyValueInterface.Remove(UUID experienceID, string key)
         {
-            var result = new List<string>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
