@@ -35,7 +35,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace SilverSim.Database.MySQL.Asset.Deduplication
+namespace SilverSim.Database.MySQL.Asset
 {
     [Description("MySQL Asset Backend")]
     [PluginName("Assets")]

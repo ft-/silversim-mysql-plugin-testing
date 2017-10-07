@@ -28,7 +28,7 @@ using SilverSim.Types.Asset;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace SilverSim.Database.MySQL.Asset.Deduplication
+namespace SilverSim.Database.MySQL.Asset
 {
     public sealed partial class MySQLAssetService : IAssetPurgeServiceInterface, IQueueStatsAccess
     {
