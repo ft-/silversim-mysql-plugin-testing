@@ -37,18 +37,18 @@ using System.Security.Cryptography;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
-    [Description("MySQL Deduplication Asset Backend")]
-    [PluginName("DedupAssets")]
-    public sealed partial class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
+    [Description("MySQL Asset Backend")]
+    [PluginName("Assets")]
+    public sealed partial class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin, IAssetMetadataServiceInterface, IAssetDataServiceInterface, IAssetMigrationSourceInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 
         private readonly string m_ConnectionString;
         private readonly MySQLAssetReferencesService m_ReferencesService;
         private readonly RwLockedList<string> m_ConfigurationIssues;
 
         #region Constructor
-        public MySQLDedupAssetService(ConfigurationLoader loader, IConfig ownSection)
+        public MySQLAssetService(ConfigurationLoader loader, IConfig ownSection)
         {
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_ConfigurationIssues = loader.KnownConfigurationIssues;
@@ -62,8 +62,8 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         public override bool IsSameServer(AssetServiceInterface other) =>
-            other.GetType() == typeof(MySQLDedupAssetService) &&
-                (m_ConnectionString == ((MySQLDedupAssetService)other).m_ConnectionString);
+            other.GetType() == typeof(MySQLAssetService) &&
+                (m_ConnectionString == ((MySQLAssetService)other).m_ConnectionString);
 
         #region Exists methods
         public override bool Exists(UUID key)
@@ -260,9 +260,9 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #region References interface
         public sealed class MySQLAssetReferencesService : AssetReferencesServiceInterface
         {
-            private readonly MySQLDedupAssetService m_AssetService;
+            private readonly MySQLAssetService m_AssetService;
 
-            internal MySQLAssetReferencesService(MySQLDedupAssetService assetService)
+            internal MySQLAssetReferencesService(MySQLAssetService assetService)
             {
                 m_AssetService = assetService;
             }
@@ -272,7 +272,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
         internal List<UUID> GetAssetRefs(UUID key)
         {
-            List<UUID> references = new List<UUID>();
+            var references = new List<UUID>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 bool processed;
@@ -306,6 +306,10 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     references = data.References;
                     references.Remove(UUID.Zero);
                     references.Remove(data.ID);
+                }
+                else
+                {
+                    throw new AssetNotFoundException(key);
                 }
 
                 return references;

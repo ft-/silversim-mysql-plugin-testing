@@ -30,7 +30,7 @@ using System.Threading;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
-    public sealed partial class MySQLDedupAssetService : IAssetPurgeServiceInterface, IQueueStatsAccess
+    public sealed partial class MySQLAssetService : IAssetPurgeServiceInterface, IQueueStatsAccess
     {
         public void MarkAssetAsUsed(List<UUID> assetIDs)
         {
