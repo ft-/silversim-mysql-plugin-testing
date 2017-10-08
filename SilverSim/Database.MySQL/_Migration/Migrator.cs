@@ -198,13 +198,36 @@ namespace SilverSim.Database.MySQL._Migration
                     {
                         var columnInfo = (IChangeColumn)migration;
                         IColumnInfo oldColumn;
-                        if(!tableFields.TryGetValue(columnInfo.Name, out oldColumn))
+                        if (columnInfo.OldName?.Length != 0)
+                        {
+                            if (!tableFields.TryGetValue(columnInfo.OldName, out oldColumn))
+                            {
+                                throw new ArgumentException("Change column for " + columnInfo.Name + " has no preceeding AddColumn for " + columnInfo.OldName);
+                            }
+                        }
+                        else if (!tableFields.TryGetValue(columnInfo.Name, out oldColumn))
                         {
                             throw new ArgumentException("Change column for " + columnInfo.Name + " has no preceeding AddColumn");
                         }
-                        if(insideTransaction)
+                        if (insideTransaction)
                         {
                             ExecuteStatement(conn, columnInfo.Sql(table.Name, oldColumn.FieldType), log);
+                        }
+                        if(columnInfo.OldName?.Length != 0)
+                        {
+                            tableFields.Remove(columnInfo.OldName);
+                            foreach(NamedKeyInfo keyinfo in tableKeys.Values)
+                            {
+                                string[] fields = keyinfo.FieldNames;
+                                int n = fields.Length;
+                                for (int i = 0; i < n; ++i)
+                                {
+                                    if(fields[i] == columnInfo.OldName)
+                                    {
+                                        fields[i] = columnInfo.Name;
+                                    }
+                                }
+                            }
                         }
                         tableFields[columnInfo.Name] = columnInfo;
                     }

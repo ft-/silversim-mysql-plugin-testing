@@ -169,7 +169,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                    using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND DefaultType = @type AND " +
                             "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
@@ -212,7 +212,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND InventoryType = @type AND " +
+                    using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryFolderTable + " AS A WHERE OwnerID = @ownerid AND DefaultType = @type AND " +
                             "EXISTS (SELECT 1 FROM " + m_InventoryFolderTable + " AS B WHERE B.ParentFolderID = @rootparent AND B.ID = A.ParentFolderID)", connection))
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
@@ -301,7 +301,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 ["ParentFolderID"] = folder.ParentFolderID,
                 ["OwnerID"] = folder.Owner.ID,
                 ["Name"] = folder.Name,
-                ["InventoryType"] = folder.InventoryType,
+                ["DefaultType"] = folder.DefaultType,
                 ["Version"] = folder.Version
             };
 
