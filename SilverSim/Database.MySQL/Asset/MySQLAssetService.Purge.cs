@@ -55,17 +55,26 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id)", conn)
+                {
+                    CommandTimeout = 120
+                })
                 {
                     ulong now = Date.GetUnixTime() - 2 * 24 * 3600;
                     cmd.Parameters.AddParameter("@access_time", now);
                     purged = cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id)", conn)
+                {
+                    CommandTimeout = 120
+                })
                 {
                     cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType)", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType)", conn)
+                {
+                    CommandTimeout = 120
+                })
                 {
                     cmd.ExecuteNonQuery();
                 }
@@ -104,7 +113,7 @@ namespace SilverSim.Database.MySQL.Asset
 
         public List<UUID> GetUnprocessedAssets()
         {
-            List<UUID> assets = new List<UUID>();
+            var assets = new List<UUID>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();

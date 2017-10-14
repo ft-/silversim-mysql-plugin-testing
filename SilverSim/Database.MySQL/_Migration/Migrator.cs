@@ -216,7 +216,19 @@ namespace SilverSim.Database.MySQL._Migration
                         if(columnInfo.OldName?.Length != 0)
                         {
                             tableFields.Remove(columnInfo.OldName);
-                            foreach(NamedKeyInfo keyinfo in tableKeys.Values)
+                            if (primaryKey != null)
+                            {
+                                string[] fields = primaryKey.FieldNames;
+                                int n = fields.Length;
+                                for (int i = 0; i < n; ++i)
+                                {
+                                    if (fields[i] == columnInfo.OldName)
+                                    {
+                                        fields[i] = columnInfo.Name;
+                                    }
+                                }
+                            }
+                            foreach (NamedKeyInfo keyinfo in tableKeys.Values)
                             {
                                 string[] fields = keyinfo.FieldNames;
                                 int n = fields.Length;
