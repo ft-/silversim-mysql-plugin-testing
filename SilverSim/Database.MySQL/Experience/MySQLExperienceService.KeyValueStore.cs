@@ -121,17 +121,20 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                return conn.InsideTransaction<bool>(() =>
+                return conn.InsideTransaction<bool>((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key", conn))
+                    using (var cmd = new MySqlCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", experienceID);
                         cmd.Parameters.AddParameter("@key", key);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if(reader.Read())
+                            if (reader.Read())
                             {
-                                if((string)reader["Value"] != orig_value)
+                                if ((string)reader["Value"] != orig_value)
                                 {
                                     return false;
                                 }
@@ -145,7 +148,7 @@ namespace SilverSim.Database.MySQL.Experience
                         ["Key"] = key,
                         ["Value"] = value
                     };
-                    conn.ReplaceInto("experiencekeyvalues", vals);
+                    conn.ReplaceInto("experiencekeyvalues", vals, transaction);
 
                     return true;
                 });

@@ -308,16 +308,16 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
-                    if (!IsParentFolderIdValid(connection, folder.Owner.ID, folder.ParentFolderID, UUID.Zero))
+                    if (!IsParentFolderIdValid(connection, folder.Owner.ID, folder.ParentFolderID, UUID.Zero, transaction))
                     {
                         throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", folder.ParentFolderID, folder.ID));
                     }
 
                     try
                     {
-                        connection.InsertInto(m_InventoryFolderTable, newVals);
+                        connection.InsertInto(m_InventoryFolderTable, newVals, transaction);
                     }
                     catch
                     {
@@ -369,15 +369,18 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
-                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, folderID))
+                    if (!IsParentFolderIdValid(connection, principalID, toFolderID, folderID, transaction))
                     {
                         throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for folder {1}", toFolderID, folderID));
                     }
 
 
-                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection))
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@folderid", toFolderID);
                         cmd.Parameters.AddParameter("@ownerid", principalID);
@@ -389,7 +392,10 @@ namespace SilverSim.Database.MySQL.Inventory
                             }
                         }
                     }
-                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = @folderid WHERE ID = @id AND OwnerID = @ownerid", connection))
+                    using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET ParentFolderID = @folderid WHERE ID = @id AND OwnerID = @ownerid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@folderid", toFolderID);
                         cmd.Parameters.AddParameter("@ownerid", principalID);
@@ -435,7 +441,7 @@ namespace SilverSim.Database.MySQL.Inventory
             List<UUID> folders;
             InventoryFolder thisfolder = Folder[principalID, folderID];
 
-            connection.InsideTransaction(() =>
+            connection.InsideTransaction((transaction) =>
             {
                 if (deleteFolder)
                 {
@@ -446,13 +452,13 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    folders = GetFolderIDs(principalID, folderID, connection);
+                    folders = GetFolderIDs(principalID, folderID, connection, transaction);
                 }
 
                 int index = 0;
                 while(index < folders.Count)
                 {
-                    foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection))
+                    foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection, transaction))
                     {
                         if (!folders.Contains(folder))
                         {
@@ -466,7 +472,10 @@ namespace SilverSim.Database.MySQL.Inventory
                 Array.Reverse(folderArray);
                 foreach (UUID folder in folderArray)
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folder);
@@ -479,7 +488,10 @@ namespace SilverSim.Database.MySQL.Inventory
                             /* nothing to do here */
                         }
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@ownerid", principalID);
                         cmd.Parameters.AddParameter("@folderid", folder);
@@ -527,7 +539,10 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
 
-                using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection))
+                using (var cmd = new MySqlCommand("UPDATE " + m_InventoryFolderTable + " SET Version = Version + 1 WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+                {
+                    Transaction = transaction
+                })
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     if (deleteFolder)
@@ -542,10 +557,13 @@ namespace SilverSim.Database.MySQL.Inventory
             });
         }
 
-        private List<UUID> GetFolderIDs(UUID principalID, UUID key, MySqlConnection connection)
+        private List<UUID> GetFolderIDs(UUID principalID, UUID key, MySqlConnection connection, MySqlTransaction transaction)
         {
             var folders = new List<UUID>();
-            using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection))
+            using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @folderid", connection)
+            {
+                Transaction = transaction
+            })
             {
                 cmd.Parameters.AddParameter("@ownerid", principalID);
                 cmd.Parameters.AddParameter("@folderid", key);

@@ -232,19 +232,22 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                return conn.InsideTransaction<bool>(() =>
+                return conn.InsideTransaction<bool>((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn))
+                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", id);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            if(!reader.Read())
+                            if (!reader.Read())
                             {
                                 return false;
                             }
 
-                            if(!reader.GetUUI("Owner").EqualsGrid(requestingAgent))
+                            if (!reader.GetUUI("Owner").EqualsGrid(requestingAgent))
                             {
                                 return false;
                             }
@@ -253,14 +256,20 @@ namespace SilverSim.Database.MySQL.Experience
 
                     foreach(string table in m_RemoveFromTables)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE ExperienceID = @experienceid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE ExperienceID = @experienceid", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@experienceid", id);
                             cmd.ExecuteNonQuery();
                         }
                     }
 
-                    using (var cmd = new MySqlCommand("DELETE FROM experiences WHERE ID = @experienceid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM experiences WHERE ID = @experienceid", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", id);
                         return cmd.ExecuteNonQuery() > 0;
@@ -324,10 +333,13 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(() =>
+                conn.InsideTransaction((transaction) =>
                 {
                     bool isallowed = false;
-                    using (var cmd = new MySqlCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
+                    using (var cmd = new MySqlCommand("SELECT Admin FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@experienceid", info.ID);
                         cmd.Parameters.AddParameter("@admin", requestingAgent.ID.ToString() + "%");
@@ -344,7 +356,10 @@ namespace SilverSim.Database.MySQL.Experience
                     }
                     if(!isallowed)
                     {
-                        using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @id", conn))
+                        using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @id", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@id", info.ID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -360,7 +375,7 @@ namespace SilverSim.Database.MySQL.Experience
                     {
                         throw new InvalidOperationException("requesting agent is not allowed to edit experience");
                     }
-                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"");
+                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"", transaction);
                 });
             }
         }

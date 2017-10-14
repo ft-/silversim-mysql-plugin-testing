@@ -93,10 +93,13 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
                     bool haveEntry = false;
-                    using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", regionId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -107,14 +110,20 @@ namespace SilverSim.Database.MySQL.Grid
 
                     if (haveEntry)
                     {
-                        using (var cmd = new MySqlCommand("UPDATE regiondefaults SET flags = (flags & @remove) | @add WHERE uuid = @id", connection))
+                        using (var cmd = new MySqlCommand("UPDATE regiondefaults SET flags = (flags & @remove) | @add WHERE uuid = @id", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@remove", ~removeFlags);
                             cmd.Parameters.AddParameter("@add", addFlags);
                             cmd.Parameters.AddParameter("@id", regionId);
                             cmd.ExecuteNonQuery();
                         }
-                        using (var cmd = new MySqlCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid = @id", connection))
+                        using (var cmd = new MySqlCommand("DELETE FROM regiondefaults WHERE flags = 0 AND uuid = @id", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@id", regionId);
                             cmd.ExecuteNonQuery();
@@ -127,7 +136,7 @@ namespace SilverSim.Database.MySQL.Grid
                             ["uuid"] = regionId,
                             ["flags"] = addFlags
                         };
-                        connection.InsertInto("regiondefaults", vals);
+                        connection.InsertInto("regiondefaults", vals, transaction);
                     }
                 });
             }

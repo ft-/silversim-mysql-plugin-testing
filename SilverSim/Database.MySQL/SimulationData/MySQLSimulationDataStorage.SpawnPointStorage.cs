@@ -55,9 +55,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    conn.InsideTransaction(() =>
+                    conn.InsideTransaction((transaction) =>
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM spawnpoints WHERE RegionID = @regionid", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@regionid", regionID);
                             cmd.ExecuteNonQuery();
@@ -70,7 +73,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         foreach (Vector3 v in value)
                         {
                             data["Distance"] = v;
-                            conn.InsertInto("spawnpoints", data);
+                            conn.InsertInto("spawnpoints", data, transaction);
                         }
                     });
                 }

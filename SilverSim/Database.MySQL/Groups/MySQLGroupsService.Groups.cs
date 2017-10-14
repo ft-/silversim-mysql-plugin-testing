@@ -134,16 +134,22 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                conn.InsideTransaction(() =>
+                conn.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID = @groupid", conn))
+                    using (var cmd = new MySqlCommand("DELETE FROM activegroup WHERE ActiveGroupID = @groupid", conn)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@groupid", group.ID);
                         cmd.ExecuteNonQuery();
                     }
                     foreach (string table in tablenames)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID = @groupid", conn))
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE GroupID = @groupid", conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddParameter("@groupid", group.ID);
                             cmd.ExecuteNonQuery();

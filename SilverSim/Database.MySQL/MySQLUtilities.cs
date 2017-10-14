@@ -28,6 +28,7 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
@@ -156,53 +157,41 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Transaction Helper
-        public static void InsideTransaction(this MySqlConnection connection, Action del)
+        public static void InsideTransaction(this MySqlConnection connection, Action<MySqlTransaction> del) =>
+            InsideTransaction(connection, IsolationLevel.Serializable, del);
+
+        public static void InsideTransaction(this MySqlConnection connection, IsolationLevel isolationLevel, Action<MySqlTransaction> del)
         {
-            using (var cmd = new MySqlCommand("BEGIN", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            MySqlTransaction transaction = connection.BeginTransaction(isolationLevel);
             try
             {
-                del();
+                del(transaction);
             }
             catch
             {
-                using (var cmd = new MySqlCommand("ROLLBACK", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                transaction.Rollback();
                 throw;
             }
-            using (var cmd = new MySqlCommand("COMMIT", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            transaction.Commit();
         }
 
-        public static T InsideTransaction<T>(this MySqlConnection connection, Func<T> del)
+        public static T InsideTransaction<T>(this MySqlConnection connection, Func<MySqlTransaction, T> del) =>
+            InsideTransaction<T>(connection, IsolationLevel.Serializable, del);
+
+        public static T InsideTransaction<T>(this MySqlConnection connection, IsolationLevel isolationLevel, Func<MySqlTransaction, T> del)
         {
             T res;
-            using (var cmd = new MySqlCommand("BEGIN", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            MySqlTransaction transaction = connection.BeginTransaction(isolationLevel);
             try
             {
-                res = del();
+                res = del(transaction);
             }
             catch
             {
-                using (var cmd = new MySqlCommand("ROLLBACK", connection))
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                transaction.Rollback();
                 throw;
             }
-            using (var cmd = new MySqlCommand("COMMIT", connection))
-            {
-                cmd.ExecuteNonQuery();
-            }
+            transaction.Commit();
             return res;
         }
         #endregion
@@ -324,7 +313,7 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Common REPLACE INTO/INSERT INTO helper
-        public static void AnyInto(this MySqlConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
+        public static void AnyInto(this MySqlConnection connection, string cmd, string tablename, Dictionary<string, object> vals, MySqlTransaction transaction = null)
         {
             var q = new List<string>();
             foreach (KeyValuePair<string, object> kvp in vals)
@@ -406,7 +395,10 @@ namespace SilverSim.Database.MySQL
             }
             q1.Append(q2);
             q1.Append(")");
-            using (var command = new MySqlCommand(q1.ToString(), connection))
+            using (var command = new MySqlCommand(q1.ToString(), connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -595,16 +587,16 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region REPLACE INSERT INTO helper
-        public static void ReplaceInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
+        public static void ReplaceInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, MySqlTransaction transaction = null)
         {
-            connection.AnyInto("REPLACE", tablename, vals);
+            connection.AnyInto("REPLACE", tablename, vals, transaction);
         }
         #endregion
 
         #region INSERT INTO helper
-        public static void InsertInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
+        public static void InsertInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, MySqlTransaction transaction = null)
         {
-            connection.AnyInto("INSERT", tablename, vals);
+            connection.AnyInto("INSERT", tablename, vals, transaction);
         }
         #endregion
 
@@ -669,13 +661,16 @@ namespace SilverSim.Database.MySQL
             return updates;
         }
 
-        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, string where)
+        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, string where, MySqlTransaction transaction = null)
         {
             string q1 = "UPDATE " + tablename + " SET ";
 
             q1 += string.Join(",", UpdateSetFromVals(vals));
 
-            using (var command = new MySqlCommand(q1 + " WHERE " + where, connection))
+            using (var command = new MySqlCommand(q1 + " WHERE " + where, connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
                 if (command.ExecuteNonQuery() < 1)
@@ -685,7 +680,7 @@ namespace SilverSim.Database.MySQL
             }
         }
 
-        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where)
+        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where, MySqlTransaction transaction = null)
         {
             string q1 = "UPDATE " + tablename + " SET ";
 
@@ -701,10 +696,13 @@ namespace SilverSim.Database.MySQL
                 wherestr.AppendFormat("{0} = @w_{0}", w.Key);
             }
 
-            using (var command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
+            using (var command = new MySqlCommand(q1 + " WHERE " + wherestr, connection)
+            {
+                Transaction = transaction
+            })
             {
                 AddParameters(command.Parameters, vals);
-                foreach(KeyValuePair<string, object> w in where)
+                foreach (KeyValuePair<string, object> w in where)
                 {
                     command.Parameters.AddWithValue("@w_" + w.Key, w.Value);
                 }

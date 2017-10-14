@@ -89,9 +89,12 @@ namespace SilverSim.Database.MySQL.Avatar
                     }
                     else
                     {
-                        connection.InsideTransaction(() =>
+                        connection.InsideTransaction((transaction) =>
                         {
-                            using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection))
+                            using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid", connection)
+                            {
+                                Transaction = transaction
+                            })
                             {
                                 cmd.Parameters.AddParameter("@principalid", avatarID);
                                 cmd.ExecuteNonQuery();
@@ -122,11 +125,14 @@ namespace SilverSim.Database.MySQL.Avatar
                 {
                     connection.Open();
 
-                    connection.InsideTransaction(() =>
+                    connection.InsideTransaction((transaction) =>
                     {
                         foreach (string key in itemKeys)
                         {
-                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
+                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection)
+                            {
+                                Transaction = transaction
+                            })
                             {
                                 cmd.Parameters.AddWithValue("@principalid", avatarID.ToString());
                                 cmd.Parameters.AddWithValue("@name", key);
@@ -164,13 +170,13 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         ["PrincipalID"] = avatarID
                     };
-                    connection.InsideTransaction(() =>
+                    connection.InsideTransaction((transaction) =>
                     {
                         for (int i = 0; i < itemKeys.Count; ++i)
                         {
                             vals["Name"] = itemKeys[i];
                             vals["Value"] = value[i];
-                            connection.ReplaceInto("avatars", vals);
+                            connection.ReplaceInto("avatars", vals, transaction);
                         }
                     });
                 }
@@ -233,11 +239,14 @@ namespace SilverSim.Database.MySQL.Avatar
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(() =>
+                connection.InsideTransaction((transaction) =>
                 {
                     foreach (string name in nameList)
                     {
-                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
+                        using (var cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             cmd.Parameters.AddWithValue("@principalid", avatarID);
                             cmd.Parameters.AddWithValue("@name", name);

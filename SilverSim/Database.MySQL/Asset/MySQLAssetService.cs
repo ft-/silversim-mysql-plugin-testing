@@ -370,13 +370,15 @@ namespace SilverSim.Database.MySQL.Asset
                 {
                     conn.Open();
 
-                    conn.InsideTransaction(() =>
+                    conn.InsideTransaction((transaction) =>
                     {
-                        using (var cmd =
-                            new MySqlCommand(
+                        using (var cmd = new MySqlCommand(
                                 "INSERT INTO assetdata (hash, assetType, data)" +
                                 "VALUES(@hash, @assetType, @data) ON DUPLICATE KEY UPDATE assetType=assetType",
-                                conn))
+                                conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             using (cmd)
                             {
@@ -390,12 +392,14 @@ namespace SilverSim.Database.MySQL.Asset
                             }
                         }
 
-                        using (var cmd =
-                            new MySqlCommand(
+                        using (var cmd = new MySqlCommand(
                                 "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, hash)" +
                                 "VALUES(@id, @name, @assetType, @temporary, @create_time, @access_time, @asset_flags, @hash) ON " +
                                 "DUPLICATE KEY UPDATE access_time=@access_time",
-                                conn))
+                                conn)
+                        {
+                            Transaction = transaction
+                        })
                         {
                             string assetName = asset.Name;
                             if (asset.Name.Length > MAX_ASSET_NAME)
