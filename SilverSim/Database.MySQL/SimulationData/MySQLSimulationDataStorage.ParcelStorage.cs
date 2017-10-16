@@ -30,6 +30,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataParcelStorageInterface
     {
+        private readonly MySQLSimulationDataParcelAccessListStorage m_LandpassListStorage;
         private readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
         private readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
 
@@ -208,6 +209,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.WhiteList => m_WhiteListStorage;
         ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.BlackList => m_BlackListStorage;
+        ISimulationDataParcelAccessListStorageInterface ISimulationDataParcelStorageInterface.LandpassList => m_LandpassListStorage;
         ISimulationDataParcelExperienceListStorageInterface ISimulationDataParcelStorageInterface.Experiences => this;
     }
 }

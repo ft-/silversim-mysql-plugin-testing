@@ -47,6 +47,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
             m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccesswhitelist");
             m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcelaccessblacklist");
+            m_LandpassListStorage = new MySQLSimulationDataParcelAccessListStorage(m_ConnectionString, "parcellandpasslist");
         }
 
         public void Startup(ConfigurationLoader loader)
