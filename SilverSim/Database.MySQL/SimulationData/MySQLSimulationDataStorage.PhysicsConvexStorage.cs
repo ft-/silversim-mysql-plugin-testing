@@ -42,6 +42,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new PrimaryKeyInfo(new string[] {"MeshID" }),
             new TableRevision(2),
             new AddColumn<PrimitivePhysicsShapeType>("PhysicsShape") { IsNullAllowed = false, Default = PrimitivePhysicsShapeType.Convex },
+            new TableRevision(3),
+            new PrimaryKeyInfo(new string[] {"MeshID" , "PhysicsShape" }),
             #endregion
 
             #region Table primphysics
@@ -196,7 +198,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=@id AND ShapeType=@stype", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM meshphysics WHERE MeshID=@id AND PhysicsShape=@stype", conn))
                 {
                     cmd.Parameters.AddParameter("@id", sculptmeshid);
                     cmd.Parameters.AddParameter("@stype", physicsShape);
