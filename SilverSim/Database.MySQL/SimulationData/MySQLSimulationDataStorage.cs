@@ -106,7 +106,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             "spawnpoints",
             "parcelexperiences",
             "regionexperiences",
-            "regiontrustedexperiences"
+            "regiontrustedexperiences",
+            "parcelaccesswhitelist",
+            "parcelaccessblacklist",
+            "parcellandpasslist"
         };
 
         public override void RemoveRegion(UUID regionID)

@@ -115,15 +115,39 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        private static readonly string[] ParcelTables = new string[]
+        {
+            "parcelexperiences",
+            "parcelaccesswhitelist",
+            "parcelaccessblacklist",
+            "parcellandpasslist"
+        };
+
         bool ISimulationDataParcelStorageInterface.Remove(UUID regionID, UUID parcelID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
+                return connection.InsideTransaction((transaction) =>
                 {
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    foreach (string table in ParcelTables)
+                    {
+                        using (var cmd = new MySqlCommand("DELETE FROM " + table + " WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection)
+                        {
+                            Transaction = transaction
+                        })
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                    using (var cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
             }
         }
 
