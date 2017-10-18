@@ -56,18 +56,21 @@ namespace SilverSim.Database.MySQL.SimulationData
                 {
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        var entry = new ParcelAccessEntry()
+                        while (reader.Read())
                         {
-                            RegionID = regionID,
-                            ParcelID = reader.GetUUID("ParcelID"),
-                            Accessor = reader.GetUUI("Accessor")
-                        };
-                        ulong val = reader.GetUInt64("ExpiresAt");
-                        if (val != 0)
-                        {
-                            entry.ExpiresAt = Date.UnixTimeToDateTime(val);
+                            var entry = new ParcelAccessEntry()
+                            {
+                                RegionID = regionID,
+                                ParcelID = reader.GetUUID("ParcelID"),
+                                Accessor = reader.GetUUI("Accessor")
+                            };
+                            ulong val = reader.GetUInt64("ExpiresAt");
+                            if (val != 0)
+                            {
+                                entry.ExpiresAt = Date.UnixTimeToDateTime(val);
+                            }
+                            result.Add(entry);
                         }
-                        result.Add(entry);
                     }
                 }
             }
