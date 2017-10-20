@@ -21,8 +21,10 @@
 
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -153,6 +155,60 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["ExpiresAt"] = entry.ExpiresAt != null ? entry.ExpiresAt.AsULong : (ulong)0
                 };
                 connection.ReplaceInto(m_TableName, data);
+            }
+        }
+
+        public void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        {
+            bool success = false;
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.InsideTransaction((transaction) =>
+                {
+                    using (var cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= " + Date.GetUnixTime().ToString() + " AND ExpiresAt > 0", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var cmd = new MySqlCommand("INSERT IGNORE " + m_TableName + " (RegionID, ParcelID, Accessor, ExpiresAt) VALUES (@RegionID, @ParcelID, @Accessor, @ExpiresAt)", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@RegionID", regionID);
+                        cmd.Parameters.AddParameter("@ParcelID", parcelID);
+                        cmd.Parameters.AddParameter("@Accessor", accessor);
+                        cmd.Parameters.AddParameter("@ExpiresAt", Date.Now);
+                        if(cmd.ExecuteNonQuery() > 0)
+                        {
+                            success = true;
+                        }
+                    }
+
+                    using (var cmd = new MySqlCommand("UPDATE " + m_TableName + " SET ExpiresAt = ExpiresAt + @extendseconds WHERE RegionID = @RegionID AND ParcelID = @ParcelID AND Accessor = @Accessor AND ExpiresAt > 0", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@RegionID", regionID);
+                        cmd.Parameters.AddParameter("@ParcelID", parcelID);
+                        cmd.Parameters.AddParameter("@Accessor", accessor);
+                        cmd.Parameters.AddParameter("@extendseconds", extendseconds);
+                        if(cmd.ExecuteNonQuery() > 0)
+                        {
+                            success = true;
+                        }
+                    }
+                });
+            }
+
+            if(!success)
+            {
+                throw new ExtendExpiryFailedException();
             }
         }
 
