@@ -39,6 +39,16 @@ namespace SilverSim.Database.MySQL.SimulationData
             new ChangeEngine("MyISAM"),
             #endregion
 
+            #region Table defaultterrains
+            new SqlTable("defaultterrains") { Engine = "MyISAM" },
+            new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<uint>("PatchID") { IsNullAllowed = false },
+            new AddColumn<byte[]>("TerrainData"),
+            new PrimaryKeyInfo("RegionID", "PatchID"),
+            new TableRevision(2),
+            new ChangeEngine("MyISAM"),
+            #endregion
+
             #region Table environmentsettings
             new SqlTable("environmentsettings"),
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },

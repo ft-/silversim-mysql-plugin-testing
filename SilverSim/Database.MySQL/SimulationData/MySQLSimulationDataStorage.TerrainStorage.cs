@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             while (dbReader.Read())
                             {
-                                var patch = new LayerPatch()
+                                var patch = new LayerPatch
                                 {
                                     ExtendedPatchID = dbReader.GetUInt32("PatchID"),
                                     Serialization = dbReader.GetBytes("TerrainData")
@@ -58,6 +58,51 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
                 return patches;
             }
+        }
+
+        void ISimulationDataTerrainStorageInterface.SaveAsDefault(UUID regionID)
+        {
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.InsideTransaction((transaction) =>
+                {
+                    using (var cmd = new MySqlCommand("REPLACE INTO defaultterrains (RegionID, PatchID, TerrainData) SELECT RegionID, PatchID, TerrainData FROM terrains WHERE RegionID=@regionid", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@RegionID", regionID);
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
+        }
+
+        bool ISimulationDataTerrainStorageInterface.TryGetDefault(UUID regionID, List<LayerPatch> list)
+        {
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (var cmd = new MySqlCommand("SELECT PatchID, TerrainData FROM defaultterrains WHERE RegionID = @regionid", connection))
+                {
+                    cmd.Parameters.AddParameter("@regionid", regionID);
+                    cmd.CommandTimeout = 3600;
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            var patch = new LayerPatch
+                            {
+                                ExtendedPatchID = dbReader.GetUInt32("PatchID"),
+                                Serialization = dbReader.GetBytes("TerrainData")
+                            };
+                            list.Add(patch);
+                        }
+                    }
+                }
+            }
+            return list.Count != 0;
         }
     }
 }
