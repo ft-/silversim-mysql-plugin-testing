@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         if (reader.Read())
                         {
-                            prefs = new ProfilePreferences()
+                            prefs = new ProfilePreferences
                             {
                                 User = user,
                                 IMviaEmail = reader.GetBool("imviaemail"),
@@ -67,7 +67,7 @@ namespace SilverSim.Database.MySQL.Profile
                         }
                         else
                         {
-                            prefs = new ProfilePreferences()
+                            prefs = new ProfilePreferences
                             {
                                 User = user,
                                 IMviaEmail = false,
@@ -94,7 +94,7 @@ namespace SilverSim.Database.MySQL.Profile
                         {
                             if(reader.Read())
                             {
-                                return new ProfilePreferences()
+                                return new ProfilePreferences
                                 {
                                     User = user,
                                     IMviaEmail = reader.GetBool("imviaemail"),
@@ -103,7 +103,7 @@ namespace SilverSim.Database.MySQL.Profile
                             }
                             else
                             {
-                                return new ProfilePreferences()
+                                return new ProfilePreferences
                                 {
                                     User = user,
                                     IMviaEmail = false,

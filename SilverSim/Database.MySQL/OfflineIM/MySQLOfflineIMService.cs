@@ -72,7 +72,7 @@ namespace SilverSim.Database.MySQL.OfflineIM
                     {
                         while(reader.Read())
                         {
-                            var im = new GridInstantMessage()
+                            var im = new GridInstantMessage
                             {
                                 ID = reader.GetUInt64("ID"),
                                 FromAgent = reader.GetUUI("FromAgent"),

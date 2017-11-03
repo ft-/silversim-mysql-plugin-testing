@@ -321,7 +321,7 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region dbData to RegionInfo
-        private RegionInfo ToRegionInfo(MySqlDataReader dbReader) => new RegionInfo()
+        private RegionInfo ToRegionInfo(MySqlDataReader dbReader) => new RegionInfo
         {
             ID = dbReader.GetUUID("uuid"),
             Name = dbReader.GetString("regionName"),

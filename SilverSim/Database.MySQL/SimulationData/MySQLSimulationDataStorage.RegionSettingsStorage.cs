@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public partial class MySQLSimulationDataStorage : ISimulationDataRegionSettingsStorageInterface
     {
-        private RegionSettings ToRegionSettings(MySqlDataReader reader) => new RegionSettings()
+        private RegionSettings ToRegionSettings(MySqlDataReader reader) => new RegionSettings
         {
             BlockTerraform = reader.GetBool("BlockTerraform"),
             BlockFly = reader.GetBool("BlockFly"),

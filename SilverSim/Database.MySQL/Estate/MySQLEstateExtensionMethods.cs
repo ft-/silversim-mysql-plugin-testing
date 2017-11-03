@@ -26,7 +26,7 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public static class MySQLEstateExtensionMethods
     {
-        public static EstateInfo ToEstateInfo(this MySqlDataReader reader) => new EstateInfo()
+        public static EstateInfo ToEstateInfo(this MySqlDataReader reader) => new EstateInfo
         {
             ID = reader.GetUInt32("ID"),
             Name = reader.GetString("Name"),

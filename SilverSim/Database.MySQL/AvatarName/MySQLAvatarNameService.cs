@@ -212,7 +212,7 @@ namespace SilverSim.Database.MySQL.AvatarName
             }
         }
 
-        private static UUI ToUUI(MySqlDataReader dbreader) => new UUI()
+        private static UUI ToUUI(MySqlDataReader dbreader) => new UUI
         {
             ID = dbreader.GetUUID("AvatarID"),
             HomeURI = dbreader.GetUri("HomeURI"),

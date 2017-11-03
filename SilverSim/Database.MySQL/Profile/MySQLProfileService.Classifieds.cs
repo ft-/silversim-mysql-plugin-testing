@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.Profile
                     {
                         if (reader.Read())
                         {
-                            classified = new ProfileClassified()
+                            classified = new ProfileClassified
                             {
                                 ClassifiedID = reader.GetUUID("classifieduuid"),
                                 Category = reader.GetInt32("category"),

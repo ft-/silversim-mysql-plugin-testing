@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                         {
                             if (reader.Read())
                             {
-                                return new UserAuthInfo()
+                                return new UserAuthInfo
                                 {
                                     ID = reader.GetUUID("UserID"),
                                     PasswordHash = reader.GetString("PasswordHash"),
@@ -160,7 +160,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
         public override void SetPassword(UUID principalId, string password)
         {
             /* we use UserAuthInfo to calculate a new password */
-            var ai = new UserAuthInfo()
+            var ai = new UserAuthInfo
             {
                 Password = password
             };

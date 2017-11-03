@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             return list;
         }
 
-        private UUI GetUUIFromReader(MySqlDataReader reader) => new UUI()
+        private UUI GetUUIFromReader(MySqlDataReader reader) => new UUI
         {
             FirstName = reader.GetString("FirstName"),
             LastName = reader.GetString("LastName"),

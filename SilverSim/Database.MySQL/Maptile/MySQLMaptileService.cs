@@ -167,7 +167,7 @@ namespace SilverSim.Database.MySQL.Maptile
                     {
                         while(reader.Read())
                         {
-                            var info = new MaptileInfo()
+                            var info = new MaptileInfo
                             {
                                 Location = new GridVector { X = reader.GetUInt32("LocX"), Y = reader.GetUInt32("LocY") },
                                 LastUpdate = reader.GetDate("LastUpdate"),

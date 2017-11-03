@@ -27,7 +27,7 @@ namespace SilverSim.Database.MySQL.GridUser
 {
     public static class MySQLGridUserExtensionMethods
     {
-        public static GridUserInfo ToGridUser(this MySqlDataReader reader) => new GridUserInfo()
+        public static GridUserInfo ToGridUser(this MySqlDataReader reader) => new GridUserInfo
         {
             User = new UUI(reader.GetUUID("ID")),
             HomeRegionID = reader.GetUUID("HomeRegionID"),

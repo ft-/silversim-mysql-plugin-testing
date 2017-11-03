@@ -83,7 +83,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region helpers
-        private ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup()
+        private ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup
         {
             IsTempOnRez = dbReader.GetBool("IsTempOnRez"),
             Owner = dbReader.GetUUI("Owner"),

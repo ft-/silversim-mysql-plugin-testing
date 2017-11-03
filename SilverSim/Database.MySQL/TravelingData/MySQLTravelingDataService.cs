@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.TravelingData
 {
     internal static class MySQLTravelingDataExtensionMethods
     {
-        public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader) => new TravelingDataInfo()
+        public static TravelingDataInfo ToTravelingData(this MySqlDataReader reader) => new TravelingDataInfo
         {
             SessionID = reader.GetUUID("SessionID"),
             UserID = reader.GetUUID("UserID"),

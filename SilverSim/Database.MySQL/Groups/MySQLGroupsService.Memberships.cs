@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Groups
 {
     partial class MySQLGroupsService : GroupsServiceInterface.IGroupMembershipsInterface
     {
-        private GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent) => new GroupMembership()
+        private GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent) => new GroupMembership
         {
             IsAcceptNotices = reader.GetBool("AcceptNotices"),
             Contribution = reader.GetInt32("Contribution"),
