@@ -84,7 +84,7 @@ namespace SilverSim.Database.MySQL.Experience
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (var cmd = new MySqlCommand("DELETE FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin"))
+                        using (var cmd = new MySqlCommand("DELETE FROM experienceadmins WHERE ExperienceID = @experienceid AND Admin LIKE @admin", conn))
                         {
                             cmd.Parameters.AddParameter("@experienceid", experienceID);
                             cmd.Parameters.AddParameter("@admin", agent.ID.ToString() + "%");
