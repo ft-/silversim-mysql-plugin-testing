@@ -70,7 +70,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 public int CompareTo(PrimKey other)
                 {
                     int i = PartID.CompareTo(other.PartID);
-                    if (i == 0) i = ItemID.CompareTo(other.ItemID);
+                    if (i == 0)
+                    {
+                        i = ItemID.CompareTo(other.ItemID);
+                    }
+
                     return i;
                 }
 

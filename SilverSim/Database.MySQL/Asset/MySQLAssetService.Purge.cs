@@ -131,7 +131,7 @@ namespace SilverSim.Database.MySQL.Asset
             return assets;
         }
 
-        private BlockingQueue<UUID> m_AssetProcessQueue = new BlockingQueue<UUID>();
+        private readonly BlockingQueue<UUID> m_AssetProcessQueue = new BlockingQueue<UUID>();
         private int m_ActiveAssetProcessors;
         private int m_Processed;
 
