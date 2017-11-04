@@ -58,8 +58,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             public struct PrimKey : IEquatable<PrimKey>, IComparable<PrimKey>
             {
-                public UUID PartID;
-                public UUID ItemID;
+                public readonly UUID PartID;
+                public readonly UUID ItemID;
 
                 public PrimKey(ObjectInventoryUpdateInfo info)
                 {
