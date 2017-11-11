@@ -41,8 +41,8 @@ namespace SilverSim.Database.MySQL.Friends
         public static FriendInfo ToFriendInfo(this MySqlDataReader reader)
         {
             var fi = new FriendInfo();
-            fi.User.ID = reader.GetUUID("User");
-            fi.Friend.ID = reader.GetUUID("Friend");
+            fi.User.ID = reader.GetUUID("UserID");
+            fi.Friend.ID = reader.GetUUID("FriendID");
             fi.Secret = reader.GetString("Secret");
             fi.FriendGivenFlags = reader.GetEnum<FriendRightFlags>("RightsToFriend");
             fi.UserGivenFlags = reader.GetEnum<FriendRightFlags>("RightsToUser");
