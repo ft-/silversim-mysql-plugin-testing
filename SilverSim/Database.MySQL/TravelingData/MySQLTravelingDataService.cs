@@ -171,7 +171,10 @@ namespace SilverSim.Database.MySQL.TravelingData
                         }
                     }
 
-                    using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID = @id", connection))
+                    using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID = @id", connection)
+                    {
+                        Transaction = transaction
+                    })
                     {
                         cmd.Parameters.AddParameter("@id", sessionID);
                         return cmd.ExecuteNonQuery() > 0;
