@@ -147,16 +147,38 @@ namespace SilverSim.Database.MySQL.TravelingData
             return infos;
         }
 
-        public override bool Remove(UUID sessionID)
+        public override bool Remove(UUID sessionID, out TravelingDataInfo info)
         {
+            var outinfo = default(TravelingDataInfo);
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID = @id", connection))
+
+                bool res = connection.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@id", sessionID);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@id", sessionID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                outinfo = reader.ToTravelingData();
+                            }
+                        }
+                    }
+
+                    using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE SessionID = @id", connection))
+                    {
+                        cmd.Parameters.AddParameter("@id", sessionID);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
+                info = outinfo;
+                return res;
             }
         }
 
@@ -173,16 +195,40 @@ namespace SilverSim.Database.MySQL.TravelingData
             }
         }
 
-        public override bool RemoveByAgentUUID(UUID agentID)
+        public override bool RemoveByAgentUUID(UUID agentID, out TravelingDataInfo info)
         {
+            var outinfo = default(TravelingDataInfo);
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID = @id", connection))
+                bool res = connection.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@id", agentID);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id LIMIT 1", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@id", agentID);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                outinfo = reader.ToTravelingData();
+                            }
+                        }
+                    }
+
+                    using (var cmd = new MySqlCommand("DELETE FROM travelingdata WHERE UserID = @id", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@id", agentID);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
+                info = outinfo;
+                return res;
             }
         }
 
