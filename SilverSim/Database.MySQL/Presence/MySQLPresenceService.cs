@@ -148,12 +148,17 @@ namespace SilverSim.Database.MySQL.Presence
         {
             get
             {
+                bool isUserIdSet = userID != UUID.Zero;
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM presence WHERE SessionID = @sessionID", conn))
+                    using (var cmd = new MySqlCommand(isUserIdSet ? "SELECT * FROM presence WHERE SessionID = @sessionID AND UserID = @userid" : "SELECT * FROM presence WHERE SessionID = @sessionID", conn))
                     {
                         cmd.Parameters.AddParameter("@sessionID", sessionID);
+                        if(isUserIdSet)
+                        {
+                            cmd.Parameters.AddParameter("@userid", userID);
+                        }
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
@@ -195,7 +200,7 @@ namespace SilverSim.Database.MySQL.Presence
                 ["UserID"] = pInfo.UserID.ID,
                 ["SessionID"] = pInfo.SessionID,
                 ["SecureSessionID"] = pInfo.SecureSessionID,
-                ["RegionID"] = UUID.Zero,
+                ["RegionID"] = pInfo.RegionID,
                 ["LastSeen"] = Date.Now
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
