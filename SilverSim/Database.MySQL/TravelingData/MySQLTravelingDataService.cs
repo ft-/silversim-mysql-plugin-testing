@@ -244,7 +244,7 @@ namespace SilverSim.Database.MySQL.TravelingData
                 ["GridExternalName"] = data.GridExternalName,
                 ["ServiceToken"] = data.ServiceToken,
                 ["ClientIPAddress"] = data.ClientIPAddress,
-                ["Timestamp"] = Date.Now
+                ["Timestamp"] = data.Timestamp
             };
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
