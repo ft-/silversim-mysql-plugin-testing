@@ -123,7 +123,7 @@ namespace SilverSim.Database.MySQL.Maptile
                     ["LocX"] = data.Location.X,
                     ["LocY"] = data.Location.Y,
                     ["ScopeID"] = data.ScopeID,
-                    ["LastUpdate"] = Date.Now,
+                    ["LastUpdate"] = data.LastUpdate,
                     ["ContentType"] = data.ContentType,
                     ["ZoomLevel"] = data.ZoomLevel,
                     ["Data"] = data.Data
@@ -137,7 +137,7 @@ namespace SilverSim.Database.MySQL.Maptile
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel AN ScopeID = @scopeid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel AND ScopeID = @scopeid", connection))
                 {
                     cmd.Parameters.AddParameter("@locx", location.X);
                     cmd.Parameters.AddParameter("@locy", location.Y);
