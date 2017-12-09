@@ -110,6 +110,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Position = dbReader.GetVector3("Position"),
                 Rotation = dbReader.GetQuaternion("Rotation"),
                 SitText = dbReader.GetString("SitText"),
+                SitAnimation = dbReader.GetString("SitAnimation"),
                 TouchText = dbReader.GetString("TouchText"),
                 Name = dbReader.GetString("Name"),
                 Description = dbReader.GetString("Description"),
