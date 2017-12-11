@@ -662,7 +662,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                     ["IsReturnAtEdge"] = objpart.IsReturnAtEdge,
                     ["IsBlockGrabObject"] = objpart.IsBlockGrabObject,
                     ["SandboxOrigin"] = objpart.SandboxOrigin,
-                    ["ExtendedMeshData"] = objpart.ExtendedMesh.DbSerialization
+                    ["ExtendedMeshData"] = objpart.ExtendedMesh.DbSerialization,
+                    ["IsSitTargetActive"] = objpart.IsSitTargetActive,
+                    ["IsScriptedSitOnly"] = objpart.IsScriptedSitOnly,
+                    ["AllowUnsit"] = objpart.AllowUnsit
                 };
                 using (var ms = new MemoryStream())
                 {

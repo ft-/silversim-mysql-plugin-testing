@@ -192,6 +192,10 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<Date>("RezDate") { IsNullAllowed = false },
             new TableRevision(20),
             new AddColumn<string>("SitAnimation") { IsNullAllowed = false, Cardinality = 255, Default = string.Empty },
+            new TableRevision(21),
+            new AddColumn<bool>("IsSitTargetActive") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("IsScriptedSitOnly") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("AllowUnsit") { IsNullAllowed = false, Default = false },
             #endregion
 
             #region Table primitems
