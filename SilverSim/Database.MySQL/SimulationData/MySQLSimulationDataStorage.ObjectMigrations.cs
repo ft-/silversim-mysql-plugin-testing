@@ -195,7 +195,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(21),
             new AddColumn<bool>("IsSitTargetActive") { IsNullAllowed = false, Default = false },
             new AddColumn<bool>("IsScriptedSitOnly") { IsNullAllowed = false, Default = false },
-            new AddColumn<bool>("AllowUnsit") { IsNullAllowed = false, Default = false },
+            new AddColumn<bool>("AllowUnsit") { IsNullAllowed = false, Default = true },
             #endregion
 
             #region Table primitems
