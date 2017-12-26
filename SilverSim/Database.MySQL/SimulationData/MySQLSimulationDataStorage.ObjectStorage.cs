@@ -238,7 +238,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Owner = dbReader.GetUUI("Owner"),
                 ParentFolderID = dbReader.GetUUID("PrimID"),
                 NextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID"),
-                ExperienceID = dbReader.GetUUID("ExperienceID")
+                ExperienceID = dbReader.GetUUID("ExperienceID"),
+                CollisionFilter = new ObjectPartInventoryItem.CollisionFilterParam
+                {
+                    DbSerialization = dbReader.GetBytes("CollisionFilterData")
+                }
             };
             item.Permissions.Base = dbReader.GetEnum<InventoryPermissionsMask>("BasePermissions");
             item.Permissions.Current = dbReader.GetEnum<InventoryPermissionsMask>("CurrentPermissions");
