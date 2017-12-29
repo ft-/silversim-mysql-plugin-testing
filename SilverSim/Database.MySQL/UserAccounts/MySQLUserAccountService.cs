@@ -36,7 +36,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 {
     [Description("MySQL UserAccount Backend")]
     [PluginName("UserAccounts")]
-    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
+    public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin, IUserAccountSerialNoInterface
     {
         private readonly string m_ConnectionString;
         private Uri m_HomeURI;
@@ -69,6 +69,33 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 connection.Open();
                 connection.MigrateTables(Migrations, m_Log);
             }
+
+            ulong serno;
+            if(!TryGetSerialNumber(out serno))
+            {
+                using (var connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+
+                    using (var cmd = new MySqlCommand("SELECT COUNT(ID) FROM useraccounts", connection))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if(!reader.Read())
+                            {
+                                throw new ConfigurationLoader.ConfigurationErrorException("Failed to read number of accounts");
+                            }
+                            serno = (ulong)reader.GetInt32(0);
+                        }
+                    }
+
+                    var vals = new Dictionary<string, object>
+                    {
+                        { "SerialNumber", serno }
+                    };
+                    connection.InsertInto("useraccounts_serial", vals);
+                }
+            }
         }
 
         private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
@@ -91,9 +118,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new TableRevision(2),
             new ChangeColumn<uint>("UserFlags") { IsNullAllowed = false, Default = (uint)0 },
             new TableRevision(3),
-            new AddColumn<int>("IsEverLoggedIn") {IsNullAllowed = false, Default = 0 },
+            new AddColumn<int>("IsEverLoggedIn") { IsNullAllowed = false, Default = 0 },
             new TableRevision(4),
-            new ChangeColumn<bool>("IsEverLoggedIn") {IsNullAllowed = false, Default = false }
+            new ChangeColumn<bool>("IsEverLoggedIn") { IsNullAllowed = false, Default = false },
+
+            new SqlTable("useraccounts_serial"),
+            new AddColumn<ulong>("SerialNumber") { IsNullAllowed = false, Default = (ulong)0 }
         };
 
         public override bool ContainsKey(UUID scopeID, UUID accountID)
@@ -416,7 +446,51 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsertInto("useraccounts", data);
+                connection.InsideTransaction((transaction) =>
+                {
+                    connection.InsertInto("useraccounts", data, transaction);
+                    using (var cmd = new MySqlCommand("UPDATE useraccounts_serial SET SerialNumber = SerialNumber + 1", connection)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
+        }
+
+        private bool TryGetSerialNumber(out ulong serialno)
+        {
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (var cmd = new MySqlCommand("SELECT SerialNumber FROM useraccounts_serial LIMIT 1", connection))
+                {
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            serialno = reader.GetUInt64("SerialNumber");
+                            return true;
+                        }
+                    }
+                }
+            }
+            serialno = 0;
+            return false;
+        }
+
+        public ulong SerialNumber
+        {
+            get
+            {
+                ulong serno;
+                if(!TryGetSerialNumber(out serno))
+                {
+                    throw new InvalidOperationException("Serial number access failed");
+                }
+                return serno;
             }
         }
 
@@ -459,6 +533,36 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         throw new KeyNotFoundException();
                     }
                 }
+            }
+        }
+
+        public List<UUI> AccountList
+        {
+            get
+            {
+                var list = new List<UUI>();
+
+                using (var conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts", conn))
+                    {
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                list.Add(new UUI
+                                {
+                                    ID = reader.GetUUID("ID"),
+                                    FirstName = reader.GetString("FirstName"),
+                                    LastName = reader.GetString("LastName")
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return list;
             }
         }
 
