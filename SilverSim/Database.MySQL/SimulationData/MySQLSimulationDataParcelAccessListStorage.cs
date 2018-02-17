@@ -24,7 +24,6 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

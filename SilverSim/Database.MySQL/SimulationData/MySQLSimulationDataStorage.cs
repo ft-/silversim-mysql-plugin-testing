@@ -29,7 +29,6 @@ using SilverSim.ServiceInterfaces.Statistics;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {

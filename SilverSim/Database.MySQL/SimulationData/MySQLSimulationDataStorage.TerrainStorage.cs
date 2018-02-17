@@ -19,7 +19,6 @@
 // obligated to do so. If you do not wish to do so, delete this
 // exception statement from your version.
 
-using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;

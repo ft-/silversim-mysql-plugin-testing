@@ -20,8 +20,8 @@
 // exception statement from your version.
 
 using MySql.Data.MySqlClient;
-using SilverSim.Types.GridUser;
 using SilverSim.Types;
+using SilverSim.Types.GridUser;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
