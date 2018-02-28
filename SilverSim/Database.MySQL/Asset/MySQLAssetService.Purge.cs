@@ -117,7 +117,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM assetrefs WHERE usesprocessed = 0 LIMIT 1000", conn))
                 {
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
