@@ -375,6 +375,11 @@ namespace SilverSim.Database.MySQL.Grid
 
         public override void RegisterRegion(RegionInfo regionInfo)
         {
+            RegisterRegion(regionInfo, false);
+        }
+
+        public override void RegisterRegion(RegionInfo regionInfo, bool keepOnlineUnmodified)
+        {
             foreach (RegionDefaultFlagsServiceInterface service in m_RegionDefaultServices)
             {
                 regionInfo.Flags |= service.GetRegionDefaultFlags(regionInfo.ID);
@@ -401,8 +406,27 @@ namespace SilverSim.Database.MySQL.Grid
                     }
                 }
 
+                if (keepOnlineUnmodified)
+                {
+                    using (var cmd = new MySqlCommand("SELECT flags FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE ScopeID = @scopeid AND uuid = @id LIMIT 1", conn))
+                    {
+                        cmd.Parameters.AddParameter("@scopeid", regionInfo.ScopeID);
+                        cmd.Parameters.AddParameter("@id", regionInfo.ID);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                RegionFlags flags = dbReader.GetEnum<RegionFlags>("flags");
+                                regionInfo.Flags &= ~RegionFlags.RegionOnline;
+                                regionInfo.Flags |= (flags & RegionFlags.RegionOnline);
+                            }
+                        }
+                    }
+                }
+
+
                 /* we have to give checks for all intersection variants */
-                using(var cmd = new MySqlCommand("SELECT uuid FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE (" +
+                using (var cmd = new MySqlCommand("SELECT uuid FROM `" + MySqlHelper.EscapeString(m_TableName) + "` WHERE (" +
                             "(locX >= @minx AND locY >= @miny AND locX < @maxx AND locY < @maxy) OR " +
                             "(locX + sizeX > @minx AND locY+sizeY > @miny AND locX + sizeX < @maxx AND locY + sizeY < @maxy)" +
                             ") AND (NOT uuid = @regionid) AND " +
