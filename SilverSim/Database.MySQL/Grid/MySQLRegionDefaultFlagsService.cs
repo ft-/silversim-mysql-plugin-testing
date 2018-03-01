@@ -73,7 +73,7 @@ namespace SilverSim.Database.MySQL.Grid
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT flags FROM regiondefaults WHERE uuid = @id", connection))
+                using (var cmd = new MySqlCommand("SELECT flags FROM regiondefaults WHERE uuid = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", regionId);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -96,7 +96,7 @@ namespace SilverSim.Database.MySQL.Grid
                 connection.InsideTransaction((transaction) =>
                 {
                     bool haveEntry = false;
-                    using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid = @id", connection)
+                    using (var cmd = new MySqlCommand("SELECT * FROM regiondefaults WHERE uuid = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })

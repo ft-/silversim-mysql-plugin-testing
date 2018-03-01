@@ -33,7 +33,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

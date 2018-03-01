@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
         private bool TryGetParentFolderId(MySqlConnection connection, UUID principalID, UUID folderID, out UUID parentFolderID, MySqlTransaction transaction)
         {
-            using (var cmd = new MySqlCommand("SELECT ParentFolderID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid", connection)
+            using (var cmd = new MySqlCommand("SELECT ParentFolderID FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ID = @folderid LIMIT 1", connection)
             {
                 Transaction = transaction
             })
@@ -181,7 +181,7 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             if (parentFolderID == UUID.Zero)
             {
-                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid", conn)
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE OwnerID = @ownerid AND ParentFolderID = @parentfolderid LIMIT 1", conn)
                 {
                     Transaction = transaction
                 })

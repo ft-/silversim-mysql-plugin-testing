@@ -41,7 +41,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "'", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID = '" + regionID.ToString() + "' AND ParcelID = '" + parcelID.ToString() + "' LIMIT 1", connection))
                     {
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {

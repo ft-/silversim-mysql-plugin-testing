@@ -90,7 +90,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", sessionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.TravelingData
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id AND ClientIPAddress = @ip", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE UserID = @id AND ClientIPAddress = @ip LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", agentID);
                     cmd.Parameters.AddParameter("@ip", ipAddress);
@@ -156,7 +156,7 @@ namespace SilverSim.Database.MySQL.TravelingData
 
                 bool res = connection.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id", connection)
+                    using (var cmd = new MySqlCommand("SELECT * FROM travelingdata WHERE SessionID = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })

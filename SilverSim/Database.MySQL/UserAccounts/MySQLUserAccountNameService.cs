@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID = @id", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE ID = @id LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -170,7 +170,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName = @first AND LastName = @last", connection))
+                using (var cmd = new MySqlCommand("SELECT ID, FirstName, LastName FROM useraccounts WHERE FirstName = @first AND LastName = @last LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@first", firstName);
                     cmd.Parameters.AddParameter("@last", lastName);

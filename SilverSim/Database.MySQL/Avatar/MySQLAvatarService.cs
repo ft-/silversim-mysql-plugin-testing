@@ -129,7 +129,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         foreach (string key in itemKeys)
                         {
-                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection)
+                            using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name LIMIT 1", connection)
                             {
                                 Transaction = transaction
                             })
@@ -188,7 +188,7 @@ namespace SilverSim.Database.MySQL.Avatar
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name", connection))
+                using (var cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID = @principalid AND `Name` = @name LIMIT 1", connection))
                 {
                     cmd.Parameters.AddWithValue("@principalid", avatarID.ToString());
                     cmd.Parameters.AddWithValue("@name", itemKey);

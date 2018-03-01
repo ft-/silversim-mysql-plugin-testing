@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 connection.Open();
                 /* we use a specific implementation to reduce the result set here */
-                using (var cmd = new MySqlCommand("SELECT IsAllowed FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid", connection))
+                using (var cmd = new MySqlCommand("SELECT IsAllowed FROM parcelexperiences WHERE RegionID = @regionid AND ParcelID = @parcelid AND ExperienceID LIKE @experienceid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parcelid", parcelID);

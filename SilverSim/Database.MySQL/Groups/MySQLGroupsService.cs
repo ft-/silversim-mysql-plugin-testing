@@ -89,7 +89,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID = @groupid AND r.RoleID = @grouproleid", conn))
+                using (var cmd = new MySqlCommand("SELECT Powers FROM grouproles AS r WHERE r.GroupID = @groupid AND r.RoleID = @grouproleid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@grouproleid", roleID);

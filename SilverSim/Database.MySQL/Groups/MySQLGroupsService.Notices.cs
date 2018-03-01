@@ -111,7 +111,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID = @noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM groupnotices WHERE NoticeID = @noticeid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -136,7 +136,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID = @noticeid", conn))
+                using (var cmd = new MySqlCommand("SELECT NoticeID FROM groupnotices WHERE NoticeID = @noticeid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@noticeid", groupNoticeID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

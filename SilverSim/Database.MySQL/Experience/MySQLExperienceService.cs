@@ -184,7 +184,7 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Group, ID FROM experiences WHERE Group LIKE @group", conn))
+                using (var cmd = new MySqlCommand("SELECT Group, ID FROM experiences WHERE Group LIKE @group LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@group", group.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -234,7 +234,7 @@ namespace SilverSim.Database.MySQL.Experience
                 conn.Open();
                 return conn.InsideTransaction<bool>((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @experienceid", conn)
+                    using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @experienceid LIMIT 1", conn)
                     {
                         Transaction = transaction
                     })
@@ -301,7 +301,7 @@ namespace SilverSim.Database.MySQL.Experience
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM experiences WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", experienceID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -356,7 +356,7 @@ namespace SilverSim.Database.MySQL.Experience
                     }
                     if(!isallowed)
                     {
-                        using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @id", conn)
+                        using (var cmd = new MySqlCommand("SELECT Owner FROM experiences WHERE ID = @id LIMIT 1", conn)
                         {
                             Transaction = transaction
                         })

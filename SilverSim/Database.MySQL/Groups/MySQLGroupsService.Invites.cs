@@ -122,7 +122,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT InviteID from groupinvites WHERE InviteID = @inviteid", conn))
+                using (var cmd = new MySqlCommand("SELECT InviteID from groupinvites WHERE InviteID = @inviteid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@inviteid", groupInviteID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -175,7 +175,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE InviteID = @inviteid", conn))
+                using (var cmd = new MySqlCommand("SELECT * from groupinvites WHERE InviteID = @inviteid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@inviteid", groupInviteID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

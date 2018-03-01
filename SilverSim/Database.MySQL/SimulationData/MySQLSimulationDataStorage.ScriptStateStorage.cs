@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT ScriptState FROM scriptstates WHERE RegionID = @regionid AND PrimID = @primid AND ItemID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@primid", primID);

@@ -76,7 +76,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);
@@ -105,7 +105,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
                     cmd.Parameters.AddParameter("@experienceid", experienceID);

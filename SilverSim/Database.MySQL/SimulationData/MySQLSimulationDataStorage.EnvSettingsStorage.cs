@@ -35,7 +35,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID = @regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT EnvironmentSettings FROM environmentsettings WHERE RegionID = @regionid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

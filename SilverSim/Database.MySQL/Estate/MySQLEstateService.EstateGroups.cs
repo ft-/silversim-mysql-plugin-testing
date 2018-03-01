@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = @estateid AND GroupID = @groupid", conn))
+                    using (var cmd = new MySqlCommand("SELECT GroupID FROM estate_groups WHERE EstateID = @estateid AND GroupID = @groupid LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@estateid", estateID);
                         cmd.Parameters.AddParameter("@groupid", group.ID);

@@ -123,7 +123,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                 {
                     connection.Open();
 
-                    using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE parametername = @parametername", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE parametername = @parametername LIMIT 1", connection))
                     {
                         cmd.Parameters.AddParameter("@parametername", parametername);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -172,7 +172,7 @@ namespace SilverSim.Database.MySQL.ServerParam
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid = @regionid AND parametername = @parametername", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid = @regionid AND parametername = @parametername LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parametername", parameter);
@@ -205,7 +205,7 @@ namespace SilverSim.Database.MySQL.ServerParam
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid = @regionid AND parametername = @parametername", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid = @regionid AND parametername = @parametername LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     cmd.Parameters.AddParameter("@parametername", parameter);

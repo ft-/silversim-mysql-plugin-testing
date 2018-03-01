@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.Groups
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
+                    using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@principalid", principalID.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -101,7 +101,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid", conn))
+                using (var cmd = new MySqlCommand("SELECT ActiveGroupID FROM activegroup WHERE PrincipalID = @principalid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@principalid", principalID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -125,7 +125,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID = @principalid AND GroupID = @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT SelectedRoleID FROM groupmemberships WHERE PrincipalID = @principalid AND GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     cmd.Parameters.AddParameter("@principalid", principal.ID);

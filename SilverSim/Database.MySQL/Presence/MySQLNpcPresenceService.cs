@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -169,7 +169,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID AND FirstName = @first AND LastName = @last", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE RegionID = @regionID AND FirstName = @first AND LastName = @last LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionID", regionID);
                     cmd.Parameters.AddParameter("@first", firstname);
@@ -193,7 +193,7 @@ namespace SilverSim.Database.MySQL.Presence
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM npcpresence WHERE NpcID = @npcid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@npcid", npcid);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

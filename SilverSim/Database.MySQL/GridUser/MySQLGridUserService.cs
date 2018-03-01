@@ -99,7 +99,7 @@ namespace SilverSim.Database.MySQL.GridUser
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", userID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -123,7 +123,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID = @id", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID = @id LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@id", userID);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())

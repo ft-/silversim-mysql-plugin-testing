@@ -94,7 +94,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                 connection.Open();
                 connection.InsideTransaction((transaction) =>
                 {
-                    using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID = @id", connection)
+                    using (var cmd = new MySqlCommand("DELETE FROM auth WHERE UserID = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })
@@ -102,7 +102,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                         cmd.Parameters.AddParameter("@id", accountID);
                         cmd.ExecuteNonQuery();
                     }
-                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID = @id", connection)
+                    using (var cmd = new MySqlCommand("DELETE FROM tokens WHERE UserID = @id LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })
@@ -121,7 +121,7 @@ namespace SilverSim.Database.MySQL.AuthInfo
                 using (var connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID = @id", connection))
+                    using (var cmd = new MySqlCommand("SELECT * FROM auth WHERE UserID = @id LIMIT 1", connection))
                     {
                         cmd.Parameters.AddParameter("@id", accountid);
                         using (MySqlDataReader reader = cmd.ExecuteReader())

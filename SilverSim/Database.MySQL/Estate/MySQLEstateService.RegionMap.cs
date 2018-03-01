@@ -57,7 +57,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = @regionid", conn))
+                using (var cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = @regionid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@regionid", regionID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

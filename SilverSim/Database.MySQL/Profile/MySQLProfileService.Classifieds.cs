@@ -56,7 +56,7 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid = @uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -95,7 +95,7 @@ namespace SilverSim.Database.MySQL.Profile
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid = @uuid", conn))
+                using (var cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid = @uuid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@uuid", id);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

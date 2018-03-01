@@ -173,7 +173,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -195,7 +195,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE Name = @name", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE Name = @name LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -217,7 +217,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -238,7 +238,7 @@ namespace SilverSim.Database.MySQL.Estate
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE Name = @name", conn))
+                using (var cmd = new MySqlCommand("SELECT id FROM estates WHERE Name = @name LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -325,7 +325,7 @@ namespace SilverSim.Database.MySQL.Estate
                         cmd.ExecuteNonQuery();
                     }
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM estates WHERE ID = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", estateID);
                     return cmd.ExecuteNonQuery() == 1;
@@ -340,7 +340,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id", conn))
+                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@id", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())

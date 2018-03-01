@@ -74,7 +74,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` = @groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE `Name` = @groupname LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -92,7 +92,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID = @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT GroupID FROM groups WHERE GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -195,7 +195,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` = @groupname", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.`Name` = @groupname LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupname", groupName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -218,7 +218,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID = @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT g.*, " + GCountQuery + " FROM groups AS g WHERE g.GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", group.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -241,7 +241,7 @@ namespace SilverSim.Database.MySQL.Groups
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID = @groupid", conn))
+                using (var cmd = new MySqlCommand("SELECT `Name`, Location FROM groups WHERE GroupID = @groupid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@groupid", groupID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())

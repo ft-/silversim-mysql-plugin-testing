@@ -35,7 +35,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT ID FROM " + m_InventoryItemTable + " WHERE ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -56,7 +56,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@itemid", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -127,7 +127,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@itemid", key);
@@ -149,7 +149,7 @@ namespace SilverSim.Database.MySQL.Inventory
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection))
                 {
                     cmd.Parameters.AddParameter("@ownerid", principalID);
                     cmd.Parameters.AddParameter("@itemid", key);
@@ -274,7 +274,7 @@ namespace SilverSim.Database.MySQL.Inventory
                         throw new InvalidParentFolderIdException(string.Format("Invalid parent folder {0} for item {1}", toFolderID, id));
                     }
 
-                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid", connection)
+                    using (var cmd = new MySqlCommand("SELECT NULL FROM " + m_InventoryFolderTable + " WHERE ID = @folderid AND OwnerID = @ownerid LIMIT 1", connection)
                     {
                         Transaction = transaction
                     })
