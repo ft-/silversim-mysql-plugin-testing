@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id) LIMIT 1000", conn)
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id LIMIT 1) LIMIT 1000", conn)
                 {
                     CommandTimeout = 120
                 })
@@ -64,20 +64,32 @@ namespace SilverSim.Database.MySQL.Asset
                     cmd.Parameters.AddParameter("@access_time", now);
                     purged = cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id) LIMIT 1000", conn)
+                int removed = 1000;
+                int execres;
+                do
                 {
-                    CommandTimeout = 120
-                })
+                    using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id LIMIT 1) LIMIT 1", conn)
+                    {
+                        CommandTimeout = 120
+                    })
+                    {
+                        execres = cmd.ExecuteNonQuery();
+                    }
+                    removed -= execres;
+                } while (removed > 0 && execres > 0);
+
+                removed = 1000;
+                do
                 {
-                    cmd.ExecuteNonQuery();
-                }
-                using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType) LIMIT 1000", conn)
-                {
-                    CommandTimeout = 120
-                })
-                {
-                    cmd.ExecuteNonQuery();
-                }
+                    using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType LIMIT 1) LIMIT 1", conn)
+                    {
+                        CommandTimeout = 120
+                    })
+                    {
+                        execres = cmd.ExecuteNonQuery();
+                    }
+                    removed -= execres;
+                } while (removed > 0 && execres > 0);
             }
 
             return purged;

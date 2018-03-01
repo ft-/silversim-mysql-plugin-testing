@@ -437,12 +437,12 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=@id AND asset_flags <> 0", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=@id AND asset_flags <> 0 LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetrefs.\"id\" = assetsinuse.\"id\")", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetrefs.\"id\" = assetsinuse.\"id\" LIMIT 1) LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
