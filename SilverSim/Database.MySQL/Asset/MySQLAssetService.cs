@@ -72,7 +72,7 @@ namespace SilverSim.Database.MySQL.Asset
             {
                 conn.Open();
                 bool needsUpdateAccessTime = false;
-                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -171,7 +171,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -230,7 +230,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=@id", conn))
+                using (var cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=@id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -277,7 +277,7 @@ namespace SilverSim.Database.MySQL.Asset
             {
                 bool processed;
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id", conn))
+                using (var cmd = new MySqlCommand("SELECT usesprocessed FROM assetrefs WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -289,7 +289,7 @@ namespace SilverSim.Database.MySQL.Asset
                 AssetData data;
                 if(processed)
                 {
-                    using (var cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
+                    using (var cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id LIMIT 1", conn))
                     {
                         cmd.Parameters.AddParameter("@id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -340,7 +340,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id", conn))
+                using (var cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=@id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -442,7 +442,7 @@ namespace SilverSim.Database.MySQL.Asset
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
                 }
-                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE fsassetrefs.\"id\" = assetsinuse.\"id\")", conn))
+                using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE id=@id AND NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetrefs.\"id\" = assetsinuse.\"id\")", conn))
                 {
                     cmd.Parameters.AddParameter("@id", id);
                     cmd.ExecuteNonQuery();
@@ -524,6 +524,10 @@ namespace SilverSim.Database.MySQL.Asset
             new AddColumn<bool>("usesprocessed") { IsNullAllowed = false, Default = false },
             new TableRevision(4),
             new DropColumn("CreatorID"),
+            new TableRevision(5),
+            new NamedKeyInfo("assetType_index", "assetType"),
+            new NamedKeyInfo("hash_index", "hash"),
+            new NamedKeyInfo("usesprocessed_index", "usesprocessed"),
 
             new SqlTable("assetsinuse"),
             new AddColumn<UUID>("id") { IsNullAllowed = false },
