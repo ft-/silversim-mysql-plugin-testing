@@ -289,7 +289,7 @@ namespace SilverSim.Database.MySQL.Asset
                 AssetData data;
                 if(processed)
                 {
-                    using (var cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id LIMIT 1", conn))
+                    using (var cmd = new MySqlCommand("SELECT usesid FROM assetsinuse WHERE id = @id", conn))
                     {
                         cmd.Parameters.AddParameter("@id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
