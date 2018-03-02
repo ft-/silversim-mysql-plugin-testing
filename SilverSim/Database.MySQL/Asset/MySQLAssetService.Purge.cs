@@ -102,12 +102,12 @@ namespace SilverSim.Database.MySQL.Asset
                         removed -= execres;
                         Interlocked.Add(ref m_PurgedAssets, execres);
                     } while (removed > 0 && execres > 0);
-                    m_ProcessingPurge = 0;
                 }
             }
             finally
             {
                 m_PurgeState = "IDLE";
+                m_ProcessingPurge = 0;
             }
 
             return purged;
