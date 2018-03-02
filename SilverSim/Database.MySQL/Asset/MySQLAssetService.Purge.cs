@@ -49,47 +49,65 @@ namespace SilverSim.Database.MySQL.Asset
             }
         }
 
+        private int m_ProcessingPurge;
+        private string m_PurgeState = "IDLE";
+
         public long PurgeUnusedAssets()
         {
             long purged;
-            using (var conn = new MySqlConnection(m_ConnectionString))
+            try
             {
-                conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id LIMIT 1) LIMIT 1000", conn)
+                using (var conn = new MySqlConnection(m_ConnectionString))
                 {
-                    CommandTimeout = 120
-                })
-                {
-                    ulong now = Date.GetUnixTime() - 2 * 24 * 3600;
-                    cmd.Parameters.AddParameter("@access_time", now);
-                    purged = cmd.ExecuteNonQuery();
-                }
-                int removed = 1000;
-                int execres;
-                do
-                {
-                    using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id LIMIT 1) LIMIT 1", conn)
+                    conn.Open();
+                    m_PurgeState = "PURGE_REFS";
+                    using (var cmd = new MySqlCommand("DELETE FROM assetrefs WHERE usesprocessed = 1 AND access_time < @access_time AND NOT EXISTS (SELECT NULL FROM assetsinuse WHERE usesid = assetrefs.id LIMIT 1) LIMIT 1000", conn)
                     {
                         CommandTimeout = 120
                     })
                     {
-                        execres = cmd.ExecuteNonQuery();
+                        ulong now = Date.GetUnixTime() - 2 * 24 * 3600;
+                        cmd.Parameters.AddParameter("@access_time", now);
+                        purged = cmd.ExecuteNonQuery();
                     }
-                    removed -= execres;
-                } while (removed > 0 && execres > 0);
+                    m_PurgeState = "PURGE_USES";
+                    int removed = 1000;
+                    int execres;
+                    do
+                    {
+                        m_ProcessingPurge = removed;
+                        using (var cmd = new MySqlCommand("DELETE FROM assetsinuse WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetsinuse.id = assetrefs.id LIMIT 1) LIMIT 1", conn)
+                        {
+                            CommandTimeout = 120
+                        })
+                        {
+                            execres = cmd.ExecuteNonQuery();
+                        }
+                        removed -= execres;
+                        Interlocked.Add(ref m_PurgedAssets, execres);
+                    } while (removed > 0 && execres > 0);
 
-                removed = 1000;
-                do
-                {
-                    using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType LIMIT 1) LIMIT 1", conn)
+                    m_PurgeState = "PURGE_DATA";
+                    removed = 1000;
+                    do
                     {
-                        CommandTimeout = 120
-                    })
-                    {
-                        execres = cmd.ExecuteNonQuery();
-                    }
-                    removed -= execres;
-                } while (removed > 0 && execres > 0);
+                        m_ProcessingPurge = removed;
+                        using (var cmd = new MySqlCommand("DELETE FROM assetdata WHERE NOT EXISTS (SELECT NULL FROM assetrefs WHERE assetdata.hash = assetrefs.hash AND assetdata.assetType = assetrefs.assetType LIMIT 1) LIMIT 1", conn)
+                        {
+                            CommandTimeout = 120
+                        })
+                        {
+                            execres = cmd.ExecuteNonQuery();
+                        }
+                        removed -= execres;
+                        Interlocked.Add(ref m_PurgedAssets, execres);
+                    } while (removed > 0 && execres > 0);
+                    m_ProcessingPurge = 0;
+                }
+            }
+            finally
+            {
+                m_PurgeState = "IDLE";
             }
 
             return purged;
@@ -146,6 +164,7 @@ namespace SilverSim.Database.MySQL.Asset
         private readonly BlockingQueue<UUID> m_AssetProcessQueue = new BlockingQueue<UUID>();
         private int m_ActiveAssetProcessors;
         private int m_Processed;
+        private int m_PurgedAssets;
 
         public void EnqueueAsset(UUID assetid)
         {
@@ -206,12 +225,19 @@ namespace SilverSim.Database.MySQL.Asset
             return new QueueStat(c != 0 ? "PROCESSING" : "IDLE", c, (uint)m_Processed);
         }
 
+        private QueueStat GetPurgeQueueStats()
+        {
+            int c = m_ProcessingPurge;
+            return new QueueStat(m_PurgeState, c, (uint)m_PurgedAssets);
+        }
+
         IList<QueueStatAccessor> IQueueStatsAccess.QueueStats
         {
             get
             {
                 var stats = new List<QueueStatAccessor>();
                 stats.Add(new QueueStatAccessor("AssetReferences", GetProcessorQueueStats));
+                stats.Add(new QueueStatAccessor("AssetPurges", GetPurgeQueueStats));
                 return stats;
             }
         }
