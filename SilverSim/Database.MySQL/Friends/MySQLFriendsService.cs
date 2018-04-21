@@ -176,18 +176,22 @@ namespace SilverSim.Database.MySQL.Friends
                 connection.Open();
                 connection.InsideTransaction((transaction) =>
                 {
-                    var vals = new Dictionary<string, object>();
-                    vals.Add("UserID", fi.User.ID);
-                    vals.Add("FriendID", fi.Friend.ID);
-                    vals.Add("Secret", fi.Secret);
-                    vals.Add("RightsToFriend", fi.FriendGivenFlags);
-
+                    var vals = new Dictionary<string, object>
+                    {
+                        { "UserID", fi.User.ID },
+                        { "FriendID", fi.Friend.ID },
+                        { "Secret", fi.Secret },
+                        { "RightsToFriend", fi.FriendGivenFlags }
+                    };
                     connection.ReplaceInto("friends", vals, transaction);
 
-                    vals.Add("UserID", fi.Friend.ID);
-                    vals.Add("FriendID", fi.User.ID);
-                    vals.Add("Secret", fi.Secret);
-                    vals.Add("RightsToFriend", fi.UserGivenFlags);
+                    vals = new Dictionary<string, object>
+                    {
+                        { "UserID", fi.Friend.ID },
+                        { "FriendID", fi.User.ID },
+                        { "Secret", fi.Secret },
+                        { "RightsToFriend", fi.UserGivenFlags }
+                    };
                     connection.ReplaceInto("friends", vals, transaction);
                 });
             }
