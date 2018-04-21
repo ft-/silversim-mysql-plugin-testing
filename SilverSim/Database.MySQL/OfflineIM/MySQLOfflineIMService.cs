@@ -75,9 +75,9 @@ namespace SilverSim.Database.MySQL.OfflineIM
                             var im = new GridInstantMessage
                             {
                                 ID = reader.GetUInt64("ID"),
-                                FromAgent = reader.GetUUI("FromAgent"),
+                                FromAgent = reader.GetUGUIWithName("FromAgent"),
                                 FromGroup = reader.GetUGI("FromGroup"),
-                                ToAgent = new UUI(reader.GetUUID("ToAgentID")),
+                                ToAgent = reader.GetUGUI("ToAgentID"),
                                 Dialog = reader.GetEnum<GridInstantMessageDialog>("Dialog"),
                                 IsFromGroup = reader.GetBool("IsFromGroup"),
                                 Message = reader.GetString("Message"),
@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.OfflineIM
         {
             new SqlTable("offlineim"),
             new AddColumn<ulong>("ID") { IsNullAllowed = false },
-            new AddColumn<UUI>("FromAgent") { IsNullAllowed = false },
+            new AddColumn<UGUIWithName>("FromAgent") { IsNullAllowed = false },
             new AddColumn<UGI>("FromGroup") { IsNullAllowed = false },
             new AddColumn<UUID>("ToAgentID") { IsNullAllowed = false },
             new AddColumn<GridInstantMessageDialog>("Dialog") { IsNullAllowed = false },

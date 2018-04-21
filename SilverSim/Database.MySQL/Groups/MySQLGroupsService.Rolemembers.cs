@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Groups
 {
     partial class MySQLGroupsService : GroupsServiceInterface.IGroupRolemembersInterface
     {
-        List<GroupRolemember> IGroupRolemembersInterface.this[UUI requestingAgent, UGI group]
+        List<GroupRolemember> IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group]
         {
             get
             {
@@ -78,7 +78,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        List<GroupRolemembership> IGroupRolemembersInterface.this[UUI requestingAgent, UUI principal]
+        List<GroupRolemembership> IGroupRolemembersInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get
             {
@@ -127,7 +127,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        List<GroupRolemember> IGroupRolemembersInterface.this[UUI requestingAgent, UGI group, UUID roleID]
+        List<GroupRolemember> IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group, UUID roleID]
         {
             get
             {
@@ -186,7 +186,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        GroupRolemember IGroupRolemembersInterface.this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
+        GroupRolemember IGroupRolemembersInterface.this[UGUI requestingAgent, UGI group, UUID roleID, UGUI principal]
         {
             get
             {
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        void IGroupRolemembersInterface.Add(UUI requestingAgent, GroupRolemember rolemember)
+        void IGroupRolemembersInterface.Add(UGUI requestingAgent, GroupRolemember rolemember)
         {
             if(rolemember.RoleID == UUID.Zero)
             {
@@ -218,7 +218,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupRolemembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
+        bool IGroupRolemembersInterface.ContainsKey(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal)
         {
             if(UUID.Zero == roleID)
             {
@@ -243,7 +243,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        void IGroupRolemembersInterface.Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
+        void IGroupRolemembersInterface.Delete(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal)
         {
             if(UUID.Zero == roleID)
             {
@@ -288,7 +288,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupRolemembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem)
+        bool IGroupRolemembersInterface.TryGetValue(UGUI requestingAgent, UGI group, UUID roleID, UGUI principal, out GroupRolemember grolemem)
         {
             grolemem = null;
             if(UUID.Zero == roleID)

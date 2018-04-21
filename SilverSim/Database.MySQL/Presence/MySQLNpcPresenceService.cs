@@ -116,7 +116,7 @@ namespace SilverSim.Database.MySQL.Presence
             new AddColumn<UUID>("NpcID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("FirstName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<string>("LastName") { Cardinality = 31, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUI.Unknown },
+            new AddColumn<UGUI>("Owner") { IsNullAllowed = false, Default = UGUI.Unknown },
             new AddColumn<UGI>("Group") { IsNullAllowed = false, Default = UGI.Unknown },
             new AddColumn<NpcOptions>("Options") { IsNullAllowed = false, Default = NpcOptions.None },
             new AddColumn<UUID>("RegionID") { IsNullAllowed = false, Default = UUID.Zero },
@@ -148,13 +148,13 @@ namespace SilverSim.Database.MySQL.Presence
 
         private NpcPresenceInfo ReaderToPresenceInfo(MySqlDataReader reader) => new NpcPresenceInfo
         {
-            Npc = new UUI
+            Npc = new UGUIWithName
             {
                 ID = reader.GetUUID("NpcID"),
                 FirstName = reader.GetString("FirstName"),
                 LastName = reader.GetString("LastName")
             },
-            Owner = reader.GetUUI("Owner"),
+            Owner = reader.GetUGUI("Owner"),
             Group = reader.GetUGI("Group"),
             Options = reader.GetEnum<NpcOptions>("Options"),
             RegionID = reader.GetUUID("RegionID"),

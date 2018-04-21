@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Groups
 {
     partial class MySQLGroupsService : GroupsServiceInterface.IGroupMembersInterface
     {
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UUI principal]
+        List<GroupMember> IGroupMembersInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get
             {
@@ -56,7 +56,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        List<GroupMember> IGroupMembersInterface.this[UUI requestingAgent, UGI group]
+        List<GroupMember> IGroupMembersInterface.this[UGUI requestingAgent, UGI group]
         {
             get
             {
@@ -83,7 +83,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        GroupMember IGroupMembersInterface.this[UUI requestingAgent, UGI group, UUI principal]
+        GroupMember IGroupMembersInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
         {
             get
             {
@@ -96,7 +96,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        GroupMember IGroupMembersInterface.Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
+        GroupMember IGroupMembersInterface.Add(UGUI requestingAgent, UGI group, UGUI principal, UUID roleID, string accessToken)
         {
             var vals = new Dictionary<string, object>
             {
@@ -122,7 +122,7 @@ namespace SilverSim.Database.MySQL.Groups
             };
         }
 
-        bool IGroupMembersInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal)
+        bool IGroupMembersInterface.ContainsKey(UGUI requestingAgent, UGI group, UGUI principal)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        void IGroupMembersInterface.Delete(UUI requestingAgent, UGI group, UUI principal)
+        void IGroupMembersInterface.Delete(UGUI requestingAgent, UGI group, UGUI principal)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -156,7 +156,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        void IGroupMembersInterface.SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution)
+        void IGroupMembersInterface.SetContribution(UGUI requestingagent, UGI group, UGUI principal, int contribution)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -174,7 +174,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupMembersInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMember gmem)
+        bool IGroupMembersInterface.TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMember gmem)
         {
             gmem = null;
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.Groups
             return false;
         }
 
-        void IGroupMembersInterface.Update(UUI requestingagent, UGI group, UUI principal, bool acceptNotices, bool listInProfile)
+        void IGroupMembersInterface.Update(UGUI requestingagent, UGI group, UGUI principal, bool acceptNotices, bool listInProfile)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

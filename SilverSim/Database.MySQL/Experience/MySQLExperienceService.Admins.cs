@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.Experience
 {
     public sealed partial class MySQLExperienceService : ExperienceServiceInterface.IExperienceAdminInterface
     {
-        List<UUID> IExperienceAdminInterface.this[UUI agent]
+        List<UUID> IExperienceAdminInterface.this[UGUI agent]
         {
             get
             {
@@ -43,7 +43,7 @@ namespace SilverSim.Database.MySQL.Experience
                         {
                             while (reader.Read())
                             {
-                                if (reader.GetUUI("Admin").EqualsGrid(agent))
+                                if (reader.GetUGUI("Admin").EqualsGrid(agent))
                                 {
                                     result.Add(reader.GetUUID("ExperienceID"));
                                 }
@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        bool IExperienceAdminInterface.this[UUID experienceID, UUI agent]
+        bool IExperienceAdminInterface.this[UUID experienceID, UGUI agent]
         {
             get
             {
@@ -94,7 +94,7 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UUI agent, out bool allowed)
+        bool IExperienceAdminInterface.TryGetValue(UUID experienceID, UGUI agent, out bool allowed)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -107,7 +107,7 @@ namespace SilverSim.Database.MySQL.Experience
                     {
                         while(reader.Read())
                         {
-                            if(reader.GetUUI("Admin").EqualsGrid(agent))
+                            if(reader.GetUGUI("Admin").EqualsGrid(agent))
                             {
                                 return allowed = true;
                             }

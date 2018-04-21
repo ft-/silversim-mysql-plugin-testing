@@ -28,11 +28,11 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public partial class MySQLEstateService : IEstateManagerServiceInterface, IEstateManagerServiceListAccessInterface
     {
-        List<UUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
+        List<UGUI> IEstateManagerServiceListAccessInterface.this[uint estateID]
         {
             get
             {
-                var estatemanagers = new List<UUI>();
+                var estatemanagers = new List<UGUI>();
                 using(var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
@@ -43,7 +43,7 @@ namespace SilverSim.Database.MySQL.Estate
                         {
                             while(reader.Read())
                             {
-                                estatemanagers.Add(reader.GetUUI("UserID"));
+                                estatemanagers.Add(reader.GetUGUI("UserID"));
                             }
                         }
                     }
@@ -52,7 +52,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        bool IEstateManagerServiceInterface.this[uint estateID, UUI agent]
+        bool IEstateManagerServiceInterface.this[uint estateID, UGUI agent]
         {
             get
             {
@@ -67,7 +67,7 @@ namespace SilverSim.Database.MySQL.Estate
                         {
                             while(reader.Read())
                             {
-                                UUI uui = reader.GetUUI("UserID");
+                                UGUI uui = reader.GetUGUI("UserID");
                                 if(uui.EqualsGrid(agent))
                                 {
                                     return true;

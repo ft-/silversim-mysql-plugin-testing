@@ -54,7 +54,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 Area = dbReader.GetInt32("Area"),
                                 AuctionID = dbReader.GetUInt32("AuctionID"),
-                                AuthBuyer = dbReader.GetUUI("AuthBuyer"),
+                                AuthBuyer = dbReader.GetUGUI("AuthBuyer"),
                                 Category = dbReader.GetEnum<ParcelCategory>("Category"),
                                 ClaimDate = dbReader.GetDate("ClaimDate"),
                                 ClaimPrice = dbReader.GetInt32("ClaimPrice"),
@@ -69,7 +69,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 Name = dbReader.GetString("Name"),
                                 LocalID = dbReader.GetInt32("LocalID"),
                                 MediaID = dbReader.GetUUID("MediaID"),
-                                Owner = dbReader.GetUUI("Owner"),
+                                Owner = dbReader.GetUGUI("Owner"),
                                 SnapshotID = dbReader.GetUUID("SnapshotID"),
                                 SalePrice = dbReader.GetInt32("SalePrice"),
                                 OtherCleanTime = dbReader.GetInt32("OtherCleanTime"),

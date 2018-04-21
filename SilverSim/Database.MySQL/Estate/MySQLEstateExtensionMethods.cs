@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Estate
         {
             ID = reader.GetUInt32("ID"),
             Name = reader.GetString("Name"),
-            Owner = reader.GetUUI("Owner"),
+            Owner = reader.GetUGUI("Owner"),
             Flags = reader.GetEnum<RegionOptionFlags>("Flags"),
             PricePerMeter = reader.GetInt32("PricePerMeter"),
             BillableFactor = reader.GetDouble("BillableFactor"),

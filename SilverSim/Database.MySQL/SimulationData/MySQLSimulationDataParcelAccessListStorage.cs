@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_TableName = tableName;
         }
 
-        public bool TryGetValue(UUID regionID, UUID parcelID, UUI accessor, out ParcelAccessEntry e)
+        public bool TryGetValue(UUID regionID, UUID parcelID, UGUI accessor, out ParcelAccessEntry e)
         {
             var result = new List<ParcelAccessEntry>();
 
@@ -63,7 +63,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             {
                                 RegionID = regionID,
                                 ParcelID = reader.GetUUID("ParcelID"),
-                                Accessor = reader.GetUUI("Accessor")
+                                Accessor = reader.GetUGUI("Accessor")
                             };
                             ulong val = reader.GetUInt64("ExpiresAt");
                             if (val != 0)
@@ -88,7 +88,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             return true;
         }
 
-        public bool this[UUID regionID, UUID parcelID, UUI accessor]
+        public bool this[UUID regionID, UUID parcelID, UGUI accessor]
         {
             get
             {
@@ -120,7 +120,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 {
                                     RegionID = reader.GetUUID("RegionID"),
                                     ParcelID = reader.GetUUID("ParcelID"),
-                                    Accessor = reader.GetUUI("Accessor")
+                                    Accessor = reader.GetUGUI("Accessor")
                                 };
                                 ulong val = reader.GetUInt64("ExpiresAt");
                                 if (val != 0)
@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public void ExtendExpiry(UUID regionID, UUID parcelID, UUI accessor, ulong extendseconds)
+        public void ExtendExpiry(UUID regionID, UUID parcelID, UGUI accessor, ulong extendseconds)
         {
             bool success = false;
             using (var connection = new MySqlConnection(m_ConnectionString))
@@ -235,7 +235,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public bool Remove(UUID regionID, UUID parcelID, UUI accessor)
+        public bool Remove(UUID regionID, UUID parcelID, UGUI accessor)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {

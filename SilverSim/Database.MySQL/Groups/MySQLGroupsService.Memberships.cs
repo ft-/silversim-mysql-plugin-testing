@@ -29,7 +29,7 @@ namespace SilverSim.Database.MySQL.Groups
 {
     partial class MySQLGroupsService : GroupsServiceInterface.IGroupMembershipsInterface
     {
-        private GroupMembership MembershipFromReader(MySqlDataReader reader, UUI requestingAgent) => new GroupMembership
+        private GroupMembership MembershipFromReader(MySqlDataReader reader, UGUI requestingAgent) => new GroupMembership
         {
             IsAcceptNotices = reader.GetBool("AcceptNotices"),
             Contribution = reader.GetInt32("Contribution"),
@@ -38,12 +38,12 @@ namespace SilverSim.Database.MySQL.Groups
             GroupTitle = reader.GetString("RoleTitle"),
             IsListInProfile = reader.GetBool("ListInProfile"),
             Group = ResolveName(requestingAgent, new UGI(reader.GetUUID("GroupID"))),
-            Principal = ResolveName(new UUI(reader.GetUUID("PrincipalID"))),
+            Principal = ResolveName(reader.GetUGUI("PrincipalID")),
 
             IsAllowPublish = reader.GetBool("AllowPublish"),
             Charter = reader.GetString("Charter"),
             ActiveRoleID = reader.GetUUID("ActiveRoleID"),
-            Founder = ResolveName(new UUI(reader.GetUUID("FounderID"))),
+            Founder = ResolveName(reader.GetUGUI("FounderID")),
             AccessToken = reader.GetString("AccessToken"),
             IsMaturePublish = reader.GetBool("MaturePublish"),
             IsOpenEnrollment = reader.GetBool("OpenEnrollment"),
@@ -51,7 +51,7 @@ namespace SilverSim.Database.MySQL.Groups
             IsShownInList = reader.GetBool("ShowInList")
         };
 
-        List<GroupMembership> IGroupMembershipsInterface.this[UUI requestingAgent, UUI principal]
+        List<GroupMembership> IGroupMembershipsInterface.this[UGUI requestingAgent, UGUI principal]
         {
             get
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        GroupMembership IGroupMembershipsInterface.this[UUI requestingAgent, UGI group, UUI principal]
+        GroupMembership IGroupMembershipsInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
         {
             get
             {
@@ -93,7 +93,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupMembershipsInterface.ContainsKey(UUI requestingAgent, UGI group, UUI principal)
+        bool IGroupMembershipsInterface.ContainsKey(UGUI requestingAgent, UGI group, UGUI principal)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -114,7 +114,7 @@ namespace SilverSim.Database.MySQL.Groups
             }
         }
 
-        bool IGroupMembershipsInterface.TryGetValue(UUI requestingAgent, UGI group, UUI principal, out GroupMembership gmem)
+        bool IGroupMembershipsInterface.TryGetValue(UGUI requestingAgent, UGI group, UGUI principal, out GroupMembership gmem)
         {
             gmem = null;
             using (var conn = new MySqlConnection(m_ConnectionString))

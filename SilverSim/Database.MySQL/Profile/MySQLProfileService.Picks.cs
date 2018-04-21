@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Profile
 {
     public sealed partial class MySQLProfileService : ProfileServiceInterface.IPicksInterface
     {
-        Dictionary<UUID, string> IPicksInterface.GetPicks(UUI user)
+        Dictionary<UUID, string> IPicksInterface.GetPicks(UGUI user)
         {
             var res = new Dictionary<UUID, string>();
             using(var conn = new MySqlConnection(m_ConnectionString))
@@ -51,7 +51,7 @@ namespace SilverSim.Database.MySQL.Profile
             }
         }
 
-        bool IPicksInterface.ContainsKey(UUI user, UUID id)
+        bool IPicksInterface.ContainsKey(UGUI user, UUID id)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -72,7 +72,7 @@ namespace SilverSim.Database.MySQL.Profile
             return false;
         }
 
-        bool IPicksInterface.TryGetValue(UUI user, UUID id, out ProfilePick pick)
+        bool IPicksInterface.TryGetValue(UGUI user, UUID id, out ProfilePick pick)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -85,7 +85,7 @@ namespace SilverSim.Database.MySQL.Profile
                         if (reader.Read())
                         {
                             pick = new ProfilePick();
-                            pick.Creator.ID = reader.GetUUID("creatoruuid");
+                            pick.Creator = reader.GetUGUI("creatoruuid");
                             pick.Description = reader.GetString("description");
                             pick.Enabled = reader.GetBoolean("enabled");
                             pick.Name = reader.GetString("name");
@@ -108,7 +108,7 @@ namespace SilverSim.Database.MySQL.Profile
             return false;
         }
 
-        ProfilePick IPicksInterface.this[UUI user, UUID id]
+        ProfilePick IPicksInterface.this[UGUI user, UUID id]
         {
             get
             {

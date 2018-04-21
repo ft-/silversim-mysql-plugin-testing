@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Estate
             new NamedKeyInfo("UserID", "UserID"),
             new NamedKeyInfo("EstateID", "EstateID"),
             new TableRevision(2),
-            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new ChangeColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
 
             #region estate_groups
@@ -102,34 +102,34 @@ namespace SilverSim.Database.MySQL.Estate
             #region estate_users
             new SqlTable("estate_users"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
-            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
             new NamedKeyInfo("EstateID", "EstateID"),
             new NamedKeyInfo("UserID", "UserID"),
             new TableRevision(2),
             /* following two entries are not produced as change lines when not finding a revision 1 table */
             new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
-            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new ChangeColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
 
             #region estate_bans
             new SqlTable("estate_bans"),
             new AddColumn<uint>("EstateID") { IsNullAllowed = false },
-            new AddColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo(new string[] { "EstateID", "UserID" }),
             new NamedKeyInfo("EstateID", "EstateID"),
             new NamedKeyInfo("UserID", "UserID"),
             new TableRevision(2),
             /* following two entries are not produced as change lines when not finding a revision 1 table */
             new ChangeColumn<uint>("EstateID") { IsNullAllowed = false },
-            new ChangeColumn<UUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
+            new ChangeColumn<UGUI>("UserID") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
 
             #region estates
             new SqlTable("estates"),
             new AddColumn<uint>("ID") { IsNullAllowed = false },
             new AddColumn<string>("Name") { Cardinality = 64, IsNullAllowed = false },
-            new AddColumn<UUI>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("OwnerID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("Flags") { IsNullAllowed = false, Default = (uint)0 },
             new AddColumn<int>("PricePerMeter") { IsNullAllowed = false, Default = 0 },
             new AddColumn<double>("BillableFactor") { IsNullAllowed = false, Default = (double)1 },
@@ -145,7 +145,7 @@ namespace SilverSim.Database.MySQL.Estate
             new TableRevision(3),
             new AddColumn<bool>("UseGlobalTime") { IsNullAllowed = false, Default = true },
             new TableRevision(4),
-            new ChangeColumn<UUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" },
+            new ChangeColumn<UGUI>("Owner") { IsNullAllowed = false, Default = UUID.Zero, OldName = "OwnerID" },
             /* ^^ this is for compatibility our list generator actually skips this field when not finding the revision 3 table */
             new TableRevision(5),
             new AddColumn<uint>("ParentEstateID") {IsNullAllowed = false, Default = (uint)1 },

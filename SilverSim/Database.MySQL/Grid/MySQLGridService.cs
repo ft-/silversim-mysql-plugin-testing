@@ -332,13 +332,13 @@ namespace SilverSim.Database.MySQL.Grid
             Location = dbReader.GetGridVector("loc"),
             RegionMapTexture = dbReader.GetUUID("regionMapTexture"),
             ServerHttpPort = dbReader.GetUInt32("serverHttpPort"),
-            Owner = dbReader.GetUUI("owner"),
+            Owner = dbReader.GetUGUI("owner"),
             Access = dbReader.GetEnum<RegionAccess>("access"),
             ScopeID = dbReader.GetUUID("ScopeID"),
             Size = dbReader.GetGridVector("size"),
             Flags = dbReader.GetEnum<RegionFlags>("flags"),
             AuthenticatingToken = dbReader.GetString("AuthenticatingToken"),
-            AuthenticatingPrincipal = dbReader.GetUUI("AuthenticatingPrincipalID"),
+            AuthenticatingPrincipal = dbReader.GetUGUI("AuthenticatingPrincipalID"),
             ParcelMapTexture = dbReader.GetUUID("parcelMapTexture"),
             ProductName = dbReader.GetString("ProductName")
         };
@@ -695,14 +695,14 @@ namespace SilverSim.Database.MySQL.Grid
             new AddColumn<GridVector>("loc") { IsNullAllowed = false, Default = GridVector.Zero },
             new AddColumn<UUID>("regionMapTexture") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("serverHttpPort") { IsNullAllowed = false },
-            new AddColumn<UUI>("owner") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("owner") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<uint>("access") { IsNullAllowed = false, Default = (uint)13 },
             new AddColumn<UUID>("ScopeID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<GridVector>("Size") { IsNullAllowed = false, Default = GridVector.Zero },
             new AddColumn<uint>("flags") { IsNullAllowed = false, Default = (uint)0 },
             new AddColumn<Date>("last_seen") { IsNullAllowed = false , Default = Date.UnixTimeToDateTime(0) },
             new AddColumn<string>("AuthenticatingToken") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<UUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<UGUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<UUID>("parcelMapTexture") { IsNullAllowed = false, Default = UUID.Zero },
             new PrimaryKeyInfo("uuid"),
             new NamedKeyInfo("regionName", "regionName"),
@@ -712,7 +712,7 @@ namespace SilverSim.Database.MySQL.Grid
             new AddColumn<string>("ProductName") { Cardinality = 255, IsNullAllowed = false, Default = "Mainland" },
             new TableRevision(3),
             /* only used as alter table when revision 2 table exists */
-            new ChangeColumn<UUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
+            new ChangeColumn<UGUI>("AuthenticatingPrincipalID") { IsNullAllowed = false, Default = UUID.Zero },
         };
     }
 }

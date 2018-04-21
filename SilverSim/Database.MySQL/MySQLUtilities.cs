@@ -269,7 +269,7 @@ namespace SilverSim.Database.MySQL
             {
                 mysqlparam.AddWithValue(key, (bool)value ? 1 : 0);
             }
-            else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri))
+            else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri))
             {
                 mysqlparam.AddWithValue(key, value.ToString());
             }
@@ -539,7 +539,7 @@ namespace SilverSim.Database.MySQL
                 {
                     resvals.Add((bool)value ? "1" : "0");
                 }
-                else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(string))
+                else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(string))
                 {
                     resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
                 }
@@ -752,21 +752,38 @@ namespace SilverSim.Database.MySQL
             throw new InvalidCastException("GetUUID could not convert value for " + prefix);
         }
 
-        public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
+        public static UGUI GetUGUI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
             var t = v?.GetType();
             if (t == typeof(Guid))
             {
-                return new UUI((Guid)v);
+                return new UGUI((Guid)v);
             }
 
             if (t == typeof(string))
             {
-                return new UUI((string)v);
+                return new UGUI((string)v);
             }
 
-            throw new InvalidCastException("GetUUI could not convert value for " + prefix);
+            throw new InvalidCastException("GetUGUI could not convert value for " + prefix);
+        }
+
+        public static UGUIWithName GetUGUIWithName(this MySqlDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            var t = v?.GetType();
+            if (t == typeof(Guid))
+            {
+                return new UGUIWithName((Guid)v);
+            }
+
+            if (t == typeof(string))
+            {
+                return new UGUIWithName((string)v);
+            }
+
+            throw new InvalidCastException("GetUGUIWithName could not convert value for " + prefix);
         }
 
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
