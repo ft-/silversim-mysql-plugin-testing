@@ -23,6 +23,7 @@ using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -218,6 +219,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     objpart.DynAttrs.Add(kvp.Key, kvp.Value);
                 }
             }
+            objpart.LoadFromVehicleSerialization(dbReader.GetBytes("VehicleData"));
 
             return objpart;
         }
