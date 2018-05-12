@@ -206,7 +206,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             new TableRevision(24),
             new AddColumn<byte[]>("VehicleData"),
             new TableRevision(25),
-            new AddColumn<CharacterType>("PathfindingCharacterType") {Default = CharacterType.None },
+            new AddColumn<CharacterType>("PathfindingCharacterType") { IsNullAllowed = false, Default = CharacterType.None },
             #endregion
 
             #region Table primitems
