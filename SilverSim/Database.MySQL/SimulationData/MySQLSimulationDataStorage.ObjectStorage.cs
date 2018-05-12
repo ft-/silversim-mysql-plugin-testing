@@ -23,6 +23,7 @@ using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Parameters;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
@@ -128,6 +129,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 PhysicsShapeType = dbReader.GetEnum<PrimitivePhysicsShapeType>("PhysicsShapeType"),
                 PathfindingType = dbReader.GetEnum<PathfindingType>("PathfindingType"),
+                PathfindingCharacterType = dbReader.GetEnum<CharacterType>("PathfindingCharacterType"),
                 WalkableCoefficientAvatar = dbReader.GetDouble("WalkableCoefficientAvatar"),
                 WalkableCoefficientA = dbReader.GetDouble("WalkableCoefficientA"),
                 WalkableCoefficientB = dbReader.GetDouble("WalkableCoefficientB"),

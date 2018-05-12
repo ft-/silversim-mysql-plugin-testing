@@ -21,6 +21,7 @@
 
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Pathfinding;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -204,6 +205,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<byte[]>("LocalizationData") { IsLong = true },
             new TableRevision(24),
             new AddColumn<byte[]>("VehicleData"),
+            new TableRevision(25),
+            new AddColumn<CharacterType>("PathfindingCharacterType") {Default = CharacterType.None },
             #endregion
 
             #region Table primitems
