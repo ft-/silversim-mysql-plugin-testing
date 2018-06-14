@@ -214,7 +214,7 @@ namespace SilverSim.Database.MySQL.Asset
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT id, LENGTH(data) AS dataLength, assetType, name, create_time, access_time, asset_flags, temporary FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id LIMIT 1", conn))
+                using (var cmd = new MySqlCommand("SELECT id, LENGTH(data) AS dataLength, assetrefs.assetType, name, create_time, access_time, asset_flags, temporary FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id = @id LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
