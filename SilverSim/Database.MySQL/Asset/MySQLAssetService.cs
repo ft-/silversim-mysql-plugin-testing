@@ -152,19 +152,6 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Accessors
-        public override AssetData this[UUID key]
-        {
-            get
-            {
-                AssetData asset;
-                if(!TryGetValue(key, out asset))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return asset;
-            }
-        }
-
         public override bool TryGetValue(UUID key, out AssetData asset)
         {
             asset = null;
@@ -253,19 +240,6 @@ namespace SilverSim.Database.MySQL.Asset
 
         #region Metadata interface
         public override IAssetMetadataServiceInterface Metadata => this;
-
-        AssetMetadata IAssetMetadataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                AssetMetadata s;
-                if (!Metadata.TryGetValue(key, out s))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return s;
-            }
-        }
 
         bool IAssetMetadataServiceInterface.TryGetValue(UUID key, out AssetMetadata metadata)
         {
@@ -363,19 +337,6 @@ namespace SilverSim.Database.MySQL.Asset
 
         #region Data interface
         public override IAssetDataServiceInterface Data => this;
-
-        Stream IAssetDataServiceInterface.this[UUID key]
-        {
-            get
-            {
-                Stream s;
-                if (!Data.TryGetValue(key, out s))
-                {
-                    throw new AssetNotFoundException(key);
-                }
-                return s;
-            }
-        }
 
         bool IAssetDataServiceInterface.TryGetValue(UUID key, out Stream s)
         {

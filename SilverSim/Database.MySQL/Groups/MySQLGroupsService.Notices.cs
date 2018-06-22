@@ -27,21 +27,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IGroupNoticesInterface
+    partial class MySQLGroupsService : IGroupNoticesInterface
     {
-        GroupNotice IGroupNoticesInterface.this[UGUI requestingAgent, UUID groupNoticeID]
-        {
-            get
-            {
-                var notice = new GroupNotice();
-                if(!Notices.TryGetValue(requestingAgent, groupNoticeID, out notice))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return notice;
-            }
-        }
-
         void IGroupNoticesInterface.Add(UGUI requestingAgent, GroupNotice notice)
         {
             var vals = new Dictionary<string, object>

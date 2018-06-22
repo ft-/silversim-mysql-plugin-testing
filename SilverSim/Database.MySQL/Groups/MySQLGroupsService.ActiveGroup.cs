@@ -25,7 +25,7 @@ using SilverSim.Types;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IGroupSelectInterface
+    partial class MySQLGroupsService : IGroupSelectInterface
     {
         UGI IGroupSelectInterface.this[UGUI requestingAgent, UGUI principalID]
         {

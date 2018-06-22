@@ -74,19 +74,6 @@ namespace SilverSim.Database.MySQL.Inventory
             return false;
         }
 
-        InventoryItem IInventoryItemServiceInterface.this[UUID key]
-        {
-            get
-            {
-                InventoryItem item;
-                if(!Item.TryGetValue(key, out item))
-                {
-                    throw new InventoryItemNotFoundException(key);
-                }
-                return item;
-            }
-        }
-
         List<InventoryItem> IInventoryItemServiceInterface.this[UUID principalID, List<UUID> itemids]
         {
             get
@@ -166,19 +153,6 @@ namespace SilverSim.Database.MySQL.Inventory
 
             item = default(InventoryItem);
             return false;
-        }
-
-        InventoryItem IInventoryItemServiceInterface.this[UUID principalID, UUID key]
-        {
-            get
-            {
-                InventoryItem item;
-                if(!Item.TryGetValue(principalID, key, out item))
-                {
-                    throw new InventoryItemNotFoundException(key);
-                }
-                return item;
-            }
         }
 
         void IInventoryItemServiceInterface.Add(InventoryItem item)

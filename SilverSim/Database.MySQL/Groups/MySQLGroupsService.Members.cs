@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IGroupMembersInterface
+    partial class MySQLGroupsService : IGroupMembersInterface
     {
         List<GroupMember> IGroupMembersInterface.this[UGUI requestingAgent, UGUI principal]
         {
@@ -80,19 +80,6 @@ namespace SilverSim.Database.MySQL.Groups
                     }
                 }
                 return members;
-            }
-        }
-
-        GroupMember IGroupMembersInterface.this[UGUI requestingAgent, UGI group, UGUI principal]
-        {
-            get
-            {
-                GroupMember gmem;
-                if(!Members.TryGetValue(requestingAgent, group, principal, out gmem))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return gmem;
             }
         }
 

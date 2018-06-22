@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public sealed partial class MySQLProfileService : ProfileServiceInterface.IUserPreferencesInterface
+    public sealed partial class MySQLProfileService : IUserPreferencesInterface
     {
         bool IUserPreferencesInterface.ContainsKey(UGUI user)
         {

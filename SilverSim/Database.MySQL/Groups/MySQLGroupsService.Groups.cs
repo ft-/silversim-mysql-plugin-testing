@@ -28,47 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IGroupsInterface
+    partial class MySQLGroupsService : IGroupsInterface
     {
-        GroupInfo IGroupsInterface.this[UGUI requestingAgent, UGI group]
-        {
-            get
-            {
-                GroupInfo groupInfo;
-                if (!Groups.TryGetValue(requestingAgent, group, out groupInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return groupInfo;
-            }
-        }
-
-        GroupInfo IGroupsInterface.this[UGUI requestingAgent, string groupName]
-        {
-            get
-            {
-                GroupInfo groupInfo;
-                if (!Groups.TryGetValue(requestingAgent, groupName, out groupInfo))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return groupInfo;
-            }
-        }
-
-        UGI IGroupsInterface.this[UGUI requestingAgent, UUID groupID]
-        {
-            get
-            {
-                UGI ugi;
-                if(!Groups.TryGetValue(requestingAgent, groupID, out ugi))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return ugi;
-            }
-        }
-
         bool IGroupsInterface.ContainsKey(UGUI requestingAgent, string groupName)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))

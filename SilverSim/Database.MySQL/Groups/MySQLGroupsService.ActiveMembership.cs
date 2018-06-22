@@ -26,21 +26,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IActiveGroupMembershipInterface
+    partial class MySQLGroupsService : IActiveGroupMembershipInterface
     {
-        GroupActiveMembership IActiveGroupMembershipInterface.this[UGUI requestingAgent, UGUI principal]
-        {
-            get
-            {
-                GroupActiveMembership gam;
-                if(!ActiveMembership.TryGetValue(requestingAgent, principal, out gam))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return gam;
-            }
-        }
-
         bool IActiveGroupMembershipInterface.ContainsKey(UGUI requestingAgent, UGUI principal)
         {
             GroupActiveMembership gam;

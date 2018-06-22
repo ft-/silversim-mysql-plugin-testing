@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {
-    partial class MySQLGroupsService : GroupsServiceInterface.IGroupRolesInterface
+    partial class MySQLGroupsService : IGroupRolesInterface
     {
         List<GroupRole> IGroupRolesInterface.this[UGUI requestingAgent, UGI group]
         {
@@ -79,19 +79,6 @@ namespace SilverSim.Database.MySQL.Groups
                     }
                 }
                 return roles;
-            }
-        }
-
-        GroupRole IGroupRolesInterface.this[UGUI requestingAgent, UGI group, UUID roleID]
-        {
-            get
-            {
-                GroupRole role;
-                if(!Roles.TryGetValue(requestingAgent, group, roleID, out role))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return role;
             }
         }
 

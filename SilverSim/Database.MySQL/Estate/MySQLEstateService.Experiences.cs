@@ -58,19 +58,6 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        EstateExperienceInfo IEstateExperienceServiceInterface.this[uint estateID, UUID experienceID]
-        {
-            get
-            {
-                EstateExperienceInfo info;
-                if(!Experiences.TryGetValue(estateID, experienceID, out info))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return info;
-            }
-        }
-
         bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))

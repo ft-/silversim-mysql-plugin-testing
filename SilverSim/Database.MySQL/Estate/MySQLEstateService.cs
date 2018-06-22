@@ -333,29 +333,6 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override EstateInfo this[uint estateID]
-        {
-            get
-            {
-                using (var conn = new MySqlConnection(m_ConnectionString))
-                {
-                    conn.Open();
-                    using (var cmd = new MySqlCommand("SELECT * FROM estates WHERE ID = @id LIMIT 1", conn))
-                    {
-                        cmd.Parameters.AddParameter("@id", estateID);
-                        using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if(reader.Read())
-                            {
-                                return reader.ToEstateInfo();
-                            }
-                        }
-                    }
-                }
-                throw new KeyNotFoundException();
-            }
-        }
-
         public override List<EstateInfo> All
         {
             get

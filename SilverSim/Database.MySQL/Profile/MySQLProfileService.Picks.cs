@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public sealed partial class MySQLProfileService : ProfileServiceInterface.IPicksInterface
+    public sealed partial class MySQLProfileService : IPicksInterface
     {
         Dictionary<UUID, string> IPicksInterface.GetPicks(UGUI user)
         {
@@ -106,19 +106,6 @@ namespace SilverSim.Database.MySQL.Profile
 
             pick = default(ProfilePick);
             return false;
-        }
-
-        ProfilePick IPicksInterface.this[UGUI user, UUID id]
-        {
-            get
-            {
-                ProfilePick pick;
-                if(!Picks.TryGetValue(user, id, out pick))
-                {
-                    throw new KeyNotFoundException();
-                }
-                return pick;
-            }
         }
 
         void IPicksInterface.Update(ProfilePick value)

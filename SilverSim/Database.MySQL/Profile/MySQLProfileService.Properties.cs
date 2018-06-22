@@ -27,7 +27,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public sealed partial class MySQLProfileService : ProfileServiceInterface.IPropertiesInterface
+    public sealed partial class MySQLProfileService : IPropertiesInterface
     {
         ProfileProperties IPropertiesInterface.this[UGUI user]
         {
