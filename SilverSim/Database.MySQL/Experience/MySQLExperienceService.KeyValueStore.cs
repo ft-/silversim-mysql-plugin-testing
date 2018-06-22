@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Experience
 {
-    public sealed partial class MySQLExperienceService : ExperienceServiceInterface.IExperienceKeyValueInterface
+    public sealed partial class MySQLExperienceService : IExperienceKeyValueInterface
     {
         void IExperienceKeyValueInterface.Add(UUID experienceID, string key, string value)
         {

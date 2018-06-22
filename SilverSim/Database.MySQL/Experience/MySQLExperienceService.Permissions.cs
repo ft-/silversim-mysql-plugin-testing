@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Experience
 {
-    public sealed partial class MySQLExperienceService : ExperienceServiceInterface.IExperiencePermissionsInterface
+    public sealed partial class MySQLExperienceService : IExperiencePermissionsInterface
     {
         Dictionary<UUID, bool> IExperiencePermissionsInterface.this[UGUI agent]
         {
