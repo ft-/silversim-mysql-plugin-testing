@@ -104,6 +104,8 @@ namespace SilverSim.Database.MySQL.Inventory
             };
         }
 
+        public override bool SupportsLegacyFunctions => true;
+
         public override IInventoryFolderServiceInterface Folder => this;
 
         public override IInventoryItemServiceInterface Item => this;
