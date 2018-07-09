@@ -24,6 +24,7 @@ using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Tests.Preconditions.MySQL
@@ -56,6 +57,7 @@ namespace SilverSim.Tests.Preconditions.MySQL
                 {
                     m_Log.FatalFormat("[MYSQL CONFIG]: Parameter 'Database' missing in [{0}]", config.Name);
                 }
+
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
 
@@ -63,6 +65,14 @@ namespace SilverSim.Tests.Preconditions.MySQL
             sb.UserID = config.GetString("Username");
             sb.Password = config.GetString("Password");
             sb.Database = config.GetString("Database");
+            if (config.Contains("SslMode"))
+            {
+                sb.SslMode = (MySqlSslMode)Enum.Parse(typeof(MySqlSslMode), config.GetString("SslMode"));
+            }
+            else
+            {
+                sb.SslMode = MySqlSslMode.None;
+            }
             m_ConnectionString = sb.ToString();
         }
 

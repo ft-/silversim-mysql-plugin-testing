@@ -65,11 +65,6 @@ namespace SilverSim.Database.MySQL
                 sb.ConnectionProtocol = (MySqlConnectionProtocol)Enum.Parse(typeof(MySqlConnectionProtocol), config.GetString("Protocol"));
             }
 
-            if (config.Contains("SslMode"))
-            {
-                sb.SslMode = (MySqlSslMode)Enum.Parse(typeof(MySqlSslMode), config.GetString("SslMode"));
-            }
-
             if (config.Contains("UseCompression"))
             {
                 sb.UseCompression = config.GetBoolean("UseCompression");
@@ -102,6 +97,15 @@ namespace SilverSim.Database.MySQL
             if(config.Contains("MaximumPoolsize"))
             {
                 sb.MaximumPoolSize = (uint)config.GetInt("MaximumPoolsize");
+            }
+
+            if (config.Contains("SslMode"))
+            {
+                sb.SslMode = (MySqlSslMode)Enum.Parse(typeof(MySqlSslMode), config.GetString("SslMode"));
+            }
+            else
+            {
+                sb.SslMode = MySqlSslMode.None;
             }
 
             return sb.ToString();
