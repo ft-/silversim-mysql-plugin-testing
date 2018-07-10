@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<package>
+	<name>Google.Protobuf</name>
+	<license>BSD</license>
+	<files>
+		<file name="bin/Google.Protobuf.dll" is-version-src="true"/>
+	</files>
+</package>
