@@ -88,7 +88,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         #region helpers
         private ObjectGroup ObjectGroupFromDbReader(MySqlDataReader dbReader) => new ObjectGroup
         {
-            IsTempOnRez = dbReader.GetBool("IsTempOnRez"),
+            IsTemporary = dbReader.GetBool("IsTemporary"),
             Owner = dbReader.GetUGUI("Owner"),
             LastOwner = dbReader.GetUGUI("LastOwner"),
             Group = dbReader.GetUGI("Group"),
@@ -293,6 +293,12 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 UUID objgroupID = UUID.Zero;
                 m_Log.InfoFormat("Loading object groups for region ID {0}", regionID);
+
+                using (var cmd = new MySqlCommand("DELETE FROM objects WHERE IsTemporary AND RegionID = '" + regionID.ToString() + "'", connection))
+                {
+                    cmd.CommandTimeout = 3600;
+                    cmd.ExecuteNonQuery();
+                }
 
                 using (var cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID = '" + regionID.ToString() + "'", connection))
                 {

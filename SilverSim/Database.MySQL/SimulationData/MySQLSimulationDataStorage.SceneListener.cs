@@ -152,8 +152,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                         Dictionary<string, object> data = GenerateUpdateObjectPart(info.Part);
                         data["RegionID"] = m_RegionID;
+                        m_PrimDeletions.Remove(info.ID);
                         m_PrimUpdates[info.ID] = data;
                         ObjectGroup grp = info.Part.ObjectGroup;
+                        m_GroupDeletions.Remove(grp.ID);
                         m_GroupUpdates[grp.ID] = GenerateUpdateObjectGroup(grp);
                     }
                 }
@@ -570,7 +572,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 ["ID"] = objgroup.ID,
                 ["RegionID"] = objgroup.Scene.ID,
-                ["IsTempOnRez"] = objgroup.IsTempOnRez,
+                ["IsTemporary"] = objgroup.IsTemporary,
                 ["Owner"] = objgroup.Owner,
                 ["LastOwner"] = objgroup.LastOwner,
                 ["Group"] = objgroup.Group,
