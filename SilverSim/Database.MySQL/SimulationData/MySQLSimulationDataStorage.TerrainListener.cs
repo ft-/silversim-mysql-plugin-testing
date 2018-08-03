@@ -78,43 +78,65 @@ namespace SilverSim.Database.MySQL.SimulationData
                             continue;
                         }
 
-                        uint serialNumber = req.Serial;
-
-                        if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
+                        if (req == null)
                         {
-                            var data = new Dictionary<string, object>
+                            using (var connection = new MySqlConnection(m_ConnectionString))
                             {
-                                ["RegionID"] = RegionID,
-                                ["PatchID"] = req.ExtendedPatchID,
-                                ["TerrainData"] = req.Serialization
-                            };
-                            if (replaceIntoTerrain.Length == 0)
-                            {
-                                replaceIntoTerrain = "REPLACE INTO terrains (" + MySQLUtilities.GenerateFieldNames(data) + ") VALUES ";
-                            }
-                            updateRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
-                            knownSerialNumbers[req.ExtendedPatchID] = serialNumber;
-                        }
-
-                        if ((m_StorageTerrainRequestQueue.Count == 0 && updateRequests.Count > 0) || updateRequests.Count >= 256)
-                        {
-                            string elems = string.Join(",", updateRequests);
-                            try
-                            {
-                                using (var conn = new MySqlConnection(m_ConnectionString))
+                                connection.Open();
+                                connection.InsideTransaction((transaction) =>
                                 {
-                                    conn.Open();
-                                    using (var cmd = new MySqlCommand(replaceIntoTerrain + elems, conn))
+                                    using (var cmd = new MySqlCommand("REPLACE INTO defaultterrains (RegionID, PatchID, TerrainData) SELECT RegionID, PatchID, TerrainData FROM terrains WHERE RegionID=@regionid", connection)
                                     {
+                                        Transaction = transaction
+                                    })
+                                    {
+                                        cmd.Parameters.AddParameter("@RegionID", RegionID);
                                         cmd.ExecuteNonQuery();
                                     }
-                                }
-                                updateRequests.Clear();
-                                Interlocked.Increment(ref m_ProcessedPatches);
+                                });
                             }
-                            catch (Exception e)
+                        }
+                        else
+                        {
+
+                            uint serialNumber = req.Serial;
+
+                            if (!knownSerialNumbers.Contains(req.ExtendedPatchID) || knownSerialNumbers[req.ExtendedPatchID] != req.Serial)
                             {
-                                m_Log.Error("Terrain store failed", e);
+                                var data = new Dictionary<string, object>
+                                {
+                                    ["RegionID"] = RegionID,
+                                    ["PatchID"] = req.ExtendedPatchID,
+                                    ["TerrainData"] = req.Serialization
+                                };
+                                if (replaceIntoTerrain.Length == 0)
+                                {
+                                    replaceIntoTerrain = "REPLACE INTO terrains (" + MySQLUtilities.GenerateFieldNames(data) + ") VALUES ";
+                                }
+                                updateRequests.Add("(" + MySQLUtilities.GenerateValues(data) + ")");
+                                knownSerialNumbers[req.ExtendedPatchID] = serialNumber;
+                            }
+
+                            if ((m_StorageTerrainRequestQueue.Count == 0 && updateRequests.Count > 0) || updateRequests.Count >= 256)
+                            {
+                                string elems = string.Join(",", updateRequests);
+                                try
+                                {
+                                    using (var conn = new MySqlConnection(m_ConnectionString))
+                                    {
+                                        conn.Open();
+                                        using (var cmd = new MySqlCommand(replaceIntoTerrain + elems, conn))
+                                        {
+                                            cmd.ExecuteNonQuery();
+                                        }
+                                    }
+                                    updateRequests.Clear();
+                                    Interlocked.Increment(ref m_ProcessedPatches);
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.Error("Terrain store failed", e);
+                                }
                             }
                         }
                     }
