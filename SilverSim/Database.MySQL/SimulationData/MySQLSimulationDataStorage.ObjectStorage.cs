@@ -100,6 +100,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             PayPrice3 = dbReader.GetInt32("PayPrice3"),
             PayPrice4 = dbReader.GetInt32("PayPrice4"),
             AttachedPos = dbReader.GetVector3("AttachedPos"),
+            AttachedRot = dbReader.GetQuaternion("AttachedRot"),
             AttachPoint = dbReader.GetEnum<AttachmentPoint>("AttachPoint"),
             IsIncludedInSearch = dbReader.GetBool("IsIncludedInSearch"),
             RezzingObjectID = dbReader.GetUUID("RezzingObjectID")
