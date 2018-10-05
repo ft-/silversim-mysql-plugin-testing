@@ -272,6 +272,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 }
             }
             grantinfo.PermsMask = dbReader.GetEnum<ScriptPermissions>("PermsMask");
+            grantinfo.DebitPermissionKey = dbReader.GetUUID("DebitPermissionKey");
+            item.PermsGranter = grantinfo;
 
             return item;
         }

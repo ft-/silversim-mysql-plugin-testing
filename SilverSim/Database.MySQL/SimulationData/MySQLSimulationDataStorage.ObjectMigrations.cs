@@ -215,6 +215,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<double>("Damage") { IsNullAllowed = false, Default = 0.0 },
             new TableRevision(27),
             new DropColumn("Slice"),
+            new TableRevision(28),
+            new AddColumn<UUID>("DebitPermissionKey") { IsNullAllowed = false, Default = UUID.Zero },
             #endregion
 
             #region Table primitems
