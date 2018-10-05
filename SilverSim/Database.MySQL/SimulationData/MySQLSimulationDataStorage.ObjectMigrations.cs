@@ -213,6 +213,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new AddColumn<CharacterType>("PathfindingCharacterType") { IsNullAllowed = false, Default = CharacterType.None },
             new TableRevision(26),
             new AddColumn<double>("Damage") { IsNullAllowed = false, Default = 0.0 },
+            new TableRevision(27),
+            new DropColumn("Slice"),
             #endregion
 
             #region Table primitems
