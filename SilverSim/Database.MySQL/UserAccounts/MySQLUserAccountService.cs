@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -121,6 +122,17 @@ namespace SilverSim.Database.MySQL.UserAccounts
             new AddColumn<int>("IsEverLoggedIn") { IsNullAllowed = false, Default = 0 },
             new TableRevision(4),
             new ChangeColumn<bool>("IsEverLoggedIn") { IsNullAllowed = false, Default = false },
+            new TableRevision(5),
+            new ChangeColumn<UserFlags>("UserFlags") { IsNullAllowed = false, Default = UserFlags.None },
+            new AddColumn<Date>("LastLogout"),
+            new AddColumn<UUID>("LastRegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<Vector3>("LastPosition") { IsNullAllowed = false, Default = Vector3.Zero },
+            new AddColumn<Vector3>("LastLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
+            new AddColumn<string>("LastGatekeeperURI") { IsNullAllowed = false, Default = string.Empty },
+            new AddColumn<UUID>("HomeRegionID") { IsNullAllowed = false, Default = UUID.Zero },
+            new AddColumn<Vector3>("HomePosition") { IsNullAllowed = false, Default = Vector3.Zero },
+            new AddColumn<Vector3>("HomeLookAt") { IsNullAllowed = false, Default = Vector3.Zero },
+            new AddColumn<string>("HomeGatekeeperURI") { IsNullAllowed = false, Default = string.Empty },
 
             new SqlTable("useraccounts_serial"),
             new AddColumn<ulong>("SerialNumber") { IsNullAllowed = false, Default = (ulong)0 }
@@ -494,31 +506,6 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
-        public override void Update(UserAccount userAccount)
-        {
-            var data = new Dictionary<string, object>
-            {
-                ["FirstName"] = userAccount.Principal.FirstName,
-                ["LastName"] = userAccount.Principal.LastName,
-                ["Email"] = userAccount.Email,
-                ["Created"] = userAccount.Created,
-                ["UserLevel"] = userAccount.UserLevel,
-                ["UserFlags"] = userAccount.UserFlags,
-                ["UserTitle"] = userAccount.UserTitle,
-                ["IsEverLoggedIn"] = userAccount.IsEverLoggedIn ? 1 : 0
-            };
-            var w = new Dictionary<string, object>
-            {
-                ["ScopeID"] = userAccount.ScopeID,
-                ["ID"] = userAccount.Principal.ID
-            };
-            using (var connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                connection.UpdateSet("useraccounts", data, w);
-            }
-        }
-
         public override void Remove(UUID scopeID, UUID accountID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
@@ -566,6 +553,83 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
+        #region Online Status
+        public override void LoggedOut(UUID scopeID, UUID accountID, UserRegionData regionData = null)
+        {
+            var data = new Dictionary<string, object>
+            {
+                ["LastLogout"] = Date.Now,
+            };
+            if(regionData != null)
+            {
+                data["LastRegionID"] = regionData.RegionID;
+                data["LastPosition"] = regionData.Position;
+                data["LastLookAt"] = regionData.LookAt;
+                data["LastGatekeeperURI"] = regionData.GatekeeperURI?.ToString() ?? string.Empty;
+            }
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+
+        public override void SetHome(UUID scopeID, UUID accountID, UserRegionData regionData)
+        {
+            if (regionData == null)
+            {
+                throw new ArgumentNullException(nameof(regionData));
+            }
+            var data = new Dictionary<string, object>
+            {
+                ["HomeRegionID"] = regionData.RegionID,
+                ["HomePosition"] = regionData.Position,
+                ["HomeLookAt"] = regionData.LookAt,
+                ["HomeGatekeeperURI"] = regionData.GatekeeperURI?.ToString() ?? string.Empty
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+
+        public override void SetPosition(UUID scopeID, UUID accountID, UserRegionData regionData)
+        {
+            if (regionData == null)
+            {
+                throw new ArgumentNullException(nameof(regionData));
+            }
+            var data = new Dictionary<string, object>
+            {
+                ["LastRegionID"] = regionData.RegionID,
+                ["LastPosition"] = regionData.Position,
+                ["LastLookAt"] = regionData.LookAt,
+                ["LastGatekeeperURI"] = regionData.GatekeeperURI?.ToString() ?? string.Empty,
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+        #endregion
+
         public override void SetEverLoggedIn(UUID scopeID, UUID accountID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
@@ -580,6 +644,90 @@ namespace SilverSim.Database.MySQL.UserAccounts
                         throw new KeyNotFoundException();
                     }
                 }
+            }
+        }
+
+        public override void SetEmail(UUID scopeID, UUID accountID, string email)
+        {
+            if (email == null)
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+            var data = new Dictionary<string, object>
+            {
+                ["Email"] = email,
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+
+        public override void SetUserLevel(UUID scopeID, UUID accountID, int userLevel)
+        {
+            if (userLevel < -1 || userLevel > 255)
+            {
+                throw new ArgumentNullException(nameof(userLevel));
+            }
+            var data = new Dictionary<string, object>
+            {
+                ["UserLevel"] = userLevel,
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+
+        public override void SetUserFlags(UUID scopeID, UUID accountID, UserFlags userFlags)
+        {
+            var data = new Dictionary<string, object>
+            {
+                ["UserFlags"] = userFlags,
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
+            }
+        }
+
+        public override void SetUserTitle(UUID scopeID, UUID accountID, string title)
+        {
+            if (title == null)
+            {
+                throw new ArgumentNullException(nameof(title));
+            }
+            var data = new Dictionary<string, object>
+            {
+                ["UserTitle"] = title,
+            };
+            var w = new Dictionary<string, object>
+            {
+                ["ScopeID"] = scopeID,
+                ["ID"] = accountID
+            };
+            using (var connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
             }
         }
     }

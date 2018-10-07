@@ -20,7 +20,9 @@
 // exception statement from your version.
 
 using MySql.Data.MySqlClient;
+using SilverSim.Types;
 using SilverSim.Types.Account;
+using SilverSim.Types.Agent;
 using System;
 
 namespace SilverSim.Database.MySQL.UserAccounts
@@ -30,6 +32,8 @@ namespace SilverSim.Database.MySQL.UserAccounts
         public static UserAccount ToUserAccount(this MySqlDataReader reader, Uri homeURI)
         {
             var info = new UserAccount();
+            string gkUri;
+            UserRegionData regData;
 
             info.Principal.ID = reader.GetUUID("ID");
             info.Principal.FirstName = reader.GetString("FirstName");
@@ -40,10 +44,42 @@ namespace SilverSim.Database.MySQL.UserAccounts
             info.Email = reader.GetString("Email");
             info.Created = reader.GetDate("Created");
             info.UserLevel = reader.GetInt32("UserLevel");
-            info.UserFlags = reader.GetUInt32("UserFlags");
+            info.UserFlags = reader.GetEnum<UserFlags>("UserFlags");
             info.UserTitle = reader.GetString("UserTitle");
             info.IsLocalToGrid = true;
             info.IsEverLoggedIn = reader.GetBool("IsEverLoggedIn");
+
+            gkUri = reader.GetString("LastGatekeeperURI");
+            regData = new UserRegionData
+            {
+                RegionID = reader.GetUUID("LastRegionID"),
+                Position = reader.GetVector3("LastPosition"),
+                LookAt = reader.GetVector3("LastLookAt"),
+            };
+            if(!string.IsNullOrEmpty(gkUri))
+            {
+                regData.GatekeeperURI = new URI(gkUri);
+            }
+            if(regData.RegionID != UUID.Zero)
+            {
+                info.LastRegion = regData;
+            }
+
+            gkUri = reader.GetString("HomeGatekeeperURI");
+            regData = new UserRegionData
+            {
+                RegionID = reader.GetUUID("HomeRegionID"),
+                Position = reader.GetVector3("HomePosition"),
+                LookAt = reader.GetVector3("HomeLookAt"),
+            };
+            if (!string.IsNullOrEmpty(gkUri))
+            {
+                regData.GatekeeperURI = new URI(gkUri);
+            }
+            if (regData.RegionID != UUID.Zero)
+            {
+                info.HomeRegion = regData;
+            }
 
             return info;
         }
