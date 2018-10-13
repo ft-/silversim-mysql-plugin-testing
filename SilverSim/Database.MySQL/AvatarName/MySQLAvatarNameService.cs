@@ -195,6 +195,16 @@ namespace SilverSim.Database.MySQL.AvatarName
             IsAuthoritative = true
         };
 
+        public override bool ContainsKey(UGUI input)
+        {
+            UGUI data;
+            if (TryGetValue(input.ID, out data))
+            {
+                return data.EqualsGrid(input);
+            }
+            return false;
+        }
+
         public void VerifyConnection()
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
