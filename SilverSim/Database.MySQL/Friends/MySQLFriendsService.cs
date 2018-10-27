@@ -146,7 +146,7 @@ namespace SilverSim.Database.MySQL.Friends
             }
         }
 
-        public void Remove(UUID scopeID, UUID accountID)
+        void IUserAccountDeleteServiceInterface.Remove(UUID accountID)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {

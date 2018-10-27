@@ -79,7 +79,7 @@ namespace SilverSim.Database.MySQL.MuteList
             return res;
         }
 
-        public void Remove(UUID scopeID, UUID accountID)
+        void IUserAccountDeleteServiceInterface.Remove(UUID accountID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {

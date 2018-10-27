@@ -57,7 +57,10 @@ namespace SilverSim.Database.MySQL.Maptile
             new AddColumn<byte[]>("Data") { IsLong = true },
             new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel"),
             new TableRevision(2),
-            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel", "ScopeID")
+            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel", "ScopeID"),
+            new TableRevision(3),
+            new PrimaryKeyInfo("LocX", "LocY", "ZoomLevel"),
+            new DropColumn("ScopeID")
         };
 
         public void ProcessMigrations()
@@ -82,7 +85,7 @@ namespace SilverSim.Database.MySQL.Maptile
             }
         }
 
-        public override bool TryGetValue(UUID scopeid, GridVector location, int zoomlevel, out MaptileData data)
+        public override bool TryGetValue(GridVector location, int zoomlevel, out MaptileData data)
         {
             data = default(MaptileData);
             using (var connection = new MySqlConnection(m_ConnectionString))
@@ -100,7 +103,6 @@ namespace SilverSim.Database.MySQL.Maptile
                             data = new MaptileData();
                             data.Location.X = reader.GetUInt32("LocX");
                             data.Location.Y = reader.GetUInt32("LocY");
-                            data.ScopeID = reader.GetUUID("ScopeID");
                             data.LastUpdate = reader.GetDate("LastUpdate");
                             data.ContentType = reader.GetString("ContentType");
                             data.ZoomLevel = reader.GetInt32("ZoomLevel");
@@ -122,7 +124,6 @@ namespace SilverSim.Database.MySQL.Maptile
                 {
                     ["LocX"] = data.Location.X,
                     ["LocY"] = data.Location.Y,
-                    ["ScopeID"] = data.ScopeID,
                     ["LastUpdate"] = data.LastUpdate,
                     ["ContentType"] = data.ContentType,
                     ["ZoomLevel"] = data.ZoomLevel,
@@ -132,32 +133,30 @@ namespace SilverSim.Database.MySQL.Maptile
             }
         }
 
-        public override bool Remove(UUID scopeid, GridVector location, int zoomlevel)
+        public override bool Remove(GridVector location, int zoomlevel)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel AND ScopeID = @scopeid", connection))
+                using (var cmd = new MySqlCommand("DELETE FROM maptiles WHERE LocX = @locx AND LocY = @locy AND ZoomLevel = @zoomlevel", connection))
                 {
                     cmd.Parameters.AddParameter("@locx", location.X);
                     cmd.Parameters.AddParameter("@locy", location.Y);
                     cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
-                    cmd.Parameters.AddParameter("@scopeid", scopeid);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        public override List<MaptileInfo> GetUpdateTimes(UUID scopeid, GridVector minloc, GridVector maxloc, int zoomlevel)
+        public override List<MaptileInfo> GetUpdateTimes(GridVector minloc, GridVector maxloc, int zoomlevel)
         {
             var infos = new List<MaptileInfo>();
 
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (var cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate FROM maptiles WHERE ScopeID = @scopeid AND ZoomLevel = @zoomlevel AND locX >= @locxlow AND locY >= @locylow AND locX <= @locxhigh AND locY <= @locyhigh", connection))
+                using (var cmd = new MySqlCommand("SELECT LocX, LocY, LastUpdate FROM maptiles WHERE ZoomLevel = @zoomlevel AND locX >= @locxlow AND locY >= @locylow AND locX <= @locxhigh AND locY <= @locyhigh", connection))
                 {
-                    cmd.Parameters.AddParameter("@scopeid", scopeid);
                     cmd.Parameters.AddParameter("@zoomlevel", zoomlevel);
                     cmd.Parameters.AddParameter("@locxlow", minloc.X);
                     cmd.Parameters.AddParameter("@locylow", minloc.Y);
@@ -171,7 +170,6 @@ namespace SilverSim.Database.MySQL.Maptile
                             {
                                 Location = new GridVector { X = reader.GetUInt32("LocX"), Y = reader.GetUInt32("LocY") },
                                 LastUpdate = reader.GetDate("LastUpdate"),
-                                ScopeID = scopeid,
                                 ZoomLevel = zoomlevel
                             };
                             infos.Add(info);

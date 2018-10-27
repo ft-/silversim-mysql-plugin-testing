@@ -40,7 +40,6 @@ namespace SilverSim.Database.MySQL.UserAccounts
             info.Principal.LastName = reader.GetString("LastName");
             info.Principal.HomeURI = homeURI;
             info.Principal.IsAuthoritative = true;
-            info.ScopeID = reader.GetUUID("ScopeID");
             info.Email = reader.GetString("Email");
             info.Created = reader.GetDate("Created");
             info.UserLevel = reader.GetInt32("UserLevel");
