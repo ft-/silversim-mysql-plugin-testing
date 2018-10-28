@@ -104,24 +104,26 @@ namespace SilverSim.Database.MySQL.UserSession
                     conn.Open();
                     using (var cmd = new MySqlCommand("SELECT * FROM usersessions WHERE user=@user", conn))
                     {
-                        cmd.Parameters.AddParameter("@user", user);
+                        cmd.Parameters.AddParameter("@user", new UGUI(user));
                         using (var reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
                             {
-                                UserSessionInfo info = new UserSessionInfo
+                                list.Add(new UserSessionInfo
                                 {
                                     SessionID = reader.GetUUID("sessionid"),
                                     SecureSessionID = reader.GetUUID("securesessionid"),
                                     User = reader.GetUGUI("user"),
                                     ClientIPAddress = reader.GetString("clientipaddress"),
                                     Timestamp = reader.GetDate("timestamp")
-                                };
-                                RetrieveData(conn, info);
-
-                                list.Add(info);
+                                });
                             }
                         }
+                    }
+
+                    foreach(UserSessionInfo info in list)
+                    {
+                        RetrieveData(conn, info);
                     }
                 }
                 return list;
@@ -198,7 +200,7 @@ namespace SilverSim.Database.MySQL.UserSession
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT NULL FROM usersessions WHERE user=@user LIMIT 1", conn))
                 {
-                    cmd.Parameters.AddParameter("@user", user);
+                    cmd.Parameters.AddParameter("@user", new UGUI(user));
                     using (var reader = cmd.ExecuteReader())
                     {
                         return reader.Read();
@@ -242,7 +244,7 @@ namespace SilverSim.Database.MySQL.UserSession
                     ["sessionid"] = sessionID,
                     ["securesessionid"] = secureSessionID,
                     ["clientipaddress"] = clientIPAddress,
-                    ["user"] = user,
+                    ["user"] = new UGUI(user),
                     ["timestamp"] = userSession.Timestamp
                 };
                 conn.InsertInto("usersessions", vals);
@@ -255,11 +257,25 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM usersessions WHERE sessionid=@sessionid LIMIT 1", conn))
+                return conn.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@sessionid", sessionID);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    using (var cmd = new MySqlCommand("DELETE FROM usersessiondata WHERE sessionid=@sessionid", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@sessionid", sessionID);
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (var cmd = new MySqlCommand("DELETE FROM usersessions WHERE sessionid=@sessionid", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@sessionid", sessionID);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
             }
         }
 
@@ -268,11 +284,26 @@ namespace SilverSim.Database.MySQL.UserSession
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("DELETE FROM usersessions WHERE user=@user LIMIT 1", conn))
+                return conn.InsideTransaction((transaction) =>
                 {
-                    cmd.Parameters.AddParameter("@user", user);
-                    return cmd.ExecuteNonQuery() > 0;
-                }
+                    using (var cmd = new MySqlCommand("DELETE FROM usersessiondata WHERE sessionid IN (SELECT sessionid FROM usersessions WHERE user=@user)", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@user", new UGUI(user));
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    using (var cmd = new MySqlCommand("DELETE FROM usersessions WHERE user=@user LIMIT 1", conn)
+                    {
+                        Transaction = transaction
+                    })
+                    {
+                        cmd.Parameters.AddParameter("@user", user);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                });
             }
         }
 
