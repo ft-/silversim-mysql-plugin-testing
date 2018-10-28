@@ -71,6 +71,15 @@ namespace SilverSim.Database.MySQL._Migration
             FieldNames = fieldNames;
         }
 
+        public PrimaryKeyInfo(PrimaryKeyInfo src)
+        {
+            FieldNames = new string[src.FieldNames.Length];
+            for(int i = 0; i< src.FieldNames.Length; ++i)
+            {
+                FieldNames[i] = src.FieldNames[i];
+            }
+        }
+
         public string FieldSql()
         {
             var fieldNames = new List<string>();
@@ -99,6 +108,17 @@ namespace SilverSim.Database.MySQL._Migration
         {
             Name = name;
             FieldNames = fieldNames;
+        }
+
+        public NamedKeyInfo(NamedKeyInfo src)
+        {
+            IsUnique = src.IsUnique;
+            Name = src.Name;
+            FieldNames = new string[src.FieldNames.Length];
+            for(int i = 0; i < src.FieldNames.Length; ++i)
+            {
+                FieldNames[i] = src.FieldNames[i];
+            }
         }
 
         public string FieldSql()

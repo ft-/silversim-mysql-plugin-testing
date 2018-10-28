@@ -28,7 +28,7 @@ using MySQLMigrationException = SilverSim.Database.MySQL.MySQLUtilities.MySQLMig
 
 namespace SilverSim.Database.MySQL._Migration
 {
-    public static class Migrator
+    public static partial class Migrator
     {
         static void ExecuteStatement(MySqlConnection conn, string command, ILog log)
         {
@@ -92,8 +92,9 @@ namespace SilverSim.Database.MySQL._Migration
             uint processingTableRevision = 0;
             uint currentAtRevision = 0;
             bool insideTransaction = false;
+            m_MaxAvailableMigrationRevision = 1;
 
-            if(processTable.Length == 0)
+            if (processTable.Length == 0)
             {
                 throw new MySQLMigrationException("Invalid MySQL migration");
             }
@@ -102,6 +103,7 @@ namespace SilverSim.Database.MySQL._Migration
             {
                 throw new MySQLMigrationException("First entry must be table name");
             }
+            bool skipToNext = false;
 
             foreach (IMigrationElement migration in processTable)
             {
@@ -109,7 +111,8 @@ namespace SilverSim.Database.MySQL._Migration
 
                 if (typeof(SqlTable) == migrationType)
                 {
-                    if(insideTransaction)
+                    skipToNext = false;
+                    if (insideTransaction)
                     {
                         ExecuteStatement(conn, string.Format("ALTER TABLE {0} COMMENT='{1}';", table.Name, processingTableRevision), log);
                         ExecuteStatement(conn, "COMMIT", log);
@@ -137,6 +140,20 @@ namespace SilverSim.Database.MySQL._Migration
                     selectedEngine = null;
                     currentAtRevision = conn.GetTableRevision(table.Name);
                     processingTableRevision = 1;
+                    if(currentAtRevision != 0 && m_DeleteTablesBefore)
+                    {
+                        log.Info($"Dropping table {table.Name}");
+                        ExecuteStatement(conn, $"DROP TABLE {table.Name}", log);
+                        currentAtRevision = 0;
+                    }
+                }
+                else if(skipToNext)
+                {
+                    /* skip processing */
+                    if(typeof(TableRevision) == migrationType)
+                    {
+                        m_MaxAvailableMigrationRevision = Math.Max(m_MaxAvailableMigrationRevision, ((TableRevision)migration).Revision);
+                    }
                 }
                 else if (typeof(TableRevision) == migrationType)
                 {
@@ -152,6 +169,14 @@ namespace SilverSim.Database.MySQL._Migration
                     }
 
                     var rev = (TableRevision)migration;
+                    m_MaxAvailableMigrationRevision = Math.Max(m_MaxAvailableMigrationRevision, rev.Revision);
+                    if (processingTableRevision == m_StopAtMigrationRevision)
+                    {
+                        /* advance to next table for testing */
+                        skipToNext = true;
+                        continue;
+                    }
+
                     if(rev.Revision != processingTableRevision + 1)
                     {
                         throw new MySQLMigrationException(string.Format("Invalid TableRevision entry. Expected {0}. Got {1}", processingTableRevision + 1, rev.Revision));
@@ -267,7 +292,7 @@ namespace SilverSim.Database.MySQL._Migration
                         {
                             ExecuteStatement(conn, "ALTER TABLE `" + MySqlHelper.EscapeString(table.Name) + "` DROP PRIMARY KEY;", log);
                         }
-                        primaryKey = (PrimaryKeyInfo)migration;
+                        primaryKey = new PrimaryKeyInfo((PrimaryKeyInfo)migration);
                         if (insideTransaction)
                         {
                             ExecuteStatement(conn, primaryKey.Sql(table.Name), log);
@@ -284,7 +309,7 @@ namespace SilverSim.Database.MySQL._Migration
                     else if(migrationType == typeof(NamedKeyInfo))
                     {
                         var namedKey = (NamedKeyInfo)migration;
-                        tableKeys.Add(namedKey.Name, namedKey);
+                        tableKeys.Add(namedKey.Name, new NamedKeyInfo(namedKey));
                         if (insideTransaction)
                         {
                             ExecuteStatement(conn, namedKey.Sql(table.Name), log);
