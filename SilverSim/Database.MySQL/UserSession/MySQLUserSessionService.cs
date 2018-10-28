@@ -227,7 +227,27 @@ namespace SilverSim.Database.MySQL.UserSession
 
         public override UserSessionInfo CreateSession(UGUI user, string clientIPAddress, UUID sessionID, UUID secureSessionID)
         {
-            throw new NotImplementedException();
+            UserSessionInfo userSession = new UserSessionInfo
+            {
+                SessionID = sessionID,
+                SecureSessionID = secureSessionID,
+                ClientIPAddress = clientIPAddress,
+                User = user
+            };
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                var vals = new Dictionary<string, object>
+                {
+                    ["sessionid"] = sessionID,
+                    ["securesessionid"] = secureSessionID,
+                    ["clientipaddress"] = clientIPAddress,
+                    ["user"] = user,
+                    ["timestamp"] = userSession.Timestamp
+                };
+                conn.InsertInto("usersessions", vals);
+            }
+            return userSession;
         }
 
         public override bool Remove(UUID sessionID)
