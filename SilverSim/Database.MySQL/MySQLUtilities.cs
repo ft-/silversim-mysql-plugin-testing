@@ -273,7 +273,7 @@ namespace SilverSim.Database.MySQL
             {
                 mysqlparam.AddWithValue(key, (bool)value ? 1 : 0);
             }
-            else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri))
+            else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(UEI))
             {
                 mysqlparam.AddWithValue(key, value.ToString());
             }
@@ -543,7 +543,7 @@ namespace SilverSim.Database.MySQL
                 {
                     resvals.Add((bool)value ? "1" : "0");
                 }
-                else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(string))
+                else if (t == typeof(UUID) || t == typeof(UGUI) || t == typeof(UGUIWithName) || t == typeof(UGI) || t == typeof(Uri) || t == typeof(string) || t == typeof(UEI))
                 {
                     resvals.Add("'" + MySqlHelper.EscapeString(value.ToString()) + "'");
                 }
@@ -805,6 +805,23 @@ namespace SilverSim.Database.MySQL
             }
 
             throw new InvalidCastException("GetUGI could not convert value for " + prefix);
+        }
+
+        public static UEI GetUEI(this MySqlDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            var t = v?.GetType();
+            if (t == typeof(Guid))
+            {
+                return new UEI((Guid)v);
+            }
+
+            if (t == typeof(string))
+            {
+                return new UEI((string)v);
+            }
+
+            throw new InvalidCastException("GetUEI could not convert value for " + prefix);
         }
 
         public static Date GetDate(this MySqlDataReader dbReader, string prefix)

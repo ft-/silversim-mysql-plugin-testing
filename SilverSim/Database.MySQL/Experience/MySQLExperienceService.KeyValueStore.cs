@@ -28,11 +28,11 @@ namespace SilverSim.Database.MySQL.Experience
 {
     public sealed partial class MySQLExperienceService : IExperienceKeyValueInterface
     {
-        void IExperienceKeyValueInterface.Add(UUID experienceID, string key, string value)
+        void IExperienceKeyValueInterface.Add(UEI experienceID, string key, string value)
         {
             var vals = new Dictionary<string, object>
             {
-                ["ExperienceID"] = experienceID,
+                ["ExperienceID"] = experienceID.ID,
                 ["Key"] = key,
                 ["Value"] = value
             };
@@ -44,7 +44,7 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        bool IExperienceKeyValueInterface.GetDatasize(UUID experienceID, out int used, out int quota)
+        bool IExperienceKeyValueInterface.GetDatasize(UEI experienceID, out int used, out int quota)
         {
             used = 0;
             quota = -1;
@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.Experience
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid", conn))
                 {
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
@@ -66,7 +66,7 @@ namespace SilverSim.Database.MySQL.Experience
             return true;
         }
 
-        List<string> IExperienceKeyValueInterface.GetKeys(UUID experienceID)
+        List<string> IExperienceKeyValueInterface.GetKeys(UEI experienceID)
         {
             var result = new List<string>();
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -74,7 +74,7 @@ namespace SilverSim.Database.MySQL.Experience
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT `Key` FROM experiencekeyvalues WHERE ExperienceID = @experienceid", conn))
                 {
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while(reader.Read())
@@ -87,25 +87,25 @@ namespace SilverSim.Database.MySQL.Experience
             return result;
         }
 
-        bool IExperienceKeyValueInterface.Remove(UUID experienceID, string key)
+        bool IExperienceKeyValueInterface.Remove(UEI experienceID, string key)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand("DELETE FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key", conn))
                 {
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     cmd.Parameters.AddParameter("@key", key);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        void IExperienceKeyValueInterface.Store(UUID experienceID, string key, string value)
+        void IExperienceKeyValueInterface.Store(UEI experienceID, string key, string value)
         {
             var vals = new Dictionary<string, object>
             {
-                ["ExperienceID"] = experienceID,
+                ["ExperienceID"] = experienceID.ID,
                 ["Key"] = key,
                 ["Value"] = value
             };
@@ -116,7 +116,7 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        bool IExperienceKeyValueInterface.StoreOnlyIfEqualOrig(UUID experienceID, string key, string value, string orig_value)
+        bool IExperienceKeyValueInterface.StoreOnlyIfEqualOrig(UEI experienceID, string key, string value, string orig_value)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -128,7 +128,7 @@ namespace SilverSim.Database.MySQL.Experience
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", experienceID);
+                        cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                         cmd.Parameters.AddParameter("@key", key);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -141,7 +141,7 @@ namespace SilverSim.Database.MySQL.Experience
 
                     var vals = new Dictionary<string, object>
                     {
-                        ["ExperienceID"] = experienceID,
+                        ["ExperienceID"] = experienceID.ID,
                         ["Key"] = key,
                         ["Value"] = value
                     };
@@ -152,14 +152,14 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        bool IExperienceKeyValueInterface.TryGetValue(UUID experienceID, string key, out string val)
+        bool IExperienceKeyValueInterface.TryGetValue(UEI experienceID, string key, out string val)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT `Value` FROM experiencekeyvalues WHERE ExperienceID = @experienceid AND `Key` = @key LIMIT 1", conn))
                 {
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     cmd.Parameters.AddParameter("@key", key);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {

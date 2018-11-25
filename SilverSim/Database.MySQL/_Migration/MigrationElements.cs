@@ -179,7 +179,7 @@ namespace SilverSim.Database.MySQL._Migration
                     (colInfo.IsLong ? "LONGTEXT" : "TEXT") :
                     (colInfo.IsFixed ? "CHAR" : "VARCHAR") + "(" + colInfo.Cardinality.ToString() + ")";
             }
-            else if (f == typeof(UGUI) || f == typeof(UGUIWithName) || f == typeof(UGI))
+            else if (f == typeof(UGUI) || f == typeof(UGUIWithName) || f == typeof(UGI) || f == typeof(UEI))
             {
                 typeSql = "VARCHAR(255)";
             }
@@ -436,7 +436,9 @@ namespace SilverSim.Database.MySQL._Migration
                     !(colInfo.Default.GetType() == typeof(UUID) &&
                     colInfo.FieldType == typeof(UGUIWithName)) &&
                     !(colInfo.Default.GetType() == typeof(UUID) &&
-                    colInfo.FieldType == typeof(UGI)))
+                    colInfo.FieldType == typeof(UGI)) &&
+                    !(colInfo.Default.GetType() == typeof(UUID) &&
+                    colInfo.FieldType == typeof(UEI)))
                 {
                     throw new ArgumentOutOfRangeException("Default does not match expected type in field " + colInfo.Name + " target type=" + colInfo.FieldType.FullName + " defaultType=" + colInfo.Default.GetType().FullName);
                 }

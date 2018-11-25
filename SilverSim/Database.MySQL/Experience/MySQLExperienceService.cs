@@ -40,8 +40,7 @@ namespace SilverSim.Database.MySQL.Experience
     {
         public static ExperienceInfo ToExperienceInfo(this MySqlDataReader reader) => new ExperienceInfo
         {
-            ID = reader.GetUUID("ID"),
-            Name = reader.GetString("Name"),
+            ID = new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI")),
             Description = reader.GetString("Description"),
             Properties = reader.GetEnum<ExperiencePropertyFlags>("Properties"),
             Owner = reader.GetUGUI("Owner"),
@@ -79,18 +78,21 @@ namespace SilverSim.Database.MySQL.Experience
 
         public override void Add(ExperienceInfo info)
         {
-            var vals = new Dictionary<string, object>();
-            vals.Add("ID", info.ID);
-            vals.Add("Name", info.Name);
-            vals.Add("Description", info.Description);
-            vals.Add("Properties", info.Properties);
-            vals.Add("Owner", info.Owner);
-            vals.Add("Creator", info.Creator);
-            vals.Add("Group", info.Group);
-            vals.Add("Maturity", info.Maturity);
-            vals.Add("Marketplace", info.Marketplace);
-            vals.Add("LogoID", info.LogoID);
-            vals.Add("SlUrl", info.SlUrl);
+            var vals = new Dictionary<string, object>
+            {
+                { "ID", info.ID.ID },
+                { "Name", info.ID.ExperienceName },
+                { "HomeURI", info.ID.HomeURI },
+                { "Description", info.Description },
+                { "Properties", info.Properties },
+                { "Owner", info.Owner },
+                { "Creator", info.Creator },
+                { "Group", info.Group },
+                { "Maturity", info.Maturity },
+                { "Marketplace", info.Marketplace },
+                { "LogoID", info.LogoID },
+                { "SlUrl", info.SlUrl }
+            };
 
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -99,20 +101,20 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        public override List<UUID> FindExperienceByName(string query)
+        public override List<UEI> FindExperienceByName(string query)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT ID FROM experiences WHERE Name LIKE @name", conn))
+                using (var cmd = new MySqlCommand("SELECT ID, Name, HomeURI FROM experiences WHERE Name LIKE @name", conn))
                 {
                     cmd.Parameters.AddParameter("@name", "%" + query + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            result.Add(reader.GetUUID("ID"));
+                            result.Add(new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI")));
                         }
                     }
                 }
@@ -141,13 +143,13 @@ namespace SilverSim.Database.MySQL.Experience
             return result;
         }
 
-        public override List<UUID> GetCreatorExperiences(UGUI creator)
+        public override List<UEI> GetCreatorExperiences(UGUI creator)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Creator, ID FROM experiences WHERE Creator LIKE @creator", conn))
+                using (var cmd = new MySqlCommand("SELECT Creator, ID, Name, HomeURI FROM experiences WHERE Creator LIKE @creator", conn))
                 {
                     cmd.Parameters.AddParameter("@creator", creator.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -156,7 +158,7 @@ namespace SilverSim.Database.MySQL.Experience
                         {
                             if (reader.GetUGUI("Creator").EqualsGrid(creator))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -165,13 +167,13 @@ namespace SilverSim.Database.MySQL.Experience
             return result;
         }
 
-        public override List<UUID> GetGroupExperiences(UGI group)
+        public override List<UEI> GetGroupExperiences(UGI group)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Group, ID FROM experiences WHERE Group LIKE @group LIMIT 1", conn))
+                using (var cmd = new MySqlCommand("SELECT Group, ID, Name, HomeURI FROM experiences WHERE Group LIKE @group LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@group", group.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -180,7 +182,7 @@ namespace SilverSim.Database.MySQL.Experience
                         {
                             if (reader.GetUGI("Group").Equals(group))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -189,13 +191,13 @@ namespace SilverSim.Database.MySQL.Experience
             return result;
         }
 
-        public override List<UUID> GetOwnerExperiences(UGUI owner)
+        public override List<UEI> GetOwnerExperiences(UGUI owner)
         {
-            var result = new List<UUID>();
+            var result = new List<UEI>();
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (var cmd = new MySqlCommand("SELECT Owner, ID FROM experiences WHERE Owner LIKE @owner", conn))
+                using (var cmd = new MySqlCommand("SELECT Owner, ID, Name, HomeURI FROM experiences WHERE Owner LIKE @owner", conn))
                 {
                     cmd.Parameters.AddParameter("@owner", owner.ID.ToString() + "%");
                     using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -204,7 +206,7 @@ namespace SilverSim.Database.MySQL.Experience
                         {
                             if (reader.GetUGUI("Owner").EqualsGrid(owner))
                             {
-                                result.Add(reader.GetUUID("ID"));
+                                result.Add(new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI")));
                             }
                         }
                     }
@@ -214,7 +216,7 @@ namespace SilverSim.Database.MySQL.Experience
         }
 
         private static readonly string[] m_RemoveFromTables = new string[] { "experiencekeyvalues", "experienceadmins", "experienceusers" };
-        public override bool Remove(UGUI requestingAgent, UUID id)
+        public override bool Remove(UGUI requestingAgent, UEI id)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -226,7 +228,7 @@ namespace SilverSim.Database.MySQL.Experience
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", id);
+                        cmd.Parameters.AddParameter("@experienceid", id.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (!reader.Read())
@@ -248,7 +250,7 @@ namespace SilverSim.Database.MySQL.Experience
                             Transaction = transaction
                         })
                         {
-                            cmd.Parameters.AddParameter("@experienceid", id);
+                            cmd.Parameters.AddParameter("@experienceid", id.ID);
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -258,7 +260,7 @@ namespace SilverSim.Database.MySQL.Experience
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", id);
+                        cmd.Parameters.AddParameter("@experienceid", id.ID);
                         return cmd.ExecuteNonQuery() > 0;
                     }
                 });
@@ -283,7 +285,29 @@ namespace SilverSim.Database.MySQL.Experience
             }
         }
 
-        public override bool TryGetValue(UUID experienceID, out ExperienceInfo experienceInfo)
+        public override bool TryGetValue(UUID experienceID, out UEI uei)
+        {
+            using (var conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (var cmd = new MySqlCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
+                {
+                    cmd.Parameters.AddParameter("@id", experienceID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            uei = new UEI(reader.GetUUID("ID"), reader.GetString("Name"), reader.GetUri("HomeURI"));
+                            return true;
+                        }
+                    }
+                }
+            }
+            uei = default(UEI);
+            return false;
+        }
+
+        public override bool TryGetValue(UEI experienceID, out ExperienceInfo experienceInfo)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -307,16 +331,19 @@ namespace SilverSim.Database.MySQL.Experience
 
         public override void Update(UGUI requestingAgent, ExperienceInfo info)
         {
-            var vals = new Dictionary<string, object>();
-            vals.Add("Name", info.Name);
-            vals.Add("Description", info.Description);
-            vals.Add("Properties", info.Properties);
-            vals.Add("Owner", info.Owner);
-            vals.Add("Group", info.Group);
-            vals.Add("Maturity", info.Maturity);
-            vals.Add("Marketplace", info.Marketplace);
-            vals.Add("LogoID", info.LogoID);
-            vals.Add("SlUrl", info.SlUrl);
+            var vals = new Dictionary<string, object>
+            {
+                { "Name", info.ID.ExperienceName },
+                { "HomeURI", info.ID.HomeURI },
+                { "Description", info.Description },
+                { "Properties", info.Properties },
+                { "Owner", info.Owner },
+                { "Group", info.Group },
+                { "Maturity", info.Maturity },
+                { "Marketplace", info.Marketplace },
+                { "LogoID", info.LogoID },
+                { "SlUrl", info.SlUrl }
+            };
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
@@ -328,7 +355,7 @@ namespace SilverSim.Database.MySQL.Experience
                         Transaction = transaction
                     })
                     {
-                        cmd.Parameters.AddParameter("@experienceid", info.ID);
+                        cmd.Parameters.AddParameter("@experienceid", info.ID.ID);
                         cmd.Parameters.AddParameter("@admin", requestingAgent.ID.ToString() + "%");
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -348,7 +375,7 @@ namespace SilverSim.Database.MySQL.Experience
                             Transaction = transaction
                         })
                         {
-                            cmd.Parameters.AddParameter("@id", info.ID);
+                            cmd.Parameters.AddParameter("@id", info.ID.ID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if (reader.Read())
@@ -362,7 +389,7 @@ namespace SilverSim.Database.MySQL.Experience
                     {
                         throw new InvalidOperationException("requesting agent is not allowed to edit experience");
                     }
-                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ToString() + "\"", transaction);
+                    conn.UpdateSet("experiences", vals, "ID = \"" + info.ID.ID.ToString() + "\"", transaction);
                 });
             }
         }
@@ -400,6 +427,8 @@ namespace SilverSim.Database.MySQL.Experience
             new AddColumn<string>("SlUrl") {IsNullAllowed = false, Cardinality = 255, Default = string.Empty },
             new PrimaryKeyInfo("ID"),
             new NamedKeyInfo("NameKey", "Name"),
+            new TableRevision(2),
+            new AddColumn<Uri>("HomeURI"),
 
             new SqlTable("experienceadmins"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
