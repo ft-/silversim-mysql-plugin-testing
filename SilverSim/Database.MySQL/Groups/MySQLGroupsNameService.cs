@@ -76,7 +76,10 @@ namespace SilverSim.Database.MySQL.Groups
         }
 
         private static UGI ToUGI(MySqlDataReader dbReader) =>
-            new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"));
+            new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"))
+            {
+                AuthorizationToken = dbReader.GetBytesOrNull("AuthorizationData")
+            };
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)
         {
@@ -107,13 +110,17 @@ namespace SilverSim.Database.MySQL.Groups
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (@groupID, @homeURI, @groupName)", connection))
+                Dictionary<string, object> vars = new Dictionary<string, object>
                 {
-                    cmd.Parameters.AddParameter("@groupID", group.ID);
-                    cmd.Parameters.AddParameter("@homeURI", group.HomeURI);
-                    cmd.Parameters.AddParameter("@groupName", group.GroupName);
-                    cmd.ExecuteNonQuery();
+                    { "GroupID", group.ID },
+                    { "HomeURI", group.HomeURI },
+                    { "GroupName", group.GroupName }
+                };
+                if (group.AuthorizationToken != null)
+                {
+                    vars.Add("AuthorizationData", group.AuthorizationToken);
                 }
+                connection.ReplaceInto("groupnames", vars);
             }
         }
         #endregion
@@ -146,6 +153,8 @@ namespace SilverSim.Database.MySQL.Groups
             /* some corrections when revision 1 is found */
             new ChangeColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new ChangeColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
+            new TableRevision(3),
+            new AddColumn<byte[]>("AuthorizationData"),
         };
     }
 }

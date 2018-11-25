@@ -885,6 +885,17 @@ namespace SilverSim.Database.MySQL
             return (byte[])o;
         }
 
+        public static byte[] GetBytesOrNull(this MySqlDataReader dbReader, string prefix)
+        {
+            object o = dbReader[prefix];
+            var t = o?.GetType();
+            if (t == typeof(DBNull))
+            {
+                return null;
+            }
+            return (byte[])o;
+        }
+
         public static Uri GetUri(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
