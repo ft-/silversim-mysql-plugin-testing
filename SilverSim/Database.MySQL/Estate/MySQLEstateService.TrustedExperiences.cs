@@ -28,11 +28,11 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public sealed partial class MySQLEstateService : IEstateTrustedExperienceServiceInterface
     {
-        List<UUID> IEstateTrustedExperienceServiceInterface.this[uint estateID]
+        List<UEI> IEstateTrustedExperienceServiceInterface.this[uint estateID]
         {
             get
             {
-                var result = new List<UUID>();
+                var result = new List<UEI>();
                 using (var conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
@@ -43,7 +43,7 @@ namespace SilverSim.Database.MySQL.Estate
                         {
                             while(reader.Read())
                             {
-                                result.Add(reader.GetUUID("ExperienceID"));
+                                result.Add(new UEI(reader.GetUUID("ExperienceID")));
                             }
                         }
                     }
@@ -52,7 +52,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        bool IEstateTrustedExperienceServiceInterface.this[uint estateID, UUID experienceID]
+        bool IEstateTrustedExperienceServiceInterface.this[uint estateID, UEI experienceID]
         {
             get
             {
@@ -68,7 +68,7 @@ namespace SilverSim.Database.MySQL.Estate
                     var vals = new Dictionary<string, object>
                     {
                         ["EstateID"] = estateID,
-                        ["ExperienceID"] = experienceID
+                        ["ExperienceID"] = experienceID.ID
                     };
                     using (var conn = new MySqlConnection(m_ConnectionString))
                     {
@@ -83,7 +83,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        bool IEstateTrustedExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
+        bool IEstateTrustedExperienceServiceInterface.Remove(uint estateID, UEI experienceID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -91,19 +91,20 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var cmd = new MySqlCommand("DELETE FROM estatetrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
         }
 
-        bool IEstateTrustedExperienceServiceInterface.TryGetValue(uint estateID, UUID experienceID, out bool trusted)
+        bool IEstateTrustedExperienceServiceInterface.TryGetValue(uint estateID, UEI experienceID, out bool trusted)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT NULL FROM estatetrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
+                    cmd.Parameters.AddParameter("experienceid", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         trusted = reader.Read();

@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Estate
                                 result.Add(new EstateExperienceInfo
                                 {
                                     EstateID = reader.GetUInt32("EstateID"),
-                                    ExperienceID = reader.GetUUID("ExperienceID"),
+                                    ExperienceID = new UEI(reader.GetUUID("ExperienceID")),
                                     IsAllowed = reader.GetBool("IsAllowed")
                                 });
                             }
@@ -58,7 +58,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        bool IEstateExperienceServiceInterface.Remove(uint estateID, UUID experienceID)
+        bool IEstateExperienceServiceInterface.Remove(uint estateID, UEI experienceID)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -66,7 +66,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var cmd = new MySqlCommand("DELETE FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     return cmd.ExecuteNonQuery() > 0;
                 }
             }
@@ -77,7 +77,7 @@ namespace SilverSim.Database.MySQL.Estate
             var vals = new Dictionary<string, object>
             {
                 ["EstateID"] = info.EstateID,
-                ["ExperienceID"] = info.ExperienceID,
+                ["ExperienceID"] = info.ExperienceID.ID,
                 ["IsAllowed"] = info.IsAllowed
             };
             using (var conn = new MySqlConnection(m_ConnectionString))
@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UUID experienceID, out EstateExperienceInfo info)
+        bool IEstateExperienceServiceInterface.TryGetValue(uint estateID, UEI experienceID, out EstateExperienceInfo info)
         {
             using (var conn = new MySqlConnection(m_ConnectionString))
             {
@@ -95,7 +95,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (var cmd = new MySqlCommand("SELECT * FROM estateexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid LIMIT 1", conn))
                 {
                     cmd.Parameters.AddParameter("@estateid", estateID);
-                    cmd.Parameters.AddParameter("@experienceid", experienceID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
