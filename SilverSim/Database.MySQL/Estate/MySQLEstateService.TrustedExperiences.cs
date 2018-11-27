@@ -104,7 +104,8 @@ namespace SilverSim.Database.MySQL.Estate
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT NULL FROM estatetrustedexperiences WHERE EstateID = @estateid AND ExperienceID = @experienceid", conn))
                 {
-                    cmd.Parameters.AddParameter("experienceid", experienceID.ID);
+                    cmd.Parameters.AddParameter("@estateid", estateID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         trusted = reader.Read();
