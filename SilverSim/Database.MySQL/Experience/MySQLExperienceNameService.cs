@@ -25,22 +25,22 @@ using Nini.Config;
 using SilverSim.Database.MySQL._Migration;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Experience;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace SilverSim.Database.MySQL.Groups
+namespace SilverSim.Database.MySQL.Experience
 {
-    [Description("MySQL GroupsName Backend")]
-    [PluginName("GroupNames")]
-    public sealed class MySQLGroupsNameService : GroupsNameServiceInterface, IDBServiceInterface, IPlugin
+    [Description("MySQL ExperienceName Backend")]
+    [PluginName("ExperienceNames")]
+    public sealed class MySQLExperienceNameService : ExperienceNameServiceInterface, IDBServiceInterface, IPlugin
     {
         private readonly string m_ConnectionString;
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL EXPERIENCE NAMES SERVICE");
 
         #region Constructor
-        public MySQLGroupsNameService(IConfig ownSection)
+        public MySQLExperienceNameService(IConfig ownSection)
         {
             m_ConnectionString = MySQLUtilities.BuildConnectionString(ownSection, m_Log);
         }
@@ -52,59 +52,59 @@ namespace SilverSim.Database.MySQL.Groups
         #endregion
 
         #region Accessors
-        public override bool TryGetValue(UUID groupID, out UGI ugi)
+        public override bool TryGetValue(UUID experienceID, out UEI uei)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID = @groupid LIMIT 1", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM experiencenames WHERE ExperienceID = @experienceid LIMIT 1", connection))
                 {
-                    cmd.Parameters.AddParameter("@groupid", groupID);
+                    cmd.Parameters.AddParameter("@experienceid", experienceID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
                         {
-                            ugi = ToUGI(dbReader);
+                            uei = ToUEI(dbReader);
                             return true;
                         }
                     }
                 }
             }
-            ugi = default(UGI);
+            uei = default(UEI);
             return false;
         }
 
-        private static UGI ToUGI(MySqlDataReader dbReader) =>
-            new UGI(dbReader.GetUUID("GroupID"), dbReader.GetString("GroupName"), dbReader.GetUri("HomeURI"))
+        private static UEI ToUEI(MySqlDataReader dbReader) =>
+            new UEI(dbReader.GetUUID("ExperienceID"), dbReader.GetString("ExperienceName"), dbReader.GetUri("HomeURI"))
             {
                 AuthorizationToken = dbReader.GetBytesOrNull("AuthorizationData")
             };
 
-        public override List<UGI> GetGroupsByName(string groupName, int limit)
+        public override List<UEI> GetExperiencesByName(string experienceName, int limit)
         {
-            var groups = new List<UGI>();
+            var experiences = new List<UEI>();
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
 
-                using (var cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupName = @groupName LIMIT @limit", connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM experiencenames WHERE ExperienceName = @experienceName LIMIT @limit", connection))
                 {
-                    cmd.Parameters.AddParameter("@groupName", groupName);
+                    cmd.Parameters.AddParameter("@experienceName", experienceName);
                     cmd.Parameters.AddParameter("@limit", limit);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        while(dbReader.Read())
+                        while (dbReader.Read())
                         {
-                            groups.Add(ToUGI(dbReader));
+                            experiences.Add(ToUEI(dbReader));
                         }
                     }
                 }
             }
-            return groups;
+            return experiences;
         }
 
-        public override void Store(UGI group)
+        public override void Store(UEI experience)
         {
             using (var connection = new MySqlConnection(m_ConnectionString))
             {
@@ -112,15 +112,15 @@ namespace SilverSim.Database.MySQL.Groups
 
                 Dictionary<string, object> vars = new Dictionary<string, object>
                 {
-                    { "GroupID", group.ID },
-                    { "HomeURI", group.HomeURI },
-                    { "GroupName", group.GroupName }
+                    { "ExperienceID", experience.ID },
+                    { "HomeURI", experience.HomeURI },
+                    { "ExperienceName", experience.ExperienceName }
                 };
-                if (group.AuthorizationToken != null)
+                if (experience.AuthorizationToken != null)
                 {
-                    vars.Add("AuthorizationData", group.AuthorizationToken);
+                    vars.Add("AuthorizationData", experience.AuthorizationToken);
                 }
-                connection.ReplaceInto("groupnames", vars);
+                connection.ReplaceInto("experiencenames", vars);
             }
         }
         #endregion
@@ -144,19 +144,12 @@ namespace SilverSim.Database.MySQL.Groups
 
         private static readonly IMigrationElement[] Migrations = new IMigrationElement[]
         {
-            new SqlTable("groupnames"),
-            new AddColumn<UUID>("GroupID") { IsNullAllowed = false, Default = UUID.Zero },
+            new SqlTable("experiencenames"),
+            new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false, Default = UUID.Zero },
             new AddColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new AddColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new PrimaryKeyInfo("GroupID", "HomeURI"),
-            new TableRevision(2),
-            /* some corrections when revision 1 is found */
-            new ChangeColumn<string>("HomeURI") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new ChangeColumn<string>("GroupName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
-            new TableRevision(3),
+            new AddColumn<string>("ExperienceName") { Cardinality = 255, IsNullAllowed = false, Default = string.Empty },
             new AddColumn<byte[]>("AuthorizationData"),
-            new TableRevision(4),
-            new PrimaryKeyInfo("GroupID"),
+            new PrimaryKeyInfo("ExperienceID"),
         };
     }
 }
