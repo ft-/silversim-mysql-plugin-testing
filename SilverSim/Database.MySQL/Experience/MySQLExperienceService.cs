@@ -428,7 +428,7 @@ namespace SilverSim.Database.MySQL.Experience
             new PrimaryKeyInfo("ID"),
             new NamedKeyInfo("NameKey", "Name"),
             new TableRevision(2),
-            new AddColumn<Uri>("HomeURI"),
+            new AddColumn<string>("HomeURI"),
 
             new SqlTable("experienceadmins"),
             new AddColumn<UUID>("ExperienceID") { IsNullAllowed = false },
