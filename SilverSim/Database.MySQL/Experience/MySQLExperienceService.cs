@@ -314,7 +314,7 @@ namespace SilverSim.Database.MySQL.Experience
                 conn.Open();
                 using (var cmd = new MySqlCommand("SELECT * FROM experiences WHERE ID = @id LIMIT 1", conn))
                 {
-                    cmd.Parameters.AddParameter("@id", experienceID);
+                    cmd.Parameters.AddParameter("@id", experienceID.ID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if(reader.Read())
