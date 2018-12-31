@@ -217,6 +217,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             new DropColumn("Slice"),
             new TableRevision(28),
             new PrimaryKeyInfo("RegionID", "ID"),
+            new TableRevision(29),
+            new AddColumn<byte[]>("AnimationData"),
             #endregion
 
             #region Table primitems
