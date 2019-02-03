@@ -184,7 +184,6 @@ namespace SilverSim.Database.MySQL.Inventory
                 UUID assetID;
                 connection.InsideTransaction((transaction) =>
                 {
-
                     using (var cmd = new MySqlCommand("SELECT `AssetID`, `Flags`,`AssetType` FROM " + m_InventoryItemTable + " WHERE OwnerID = @ownerid AND ID = @itemid LIMIT 1", connection)
                     {
                         Transaction = transaction
